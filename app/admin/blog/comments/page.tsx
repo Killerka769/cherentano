@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -22,7 +22,7 @@ interface Comment {
   };
 }
 
-export default function AdminCommentsPage() {
+function AdminCommentsContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -158,5 +158,13 @@ export default function AdminCommentsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminCommentsPage() {
+  return (
+    <Suspense fallback={<div className={styles.loader}>Загрузка...</div>}>
+      <AdminCommentsContent />
+    </Suspense>
   );
 }
