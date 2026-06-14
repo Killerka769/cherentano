@@ -142,8 +142,6 @@ export default function DishCard({ dish }: DishCardProps) {
             src={dish.imageUrl || ''}
             alt={dish.name}
             className={styles.image}
-            width={300}
-            height={200}
             fallback="dish"
           />
           {dish.weight && (

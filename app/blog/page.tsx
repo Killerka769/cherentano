@@ -133,8 +133,6 @@ export default function BlogPage() {
                       src={post.imageUrl || ''}
                       alt={post.title}
                       className={styles.image}
-                      width={350}
-                      height={220}
                       fallback="blog"
                     />
                     <span className={styles.category}>{post.category.name}</span>
