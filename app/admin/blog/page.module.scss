@@ -1,0 +1,266 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 20px;
+  border-radius: 40px;
+  background: var(--card-bg);
+  border: 1px solid $border-light;
+  cursor: pointer;
+  transition: all $transition-fast;
+  color: var(--text-primary);
+  
+  &:hover {
+    border-color: $primary;
+  }
+  
+  &.active {
+    background: $primary;
+    color: white;
+    border-color: $primary;
+  }
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: $shadow-sm;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+  }
+  
+  th {
+    background: $bg-light;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  tr:hover {
+    background: $bg-light;
+  }
+}
+
+.titleCell {
+  .postTitle {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  
+  .postSlug {
+    font-size: 0.7rem;
+    color: $text-gray;
+  }
+}
+
+.commentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: $primary;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  
+  &.published {
+    background: #e8f5e9;
+    color: #4caf50;
+  }
+  
+  &.draft {
+    background: #fff3e0;
+    color: #ff9800;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editBtn, .publishBtn, .deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $bg-light;
+  }
+}
+
+.editBtn {
+  color: $primary;
+}
+
+.publishBtn {
+  color: $primary;
+}
+
+.deleteBtn {
+  color: $error;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: var(--card-bg);
+  border-radius: 24px;
+  max-width: 400px;
+  width: 90%;
+  padding: 28px;
+  
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 24px;
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.dangerBtn {
+  flex: 1;
+  background: $error;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 10px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+  
+  svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+.emptyBtn {
+  display: inline-block;
+  margin-top: 16px;
+  background: $primary;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 40px;
+  text-decoration: none;
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}

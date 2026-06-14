@@ -1,0 +1,137 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: $text-gray;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-bottom: 40px;
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+    color: $primary;
+  }
+  
+  p {
+    line-height: 1.7;
+    margin-bottom: 16px;
+    color: $text-dark;
+  }
+  
+  ul {
+    list-style: none;
+    padding-left: 0;
+    
+    li {
+      padding: 8px 0;
+      font-size: 1rem;
+    }
+  }
+}
+
+.faq {
+  margin-top: 20px;
+}
+
+.faqItem {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: $bg-light;
+  border-radius: 16px;
+  
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: $text-dark;
+  }
+  
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.seoText {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid $border-light;
+  
+  h2 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    font-size: 0.85rem;
+    color: $text-gray;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+}
+.cuisineGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 20px 0;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .cuisineCard {
+    background: $bg-light;
+    border-radius: 20px;
+    padding: 20px;
+    
+    h3 {
+      color: $primary;
+      margin-bottom: 16px;
+      font-size: 1.2rem;
+    }
+    
+    ul {
+      list-style: none;
+      padding-left: 0;
+      
+      li {
+        padding: 6px 0;
+        font-size: 0.9rem;
+        
+        &::before {
+          content: '•';
+          color: $primary;
+          font-weight: bold;
+          display: inline-block;
+          width: 20px;
+        }
+      }
+    }
+  }

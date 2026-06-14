@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.features {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, white 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  @include container;
+  position: relative;
+  z-index: 2;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.sectionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(196, 73, 44, 0.1);
+  color: $primary;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.card {
+  text-align: center;
+  padding: 32px 24px;
+  background: white;
+  border-radius: 28px;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+}
+
+.icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  .card:hover & {
+    transform: scale(1.05) rotate(5deg);
+  }
+}
+
+.cardTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.cardDesc {
+  color: $text-gray;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.trustBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, $primary, $secondary);
+  border-radius: 60px;
+  color: white;
+  font-weight: 600;
+  width: fit-content;
+  margin: 0 auto;
+  box-shadow: $shadow-md;
+}

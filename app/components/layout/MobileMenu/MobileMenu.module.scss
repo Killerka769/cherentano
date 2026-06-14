@@ -1,0 +1,288 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Кнопка бургера
+.burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: $text-dark;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  z-index: 10;
+  
+  &:hover {
+    background: $bg-light;
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  @media (max-width: 767px) {
+    display: flex;
+  }
+}
+
+// Оверлей
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Дровер - на всю высоту экрана!
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 85%;
+  max-width: 380px;
+  background: white;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  height: 100vh;
+  overflow: hidden;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// Шапка дровера
+.drawerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 20px;
+  background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+  flex-shrink: 0;
+}
+
+.logo {
+  text-align: left;
+}
+
+.logoText {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.logoSub {
+  display: block;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 4px;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// Контент дровера - с прокруткой!
+.drawerContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  
+  // Кастомный скроллбар
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $border-light;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 4px;
+  }
+}
+
+// Секции навигации
+.navSection {
+  padding: 20px;
+  border-bottom: 8px solid $bg-light;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.sectionTitle {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: $text-gray;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+// Ссылки в меню
+.drawerLink {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: $text-dark;
+  text-decoration: none;
+  border-bottom: 1px solid $border-light;
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  margin: 0 4px;
+  
+  &:hover {
+    color: $primary;
+    background: $bg-light;
+    padding-left: 16px;
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.linkIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  color: $primary;
+}
+
+// Кнопка выхода
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: calc(100% - 8px);
+  margin: 0 4px;
+  padding: 14px 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: $error;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(244, 67, 54, 0.1);
+    padding-left: 16px;
+  }
+}
+
+// Футер
+.drawerFooter {
+  padding: 20px;
+  background: $bg-light;
+  border-top: 1px solid $border-light;
+  flex-shrink: 0;
+}
+
+.phoneLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: $primary;
+  color: white;
+  text-decoration: none;
+  padding: 14px 16px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.address {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: $text-gray;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  padding: 10px;
+  background: white;
+  border-radius: 12px;
+}
+
+.hours {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: $text-gray;
+  padding: 10px;
+  background: white;
+  border-radius: 12px;
+}

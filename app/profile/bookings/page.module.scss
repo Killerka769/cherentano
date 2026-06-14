@@ -1,0 +1,198 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+  min-height: calc(100vh - 200px);
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  
+  svg {
+    color: $primary;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
+}
+
+.bookingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bookingCard {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.tableInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tableNumber {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.tableSeats {
+  font-size: 0.75rem;
+  color: $text-gray;
+  background: $bg-light;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.cardBody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: $text-gray;
+}
+
+.comment {
+  background: $bg-light;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.createdAt {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid $error;
+  color: $error;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $error;
+    color: white;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 32px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 20px;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 28px;
+  }
+}
+
+.bookBtn {
+  display: inline-block;
+  background: $primary;
+  color: white;
+  padding: 12px 32px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px 0;
+  color: $text-gray;
+}

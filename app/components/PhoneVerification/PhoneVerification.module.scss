@@ -1,0 +1,119 @@
+@use '../../styles/variables' as *;
+
+.verification {
+  background: #fff3e0;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ff9800;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.requestBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.codeForm {
+  .codeInput {
+    display: flex;
+    gap: 12px;
+    
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid $border-light;
+      border-radius: 12px;
+      font-size: 1rem;
+      text-align: center;
+      letter-spacing: 4px;
+      
+      &:focus {
+        outline: none;
+        border-color: $primary;
+      }
+    }
+    
+    button {
+      background: $primary;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      
+      &:hover:not(:disabled) {
+        background: $primary-dark;
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+      }
+    }
+  }
+  
+  .resend {
+    margin-top: 12px;
+    text-align: center;
+    
+    button {
+      background: none;
+      border: none;
+      color: $primary;
+      cursor: pointer;
+      font-size: 0.85rem;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    
+    span {
+      font-size: 0.8rem;
+      color: $text-gray;
+    }
+  }
+}
+
+.verified {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e8f5e9;
+  color: #4caf50;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.error {
+  margin-top: 12px;
+  color: $error;
+  font-size: 0.8rem;
+  text-align: center;
+}

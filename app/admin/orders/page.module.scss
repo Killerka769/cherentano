@@ -1,0 +1,485 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 40px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+  
+  .statValue {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: $primary;
+    display: block;
+  }
+  
+  .statLabel {
+    font-size: 0.85rem;
+    color: $text-gray;
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid $border-light;
+  
+  button {
+    padding: 8px 20px;
+    border-radius: 30px;
+    background: white;
+    border: 1px solid $border-light;
+    cursor: pointer;
+    transition: all $transition-fast;
+    
+    &:hover {
+      border-color: $primary;
+    }
+    
+    &.active {
+      background: $primary;
+      color: white;
+      border-color: $primary;
+    }
+  }
+}
+
+.ordersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.orderCard {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  box-shadow: $shadow-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.orderId {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.orderTime {
+  font-size: 0.75rem;
+  color: $text-gray;
+  margin-left: 12px;
+}
+
+.orderStatus {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.orderInfo {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.orderItems {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: $bg-light;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  
+  div {
+    margin-bottom: 4px;
+  }
+}
+
+.orderFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.orderTotal {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: $primary;
+}
+
+.orderActions {
+  display: flex;
+  gap: 8px;
+}
+
+.detailBtn, .callBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all $transition-fast;
+  color: $text-gray;
+  
+  &:hover {
+    background: $bg-light;
+    color: $primary;
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 24px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-light;
+  position: sticky;
+  top: 0;
+  background: white;
+  
+  h2, h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: $text-gray;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.modalBody {
+  padding: 20px;
+  
+  h3 {
+    font-size: 1rem;
+    margin: 20px 0 12px;
+    font-weight: 600;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.customerInfo {
+  background: $bg-light;
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  
+  p {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    
+    a {
+      color: $primary;
+      text-decoration: none;
+      
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.verified {
+  color: #4caf50;
+  margin-left: 8px;
+}
+
+.unverified {
+  color: #ff9800;
+  margin-left: 8px;
+}
+
+.orderDetails {
+  margin-bottom: 20px;
+}
+
+.orderItemDetail {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid $border-light;
+  font-size: 0.9rem;
+}
+
+.orderTotalDetail {
+  margin-top: 12px;
+  padding-top: 12px;
+  text-align: right;
+  font-size: 1rem;
+  
+  .totalAmount {
+    font-size: 1.2rem;
+    color: $primary;
+  }
+}
+
+.statusHistory {
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.statusLog {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid $border-light;
+  font-size: 0.85rem;
+  
+  .logStatus {
+    font-weight: 600;
+    min-width: 120px;
+  }
+  
+  .logTime {
+    color: $text-gray;
+    font-size: 0.75rem;
+  }
+  
+  .logComment {
+    color: $text-gray;
+    font-style: italic;
+    width: 100%;
+    margin-left: 120px;
+  }
+}
+
+.noLogs {
+  padding: 20px;
+  text-align: center;
+  color: $text-gray;
+  font-size: 0.85rem;
+}
+
+.statusActions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid $border-light;
+}
+
+.statusButtons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.statusBtn {
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all $transition-fast;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+  
+  &.danger {
+    background: #f44336;
+    color: white;
+  }
+}
+
+.commentInput {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 0.9rem;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.exportForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.exportField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  
+  label {
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+  
+  select, input {
+    padding: 10px 12px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.saveBtn {
+  flex: 1;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 12px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}

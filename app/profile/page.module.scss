@@ -1,0 +1,693 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding-top: 0;
+  padding-bottom: 80px;
+  min-height: calc(100vh - 200px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+  }
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: $text-gray;
+  margin-top: 4px;
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid $error;
+  color: $error;
+  padding: 10px 20px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $error;
+    color: white;
+  }
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid $border-light;
+  color: $text-gray;
+  padding: 10px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  transition: all $transition-fast;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+// Hero секция
+.heroSection {
+  position: relative;
+  background: linear-gradient(135deg, $primary, $secondary);
+  border-radius: 32px;
+  padding: 48px 24px 32px;
+  text-align: center;
+  margin-bottom: 32px;
+  color: white;
+  overflow: hidden;
+}
+
+.heroBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+  border-radius: 32px;
+}
+
+.avatarLarge {
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 700;
+  color: $primary;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.userNameLarge {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.userRole {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.userMeta {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.userSince {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.verifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+}
+
+// Статистика
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.statIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statInfo {
+  flex: 1;
+  
+  .statValue {
+    font-size: 1.2rem;
+    font-weight: 800;
+    display: block;
+    line-height: 1.3;
+  }
+  
+  .statLabel {
+    font-size: 0.75rem;
+    color: $text-gray;
+  }
+}
+
+// Табы
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid $border-light;
+  flex-wrap: wrap;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: $text-gray;
+  transition: all $transition-fast;
+  border-radius: 30px;
+  
+  &:hover {
+    background: $bg-light;
+    color: $primary;
+  }
+  
+  &.active {
+    background: $primary;
+    color: white;
+  }
+}
+
+// Профиль
+.profileCard {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+}
+
+.profileSection {
+  margin-bottom: 32px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $border-light;
+  }
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  
+  svg {
+    color: $primary;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  
+  div {
+    flex: 1;
+    
+    label {
+      display: block;
+      font-size: 0.7rem;
+      color: $text-gray;
+      margin-bottom: 4px;
+    }
+    
+    span {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+  }
+}
+
+.verified {
+  color: #4caf50;
+}
+
+.unverified {
+  color: #ff9800;
+}
+
+.settingsLinks {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.settingsLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: $bg-light;
+  border-radius: 40px;
+  text-decoration: none;
+  color: $text-dark;
+  font-size: 0.85rem;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary;
+    color: white;
+    
+    svg {
+      color: white;
+    }
+  }
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.lockIcon {
+  font-size: 1rem;
+}
+
+// Заказы
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orderCard {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.orderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+  
+  div {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+.orderId {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.orderDate {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.orderStatus {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  
+  &.new { background: rgba(33,150,243,0.1); color: #2196f3; }
+  &.called { background: rgba(33,150,243,0.1); color: #2196f3; }
+  &.confirmed { background: rgba(76,175,80,0.1); color: #4caf50; }
+  &.preparing { background: rgba(255,152,0,0.1); color: #ff9800; }
+  &.ready { background: rgba(156,39,176,0.1); color: #9c27b0; }
+  &.delivering { background: rgba(156,39,176,0.1); color: #9c27b0; }
+  &.completed { background: rgba(76,175,80,0.1); color: #4caf50; }
+  &.cancelled { background: rgba(244,67,54,0.1); color: #f44336; }
+}
+
+.orderItems {
+  margin-bottom: 16px;
+}
+
+.orderItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.85rem;
+}
+
+.orderFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.orderType {
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.orderTotal {
+  font-size: 0.95rem;
+  
+  strong {
+    color: $primary;
+    font-size: 1rem;
+  }
+}
+
+.emptyOrders {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 24px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 24px;
+  }
+}
+
+.orderBtn {
+  display: inline-block;
+  background: $primary;
+  color: white;
+  padding: 12px 32px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+// Статистика детальная
+.statsDetails {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+}
+
+.statsCardLarge {
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+}
+
+.statsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid $border-light;
+  
+  span {
+    color: $text-gray;
+  }
+  
+  strong {
+    font-size: 1rem;
+    color: $primary;
+  }
+}
+
+// 404
+.notFound {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 32px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 28px;
+  }
+}
+
+// Загрузка
+.loader {
+  text-align: center;
+  padding: 100px 0;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $border-light;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Адаптив
+@media (max-width: 768px) {
+  .heroSection {
+    padding: 32px 16px 24px;
+  }
+  
+  .avatarLarge {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+  }
+  
+  .userNameLarge {
+    font-size: 1.2rem;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tabs {
+    gap: 4px;
+  }
+  
+  .tab {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Бронирования */
+.bookingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bookingCard {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.bookingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+  
+  div {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+}
+
+.bookingTable {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.bookingSeats {
+  font-size: 0.75rem;
+  color: $text-gray;
+  background: $bg-light;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+.bookingStatus {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.bookingDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.bookingDetail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: $text-gray;
+}
+
+.shareBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}

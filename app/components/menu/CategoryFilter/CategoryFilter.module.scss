@@ -1,0 +1,55 @@
+@use '../../../styles/variables' as *;
+
+.filter {
+  margin-bottom: 40px;
+}
+
+.scrollWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $border-light;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 10px;
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 8px;
+  min-width: min-content;
+}
+
+.categoryBtn {
+  padding: 10px 24px;
+  border-radius: 40px;
+  background: white;
+  border: 1px solid $border-light;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $text-dark;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+  
+  &.active {
+    background: $primary;
+    color: white;
+    border-color: $primary;
+  }
+}

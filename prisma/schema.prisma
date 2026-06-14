@@ -1,0 +1,261 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  phone        String    @unique
+  name         String?
+  passwordHash String
+  phoneVerified   Boolean   @default(false)
+  phoneVerifiedAt DateTime?
+  role         Role      @default(USER)
+  isBlocked    Boolean   @default(false)
+  blockedUntil DateTime?
+  blockReason  String?
+  blockedAt    DateTime?
+  blockedBy    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  orders       Order[]
+  managedOrders Order[]  @relation("ManagerOrders")
+  statusLogs   OrderStatusLog[] @relation("UserStatusLogs")
+  favorites    Favorite[]
+  savedCarts   SavedCart[]
+  bookings     Booking[]  
+  blogComments BlogComment[]
+  reviews      Review[]
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dishId    Int
+  dish      Dish     @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dishId])
+}
+
+model SavedCart {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  items     Json
+  total     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Table {
+  id        Int      @id @default(autoincrement())
+  number    Int      @unique
+  seats     Int
+  isActive  Boolean  @default(true)
+  bookings  Booking[]
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  tableId     Int
+  table       Table    @relation(fields: [tableId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  customerName String
+  customerPhone String
+  customerEmail String?
+  date        DateTime
+  time        String
+  guests      Int
+  comment     String?
+  status      BookingStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  confirmedBy String?
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+model Settings {
+  id              Int      @id @default(autoincrement())
+  workDays        Json     @default("{\"monday\":{\"open\":\"11:00\",\"close\":\"23:00\"},\"tuesday\":{\"open\":\"11:00\",\"close\":\"23:00\"},\"wednesday\":{\"open\":\"11:00\",\"close\":\"23:00\"},\"thursday\":{\"open\":\"11:00\",\"close\":\"23:00\"},\"friday\":{\"open\":\"11:00\",\"close\":\"01:00\"},\"saturday\":{\"open\":\"11:00\",\"close\":\"01:00\"},\"sunday\":{\"open\":\"11:00\",\"close\":\"23:00\"}}")
+  specialDays     Json     @default("[]")
+  isSpecialDay    Boolean  @default(false)
+  specialMessage  String?  
+  phone           String   @default("+7 (988) 293-89-07")
+  email           String   @default("info@cherentano.ru")
+  address         String   @default("Республика Дагестан, Махачкала, улица Агасиева, 5А")
+  instagram       String?  
+  telegram        String?  
+  whatsapp        String?  
+  deliveryMinSum  Int      @default(1000)
+  deliveryPrice   Int      @default(150)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id])
+  customerName    String
+  customerPhone   String
+  orderType       OrderType   @default(DELIVERY)
+  deliveryAddress String?
+  comment         String?
+  total           Float
+  paymentMethod   PaymentMethod @default(CASH)
+  status          OrderStatus   @default(NEW)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  items           OrderItem[]
+  statusLogs      OrderStatusLog[]
+  assignedTo      String?
+  assignedManager User?          @relation("ManagerOrders", fields: [assignedTo], references: [id])
+}
+
+model OrderItem {
+  id        Int    @id @default(autoincrement())
+  orderId   Int
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  dishId    Int
+  dishName  String
+  quantity  Int
+  price     Float
+}
+
+model OrderStatusLog {
+  id        Int         @id @default(autoincrement())
+  orderId   Int
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  changedBy String?
+  user      User?       @relation("UserStatusLogs", fields: [changedBy], references: [id])
+  comment   String?
+  createdAt DateTime    @default(now())
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  dishes    Dish[]
+}
+
+model Dish {
+  id          Int       @id @default(autoincrement())
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  name        String
+  slug        String    @unique
+  description String?
+  price       Float
+  imageUrl    String?
+  weight      Int?
+  isAvailable Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  
+  favorites   Favorite[]
+}
+
+model BlogPost {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  excerpt     String?     
+  content     String      // HTML текст
+  imageUrl    String?
+  categoryId  String
+  category    BlogCategory @relation(fields: [categoryId], references: [id])
+  author      String      @default("Ресторан Челентано")
+  views       Int         @default(0)
+  likes       Int         @default(0)
+  isPublished Boolean     @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  comments    BlogComment[]
+}
+
+model BlogCategory {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  description String?
+  posts     BlogPost[]
+}
+
+model BlogComment {
+  id          String   @id @default(cuid())
+  postId      String
+  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     BlogComment[] @relation("CommentReplies")
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  authorName  String
+  authorEmail String?
+  content     String
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  authorName String
+  text       String
+  rating     Int
+  isApproved Boolean  @default(false)
+  reply      String?  // 👈 ответ администратора/менеджера
+  replyDate  DateTime? // 👈 дата ответа
+  createdAt  DateTime @default(now())
+}
+
+enum Role {
+  USER
+  MANAGER
+  ADMIN
+}
+
+enum OrderType {
+  DELIVERY
+  PICKUP
+}
+
+enum OrderStatus {
+  NEW
+  CALLED
+  CONFIRMED
+  PREPARING
+  READY
+  DELIVERING
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+}

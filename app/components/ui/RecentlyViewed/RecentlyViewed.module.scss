@@ -1,0 +1,81 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.recentSection {
+  padding: 40px 0;
+  background: $bg-light;
+}
+
+.container {
+  @include container;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  
+  svg {
+    color: $primary;
+  }
+  
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all $transition-base;
+  box-shadow: $shadow-sm;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.image {
+  height: 140px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.info {
+  padding: 12px;
+  
+  h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 40px;
+  }
+  
+  .price {
+    font-size: 1rem;
+    font-weight: 800;
+    color: $primary;
+  }
+}

@@ -1,0 +1,414 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+  position: relative;
+}
+
+.notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: $primary;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: $shadow-md;
+  animation: slideInRight 0.3s ease;
+  
+  button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    
+    &:hover {
+      background: rgba(255,255,255,0.3);
+    }
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.8rem;
+  font-weight: 800;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 0.9rem;
+  margin-top: 8px;
+}
+
+.refreshBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid $border-light;
+  padding: 8px 20px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  border-left: 4px solid;
+  box-shadow: $shadow-sm;
+  
+  .statValue {
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: block;
+  }
+  
+  .statLabel {
+    font-size: 0.8rem;
+    color: $text-gray;
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.dateFilter, .statusFilter, .searchFilter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  padding: 8px 16px;
+  
+  input, select {
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    background: transparent;
+  }
+}
+
+.searchFilter {
+  flex: 1;
+  min-width: 200px;
+  
+  input {
+    flex: 1;
+  }
+}
+
+.bookingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bookingCard {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+  
+  &.pendingCard {
+    border-left: 4px solid #ff9800;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.timeInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.time {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: $primary;
+}
+
+.table {
+  background: $bg-light;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.guests {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.cardBody {
+  margin-bottom: 16px;
+}
+
+.customerInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.customerName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.customerPhone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  a {
+    color: $primary;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.customerEmail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: $text-gray;
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: $bg-light;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: $text-gray;
+  margin-top: 8px;
+}
+
+.orderLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: $primary;
+  background: rgba(196,73,44,0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.createdAt {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.detailBtn {
+  background: none;
+  border: 1px solid $border-light;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 24px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-light;
+  
+  button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.detailRow {
+  margin-bottom: 12px;
+  
+  strong {
+    display: inline-block;
+    width: 100px;
+  }
+  
+  a {
+    color: $primary;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+  
+  svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}

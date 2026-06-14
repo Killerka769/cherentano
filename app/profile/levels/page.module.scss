@@ -1,0 +1,313 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  
+  svg {
+    color: $primary;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 1rem;
+}
+
+.currentProgress {
+  margin-bottom: 40px;
+}
+
+.progressCard {
+  background: linear-gradient(135deg, $primary, $secondary);
+  border-radius: 24px;
+  padding: 24px;
+  color: white;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.progressValue {
+  font-weight: 700;
+}
+
+.globalProgressBar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.globalProgressFill {
+  height: 100%;
+  background: white;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+.progressStats {
+  display: flex;
+  gap: 24px;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.levelsList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.levelCard {
+  display: flex;
+  gap: 24px;
+  background: var(--card-bg);
+  border-radius: 28px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  border: 2px solid transparent;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &.current {
+    border-color: $primary;
+    background: linear-gradient(135deg, rgba(196, 73, 44, 0.05), rgba(244, 162, 97, 0.05));
+  }
+  
+  &.unlocked {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(33, 150, 243, 0.05));
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.levelBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.levelNumber {
+  width: 40px;
+  height: 40px;
+  background: $bg-light;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: $primary;
+}
+
+.levelIcon {
+  font-size: 3rem;
+}
+
+.iconEmoji {
+  font-size: 3rem;
+}
+
+.levelContent {
+  flex: 1;
+}
+
+.levelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.levelName {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.levelTitle {
+  font-size: 0.85rem;
+  color: $text-gray;
+}
+
+.currentBadge, .unlockedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.currentBadge {
+  background: $primary;
+  color: white;
+}
+
+.unlockedBadge {
+  background: #4caf50;
+  color: white;
+}
+
+.levelRequirements {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 20px;
+  
+  .requirement {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    span {
+      font-size: 0.7rem;
+      color: $text-gray;
+    }
+    
+    strong {
+      font-size: 1rem;
+    }
+  }
+}
+
+.progressSection {
+  margin-bottom: 20px;
+}
+
+.progressBar {
+  height: 6px;
+  background: $border-light;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.perksSection {
+  background: $bg-light;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.perksHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.perksList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.perk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  background: white;
+  border-radius: 20px;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.infoBox {
+  display: flex;
+  gap: 20px;
+  background: $bg-light;
+  border-radius: 24px;
+  padding: 24px;
+  margin-top: 20px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.infoIcon {
+  font-size: 3rem;
+}
+
+.infoContent {
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 0.85rem;
+    color: $text-gray;
+    line-height: 1.6;
+  }
+}

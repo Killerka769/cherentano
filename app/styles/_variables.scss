@@ -1,0 +1,26 @@
+// Цветовая схема
+$primary: #c4492c;
+$primary-dark: #a0381f;
+$secondary: #f4a261;
+$bg-light: #fefaf5;
+$bg-white: #ffffff;
+$text-dark: #2c1810;
+$text-gray: #5c4033;
+$border-light: #ffe0c4;
+$success: #2e7d32;
+$error: #c62828;
+
+// Брейкпоинты
+$mobile: 375px;
+$tablet: 768px;
+$desktop: 1024px;
+$wide: 1280px;
+
+// Тени
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+// Анимации
+$transition-fast: 0.2s ease;
+$transition-base: 0.3s ease;

@@ -1,0 +1,214 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  text-decoration: none;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid $error;
+  color: $error;
+  padding: 8px 20px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $error;
+    color: white;
+  }
+}
+
+.form {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.main {
+  flex: 2;
+  min-width: 280px;
+}
+
+.sidebar {
+  flex: 1;
+  min-width: 280px;
+}
+
+.field {
+  margin-bottom: 24px;
+  
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  input, textarea, select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: var(--card-bg);
+    color: var(--text-primary);
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+  
+  textarea {
+    resize: vertical;
+  }
+}
+
+.hint {
+  font-size: 0.7rem;
+  color: $text-gray;
+  margin-top: 6px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: $shadow-sm;
+  
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $border-light;
+  }
+}
+
+.publishOptions {
+  display: flex;
+  gap: 12px;
+}
+
+.publishBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 40px;
+  background: none;
+  border: 1px solid $border-light;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &.active {
+    background: $primary;
+    color: white;
+    border-color: $primary;
+  }
+  
+  &:hover:not(.active) {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.imagePreview {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover;
+  }
+}
+
+.submitBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 40px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.notFound {
+  text-align: center;
+  padding: 80px;
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}
+
+@media (max-width: 768px) {
+  .form {
+    flex-direction: column;
+  }
+  
+  .title {
+    font-size: 1.4rem;
+  }
+}

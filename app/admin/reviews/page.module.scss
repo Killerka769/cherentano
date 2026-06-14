@@ -1,0 +1,419 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 20px;
+  border-radius: 40px;
+  background: var(--card-bg);
+  border: 1px solid $border-light;
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 0.85rem;
+  
+  &:hover {
+    border-color: $primary;
+  }
+  
+  &.active {
+    background: $primary;
+    color: white;
+    border-color: $primary;
+  }
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reviewCard {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  
+  strong {
+    font-size: 1rem;
+    color: $primary;
+  }
+}
+
+.rating {
+  display: flex;
+  gap: 2px;
+}
+
+.date {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+// Существующий ответ
+.existingReply {
+  background: $bg-light;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-left: 3px solid $primary;
+}
+
+.replyHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  
+  strong {
+    color: $primary;
+  }
+  
+  span {
+    font-size: 0.7rem;
+    color: $text-gray;
+  }
+}
+
+// Кнопки редактирования ответа
+.editReplyBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $primary;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(196, 73, 44, 0.1);
+  }
+}
+
+.deleteReplyBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $error;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(244, 67, 54, 0.1);
+  }
+}
+
+// Форма редактирования ответа
+.editReplyForm {
+  margin-top: 12px;
+  
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(196, 73, 44, 0.1);
+    }
+  }
+}
+
+.editReplyActions {
+  display: flex;
+  gap: 12px;
+  
+  button:first-child {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: $primary;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all $transition-fast;
+    
+    &:hover {
+      background: $primary-dark;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+  
+  button:last-child {
+    background: none;
+    border: 1px solid $border-light;
+    color: $text-gray;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all $transition-fast;
+    
+    &:hover {
+      border-color: $error;
+      color: $error;
+    }
+  }
+}
+
+// Кнопки действий
+.actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.approveBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #4caf50;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(76, 175, 80, 0.1);
+  }
+}
+
+.replyBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: $primary;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(196, 73, 44, 0.1);
+  }
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: $error;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 20px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(244, 67, 54, 0.1);
+  }
+}
+
+// Форма добавления ответа
+.replyForm {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid $border-light;
+  
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    resize: vertical;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(196, 73, 44, 0.1);
+    }
+  }
+}
+
+.replyActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.submitReplyBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.cancelReplyBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid $border-light;
+  color: $text-gray;
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    border-color: $error;
+    color: $error;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+  font-size: 1rem;
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}
+
+// Адаптив
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 0;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+  }
+  
+  .reviewCard {
+    padding: 16px;
+  }
+  
+  .reviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .replyHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .actions {
+    flex-wrap: wrap;
+  }
+  
+  .replyActions {
+    flex-wrap: wrap;
+  }
+  
+  .editReplyActions {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,265 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding-top: 40px;
+  padding-bottom: 80px;
+  min-height: calc(100vh - 200px);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: $error;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: opacity $transition-fast;
+  
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 40px;
+  
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.items {
+  background: transparent;
+}
+
+.summary {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: $shadow-md;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+  
+  @media (max-width: 900px) {
+    position: static;
+  }
+}
+
+.summaryTitle {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  
+  &.total {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: $primary;
+    margin-top: 8px;
+  }
+}
+
+.divider {
+  height: 1px;
+  background: $border-light;
+  margin: 16px 0;
+}
+
+.freeDeliveryNote {
+  font-size: 0.8rem;
+  color: $success;
+  margin-bottom: 16px;
+  padding: 8px;
+  background: rgba(46, 125, 50, 0.1);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.checkoutBtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: $primary;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 40px;
+  font-weight: 600;
+  margin-top: 20px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 20px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 30px;
+  }
+}
+
+.continueBtn {
+  display: inline-block;
+  background: $primary;
+  color: white;
+  padding: 12px 32px;
+  border-radius: 40px;
+  font-weight: 600;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+// Предупреждение для неавторизованных
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 16px 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  
+  svg {
+    color: #ff9800;
+    flex-shrink: 0;
+  }
+  
+  strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: #e65100;
+  }
+  
+  p {
+    font-size: 0.85rem;
+    color: #bf360c;
+    margin: 0;
+  }
+}
+
+.loginLink {
+  margin-left: auto;
+  background: #ff9800;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  
+  &:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+  }
+}
+
+// Кнопка для неавторизованных
+.loginToCheckout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #ff9800;
+  color: white;
+  text-decoration: none;
+  padding: 16px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+  
+  &:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+  }
+}
+
+// Кнопка оформления для авторизованных
+.checkoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: $primary;
+  color: white;
+  text-decoration: none;
+  padding: 16px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(196, 73, 44, 0.3);
+  }
+}

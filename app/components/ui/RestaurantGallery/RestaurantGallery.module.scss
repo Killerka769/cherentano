@@ -1,0 +1,244 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.gallery {
+  padding: 80px 0;
+  background: linear-gradient(180deg, $bg-light 0%, white 100%);
+}
+
+.container {
+  @include container;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.sectionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(196, 73, 44, 0.1);
+  color: $primary;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 1rem;
+}
+
+.sliderContainer {
+  position: relative;
+  border-radius: 32px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  margin-bottom: 24px;
+}
+
+.slide {
+  width: 100%;
+  height: 500px;
+  
+  @media (max-width: 768px) {
+    height: 300px;
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.imageOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  padding: 40px 30px 30px;
+  color: white;
+  
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 20px;
+    
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: $text-dark;
+  
+  &:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.05);
+  }
+  
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.prevBtn {
+  left: 20px;
+}
+
+.nextBtn {
+  right: 20px;
+}
+
+.playBtn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  z-index: 10;
+  
+  &:hover {
+    background: $primary;
+    transform: scale(1.05);
+  }
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $border-light;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &.active {
+    width: 28px;
+    border-radius: 10px;
+    background: $primary;
+  }
+  
+  &:hover {
+    background: $primary;
+  }
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 30px;
+  background: linear-gradient(135deg, $primary, $secondary);
+  border-radius: 60px;
+  margin-top: 20px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 30px;
+  }
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  color: white;
+  
+  svg {
+    opacity: 0.9;
+  }
+  
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.statDivider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.3);
+  
+  @media (max-width: 768px) {
+    width: 60px;
+    height: 1px;
+  }
+}

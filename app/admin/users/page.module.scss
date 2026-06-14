@@ -1,0 +1,480 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.subtitle {
+  color: $text-gray;
+  margin-top: 4px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+  
+  .statValue {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: $primary;
+    display: block;
+  }
+  
+  .statLabel {
+    font-size: 0.8rem;
+    color: $text-gray;
+  }
+  
+  &.blockedStat {
+    background: #ffebee;
+    
+    .statValue {
+      color: #f44336;
+    }
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  padding: 10px 20px;
+  
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+  }
+}
+
+.filterSelect {
+  padding: 10px 20px;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  background: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: $shadow-sm;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+  }
+  
+  th {
+    background: $bg-light;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  
+  tr:hover {
+    background: $bg-light;
+  }
+}
+
+.blockedRow {
+  background: #fff5f5;
+  opacity: 0.9;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  background: $primary;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  
+  &.blockedAvatar {
+    background: #9e9e9e;
+  }
+}
+
+.userNameLink {
+  font-weight: 600;
+  color: $text-dark;
+  text-decoration: none;
+  
+  &:hover {
+    color: $primary;
+    text-decoration: underline;
+  }
+}
+
+.userId {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.contactCell {
+  .contactItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    svg {
+      color: $text-gray;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.blockedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: #ffebee;
+  color: #f44336;
+}
+
+.activeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: #e8f5e9;
+  color: #4caf50;
+}
+
+.ordersCount {
+  .ordersLink {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.dateCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.editBtn, .viewBtn, .blockBtn, .unblockBtn, .deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $bg-light;
+  }
+}
+
+.editBtn { color: $primary; }
+.viewBtn { color: #9c27b0; }
+.blockBtn { color: #ff9800; }
+.unblockBtn { color: #4caf50; }
+.deleteBtn { color: $error; }
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 24px;
+  max-width: 450px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-light;
+  position: sticky;
+  top: 0;
+  background: white;
+  
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-gray;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: $bg-light;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.userAvatarSmall {
+  width: 48px;
+  height: 48px;
+  background: $primary;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.userName {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.userEmail {
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.roleSelect, .blockTypeSelect, .durationSelect, .reasonInput {
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+  }
+  
+  select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+}
+
+.blockTypeButtons {
+  display: flex;
+  gap: 12px;
+}
+
+.blockTypeBtn {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &.active {
+    border-color: $primary;
+    background: rgba(196, 73, 44, 0.1);
+    color: $primary;
+  }
+  
+  &:hover {
+    border-color: $primary;
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.saveBtn, .blockSubmitBtn {
+  flex: 1;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.blockSubmitBtn {
+  background: #ff9800;
+  
+  &:hover {
+    background: #f57c00;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 12px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  background: white;
+  border-radius: 20px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    color: $text-gray;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $border-light;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,373 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 1rem;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+  
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border-light;
+  }
+}
+
+.tablesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.tableCard {
+  background: $bg-light;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $bg-light;
+    transform: translateY(-2px);
+  }
+  
+  &.selected {
+    border-color: $primary;
+    background: rgba(196, 73, 44, 0.1);
+    
+    .tableNumber {
+      color: $primary;
+    }
+  }
+}
+
+.tableNumber {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.tableSeats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.field {
+  margin-bottom: 20px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(196, 73, 44, 0.1);
+    }
+  }
+  
+  textarea {
+    resize: vertical;
+  }
+}
+
+.warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #ff9800;
+}
+
+.submitBtn {
+  width: 100%;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.note {
+  text-align: center;
+  font-size: 0.75rem;
+  color: $text-gray;
+  margin-top: 16px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.infoCard {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+  
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    color: $text-gray;
+    font-size: 0.85rem;
+  }
+}
+
+.phoneLink {
+  display: inline-block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: $primary;
+  text-decoration: none;
+  margin: 8px 0;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Стили для чекбокса согласия
+.agreement {
+  margin: 20px 0 10px;
+  padding: 12px 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  
+  input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $primary;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  
+  a {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  span {
+    line-height: 1.4;
+  }
+}
+
+.authWarning {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff3e0;
+  border-left: 4px solid #ff9800;
+  padding: 16px 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  
+  svg {
+    color: #ff9800;
+    flex-shrink: 0;
+  }
+  
+  strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    color: #e65100;
+  }
+  
+  p {
+    font-size: 0.85rem;
+    color: #bf360c;
+    margin: 0;
+  }
+}
+
+.authButtons {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.loginBtnSmall, .registerBtnSmall {
+  padding: 6px 16px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.loginBtnSmall {
+  background: #ff9800;
+  color: white;
+  
+  &:hover {
+    background: #f57c00;
+  }
+}
+
+.registerBtnSmall {
+  background: none;
+  border: 1px solid #ff9800;
+  color: #ff9800;
+  
+  &:hover {
+    background: rgba(255, 152, 0, 0.1);
+  }
+}
+
+.disabled {
+  background: var(--bg-secondary);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.accessDenied {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 28px;
+  }
+}
+
+.loginBtn, .registerBtn {
+  display: inline-block;
+  margin: 0 8px;
+  padding: 10px 24px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.loginBtn {
+  background: $primary;
+  color: white;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+} 
+
+.registerBtn {
+  background: none;
+  border: 1px solid $primary;
+  color: $primary;
+  
+  &:hover {
+    background: rgba(196, 73, 44, 0.1);
+  }
+}
