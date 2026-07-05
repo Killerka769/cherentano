@@ -1,0 +1,534 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.titleIcon {
+  color: #e91e63;
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 0.95rem;
+  margin-left: 44px;
+}
+
+.howToBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+// Вкладки
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid $border-light;
+  flex-wrap: wrap;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: $text-gray;
+  transition: all $transition-fast;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  
+  &:hover {
+    color: $primary;
+  }
+  
+  &.active {
+    color: $primary;
+    border-bottom-color: $primary;
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+  
+  .statValue {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: $primary;
+    display: block;
+    line-height: 1.2;
+  }
+  
+  .statLabel {
+    font-size: 0.8rem;
+    color: $text-gray;
+  }
+}
+
+.mealInfo {
+  background: linear-gradient(135deg, #fff8f0, #fff0e3);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+
+.mealInfoTitle {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.mealTimes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mealCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  box-shadow: $shadow-sm;
+  
+  svg {
+    color: $primary;
+    flex-shrink: 0;
+  }
+}
+
+.mealLabel {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.mealTime {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all $transition-base;
+  box-shadow: $shadow-sm;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.cardImage {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+  background: $bg-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.urgencyBadge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.cardContent {
+  padding: 16px;
+}
+
+.cardName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.cardDescription {
+  font-size: 0.85rem;
+  color: $text-gray;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 38px;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.cardNeeds {
+  background: $bg-light;
+  padding: 2px 10px;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  color: $primary;
+}
+
+.cardAddress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.helpCount {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.helpBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: $primary;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  
+  .card:hover & {
+    gap: 10px;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 20px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: $text-gray;
+  }
+}
+
+// История
+.historySection {
+  margin-top: 8px;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.historyCard {
+  display: flex;
+  gap: 16px;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.historyImage {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: $bg-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.historyContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.historyName {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.historyMeal {
+  font-size: 0.7rem;
+  color: $text-gray;
+  margin-top: 2px;
+}
+
+.historyAmount {
+  font-size: 1rem;
+  font-weight: 800;
+  color: $primary;
+}
+
+.historyFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid $border-light;
+  margin-top: 8px;
+}
+
+.historyHelper {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.historyDate {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.loader {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+}
+
+.historyBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid $border-light;
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all $transition-fast;
+    text-decoration: none;
+    color: $text-dark;
+    
+    &:hover {
+      border-color: $primary;
+      color: $primary;
+    }
+  }
+
+  .modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .modalContent {
+    background: white;
+    border-radius: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+  
+  .modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid $border-light;
+    
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+  }
+  
+  .modalClose {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $text-gray;
+    
+    &:hover {
+      color: $primary;
+    }
+  }
+  
+  .modalBody {
+    padding: 24px;
+  }
+  
+  .helpStep {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  .helpStepNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: $primary;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  .helpStep strong {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+  
+  .helpStep p {
+    font-size: 0.85rem;
+    color: $text-gray;
+    margin: 0;
+    line-height: 1.4;
+  }
+  
+  .helpModalBtn {
+    width: 100%;
+    margin-top: 20px;
+    background: $primary;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition-fast;
+    
+    &:hover {
+      background: $primary-dark;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }

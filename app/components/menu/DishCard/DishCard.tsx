@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ShoppingCart, Plus, Minus, Heart, Check } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Heart, Check, XCircle } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { useAuth } from '@/app/contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -17,6 +17,7 @@ interface Dish {
   imageUrl: string | null;
   weight: number | null;
   slug: string;
+  isAvailable: boolean;  
 }
 
 interface DishCardProps {
@@ -59,6 +60,11 @@ export default function DishCard({ dish }: DishCardProps) {
       return;
     }
     
+    if (!dish.isAvailable) {
+      toast.error('Блюдо временно недоступно');
+      return;
+    }
+    
     setIsFavoriteLoading(true);
     
     try {
@@ -67,16 +73,23 @@ export default function DishCard({ dish }: DishCardProps) {
         toast.success('Удалено из избранного');
         setIsFavorite(false);
       } else {
-        await fetch('/api/favorites', {
+        const res = await fetch('/api/favorites', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ dishId: dish.id })
         });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.error || 'Ошибка');
+        }
+        
         toast.success('Добавлено в избранное');
         setIsFavorite(true);
       }
-    } catch (error) {
-      toast.error('Ошибка');
+    } catch (error: any) {
+      toast.error(error.message || 'Ошибка');
     } finally {
       setIsFavoriteLoading(false);
     }
@@ -85,6 +98,11 @@ export default function DishCard({ dish }: DishCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!dish.isAvailable) {
+      toast.error('Блюдо временно недоступно');
+      return;
+    }
     
     setIsAdding(true);
     setShowCheck(true);
@@ -96,7 +114,6 @@ export default function DishCard({ dish }: DishCardProps) {
       imageUrl: dish.imageUrl || undefined,
     }, quantity);
     
-    // Эффект вспышки на кнопке
     if (cartBtnRef.current) {
       cartBtnRef.current.style.transform = 'scale(1.2)';
       setTimeout(() => {
@@ -148,10 +165,18 @@ export default function DishCard({ dish }: DishCardProps) {
             <span className={styles.weight}>{dish.weight}г</span>
           )}
           
+          {/* Бейдж "Недоступно" */}
+          {!dish.isAvailable && (
+            <div className={styles.unavailableBadge}>
+              <XCircle size={14} />
+              Временно недоступно
+            </div>
+          )}
+          
           <button 
             onClick={toggleFavorite}
             className={`${styles.favoriteBtn} ${isFavorite ? styles.active : ''}`}
-            disabled={isFavoriteLoading}
+            disabled={isFavoriteLoading || !dish.isAvailable}
             aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
           >
             <Heart size={18} fill={isFavorite ? '#fff' : 'none'} stroke="#fff" strokeWidth={1.5} />
@@ -164,25 +189,33 @@ export default function DishCard({ dish }: DishCardProps) {
             <p className={styles.description}>{dish.description}</p>
           )}
           <div className={styles.footer}>
-            <div className={styles.price}>{dish.price} ₽</div>
-            
-            <div className={styles.quantityControl}>
-              <button onClick={decrement} className={styles.qtyBtn}>
-                <Minus size={14} />
-              </button>
-              <span className={styles.qtyValue}>{quantity}</span>
-              <button onClick={increment} className={styles.qtyBtn}>
-                <Plus size={14} />
-              </button>
+            <div className={dish.isAvailable ? styles.price : styles.priceUnavailable}>
+              {dish.isAvailable ? `${dish.price} ₽` : 'Недоступно'}
             </div>
             
-            <button 
-              onClick={handleAddToCart} 
-              className={`${styles.cartBtn} ${isAdding ? styles.adding : ''}`}
-              ref={cartBtnRef}
-            >
-              {showCheck ? <Check size={18} /> : <ShoppingCart size={18} />}
-            </button>
+            {dish.isAvailable ? (
+              <>
+                <div className={styles.quantityControl}>
+                  <button onClick={decrement} className={styles.qtyBtn}>
+                    <Minus size={14} />
+                  </button>
+                  <span className={styles.qtyValue}>{quantity}</span>
+                  <button onClick={increment} className={styles.qtyBtn}>
+                    <Plus size={14} />
+                  </button>
+                </div>
+                
+                <button 
+                  onClick={handleAddToCart} 
+                  className={`${styles.cartBtn} ${isAdding ? styles.adding : ''}`}
+                  ref={cartBtnRef}
+                >
+                  {showCheck ? <Check size={18} /> : <ShoppingCart size={18} />}
+                </button>
+              </>
+            ) : (
+              <span className={styles.unavailableText}>Недоступно</span>
+            )}
           </div>
         </div>
       </div>

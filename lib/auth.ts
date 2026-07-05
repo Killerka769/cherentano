@@ -57,10 +57,29 @@ export async function getCurrentUser() {
       blockReason: true,
       blockedAt: true,
       blockedBy: true,
+      birthDate: true,
       createdAt: true,
       updatedAt: true
     }
   })
+  
+  if (!user) return null
+  
+  // Проверяем, истекла ли временная блокировка
+  if (user.isBlocked && user.blockedUntil && new Date(user.blockedUntil) < new Date()) {
+    // Автоматически разблокируем
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isBlocked: false,
+        blockedUntil: null,
+        blockReason: null,
+        blockedAt: null,
+        blockedBy: null
+      }
+    })
+    return { ...user, isBlocked: false, blockedUntil: null, blockReason: null }
+  }
   
   return user
 }

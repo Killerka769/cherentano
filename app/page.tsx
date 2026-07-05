@@ -7,6 +7,8 @@ import PopularDishes from '@/app/components/ui/PopularDishes/PopularDishes';
 import RestaurantGallery from '@/app/components/ui/RestaurantGallery/RestaurantGallery';
 import Reviews from './components/ui/Reviews/Reviews';
 import RecentlyViewed from './components/ui/RecentlyViewed/RecentlyViewed';
+import Banner from './components/ui/Banner/Banner';
+import RegistrationBanner from './components/ui/RegistrationBanner/RegistrationBanner';
 
 export default function Home() {
   return (
@@ -17,10 +19,12 @@ export default function Home() {
     >
       <Hero />
       {/* <RestaurantGallery /> */}
+      <Banner />
       <Features />
       <Reviews />
       <PopularDishes />
       <RecentlyViewed />
+      <RegistrationBanner />
     </motion.div>
   );
 }

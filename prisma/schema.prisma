@@ -11,6 +11,7 @@ model User {
   email        String    @unique
   phone        String    @unique
   name         String?
+  birthDate    DateTime?
   passwordHash String
   phoneVerified   Boolean   @default(false)
   phoneVerifiedAt DateTime?
@@ -31,6 +32,12 @@ model User {
   bookings     Booking[]  
   blogComments BlogComment[]
   reviews      Review[]
+  userDiscounts UserDiscount[]
+  discountUsages DiscountUsage[]
+  addresses    AddressHistory[]
+  recipeComments RecipeComment[]
+  helpRequests   HelpRequest[]
+  helpHistories  HelpHistory[]
 }
 
 model Favorite {
@@ -55,12 +62,26 @@ model SavedCart {
   updatedAt DateTime @updatedAt
 }
 
+model AddressHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address   String
+  usedAt    DateTime @default(now())
+  orderId   Int?
+}
+
 model Table {
-  id        Int      @id @default(autoincrement())
-  number    Int      @unique
-  seats     Int
-  isActive  Boolean  @default(true)
-  bookings  Booking[]
+  id          Int      @id @default(autoincrement())
+  number      Int      @unique
+  seats       Int
+  isActive    Boolean  @default(true)
+  name        String?  // Название кабинки (например "Уютная", "Семейная")
+  description String?  // Описание кабинки
+  imageUrl    String?  // Фото кабинки
+  images      Json?    // Массив фото для галереи
+  purpose     String?  // Назначение (День рождения, Романтический ужин, Деловая встреча)
+  bookings    Booking[]
 }
 
 model Booking {
@@ -74,6 +95,7 @@ model Booking {
   customerEmail String?
   date        DateTime
   time        String
+  endTime     String?  // Время окончания брони
   guests      Int
   comment     String?
   status      BookingStatus @default(PENDING)
@@ -120,13 +142,24 @@ model Order {
   total           Float
   paymentMethod   PaymentMethod @default(CASH)
   status          OrderStatus   @default(NEW)
+  isCharity       Boolean       @default(false)
+  paymentStatus  PaymentStatus @default(PENDING)  // PENDING, PAID, CONFIRMED, EXPIRED
+  paymentData    Json?        // Храним данные оплаты
+  expiresAt      DateTime?    // Когда заказ истекает (через 30 мин)
+  isReminded     Boolean      @default(false) // Был ли баннер показан
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+
+  discountId      Int?
+  discount        Discount?    @relation(fields: [discountId], references: [id])
+  discountAmount  Float?       // Фактическая сумма скидки
   
   items           OrderItem[]
   statusLogs      OrderStatusLog[]
   assignedTo      String?
   assignedManager User?          @relation("ManagerOrders", fields: [assignedTo], references: [id])
+  discountUsages  DiscountUsage[]
+  helpRequests    HelpRequest[]
 }
 
 model OrderItem {
@@ -173,6 +206,18 @@ model Dish {
   createdAt   DateTime  @default(now())
   
   favorites   Favorite[]
+  dishOfDay   DishOfDay[]  // Одно блюдо может быть в нескольких днях
+}
+
+model DishOfDay {
+  id        Int      @id @default(autoincrement())
+  dishId    Int
+  dish      Dish     @relation(fields: [dishId], references: [id])
+  date      DateTime  // Дата, на которую назначено блюдо дня
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([date, dishId])  // Уникальная пара дата+блюдо
 }
 
 model BlogPost {
@@ -232,6 +277,239 @@ model Review {
   createdAt  DateTime @default(now())
 }
 
+model Banner {
+  id          Int      @id @default(autoincrement())
+  title       String
+  subtitle    String?
+  description String?
+  imageUrl    String
+  link        String?
+  linkText    String?
+  type        BannerType @default(PROMOTION)  // 👈 Добавляем поле
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum BannerType {
+  PROMOTION   // Акция
+  EVENT       // Событие
+  RECOMMEND   // Рекомендация
+  HOT         // Горячее предложение
+  NEW         // Новинка
+  SPECIAL     // Спецпредложение
+}
+
+model Discount {
+  id              Int            @id @default(autoincrement())
+  code            String         @unique
+  name            String
+  description     String?
+  type            DiscountType   @default(PERCENT)
+  value           Float
+  minOrderAmount  Float?
+  maxDiscount     Float?
+  usageLimit      Int?
+  usedCount       Int            @default(0)
+  isActive        Boolean        @default(true)
+  isFirstOrder    Boolean        @default(false)
+  isBirthday      Boolean        @default(false)
+  isIndividual    Boolean        @default(false)
+  startDate       DateTime?
+  endDate         DateTime?
+  appliesTo       DiscountApplies @default(ALL)
+  appliesToIds    Int[]           @default([])  // без ?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  usages          DiscountUsage[]
+  userDiscounts   UserDiscount[]
+  orders          Order[]
+}
+
+// 👇 Новая модель: скидки, выданные конкретным пользователям
+model UserDiscount {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  discountId  Int
+  discount    Discount @relation(fields: [discountId], references: [id])
+  used        Boolean  @default(false)
+  usedAt      DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@unique([userId, discountId])
+}
+
+model DiscountUsage {
+  id            Int      @id @default(autoincrement())
+  discountId    Int
+  discount      Discount @relation(fields: [discountId], references: [id])
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  orderId       Int
+  order         Order    @relation(fields: [orderId], references: [id])
+  discountValue Float
+  createdAt     DateTime @default(now())
+}
+
+model Recipe {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  excerpt     String?     
+  content     String      // HTML текст
+  imageUrl    String?
+  categoryId  String
+  category    RecipeCategory @relation(fields: [categoryId], references: [id])
+  author      String      @default("Ресторан Челентано")
+  cookingTime Int?        // Время приготовления в минутах
+  servings    Int?        // Количество порций
+  difficulty  Difficulty? @default(MEDIUM)
+  views       Int         @default(0)
+  likes       Int         @default(0)
+  isPublished Boolean     @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  comments    RecipeComment[]
+}
+
+model RecipeCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  description String?
+  recipes   Recipe[]
+}
+
+model RecipeComment {
+  id          String   @id @default(cuid())
+  recipeId    String
+  recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      RecipeComment? @relation("RecipeCommentReplies", fields: [parentId], references: [id])
+  replies     RecipeComment[] @relation("RecipeCommentReplies")
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  authorName  String
+  authorEmail String?
+  content     String
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LoadInterval {
+  id        Int      @id @default(autoincrement())
+  date      DateTime // Дата, на которую установлен интервал
+  startTime String   // Время начала (HH:MM)
+  endTime   String   // Время окончания (HH:MM)
+  loadLevel Int      // Уровень загруженности: 1-10 (1 - очень мало, 10 - максимально)
+  comment   String?  // Комментарий (почему такая загрузка)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([date, startTime, endTime])
+}
+
+// Нуждающийся человек
+model Beneficiary {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  address     String
+  phone       String?
+  needs       String
+  urgency     String   @default("Нормальный")
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  isCompleted Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  helpRequests HelpRequest[]
+  helpHistory  HelpHistory[]
+}
+
+// Заявка на помощь
+model HelpRequest {
+  id          String   @id @default(cuid())
+  beneficiaryId String
+  beneficiary  Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  orderId     Int?
+  order       Order?   @relation(fields: [orderId], references: [id])
+  mealTime    String   @default("LUNCH")  // BREAKFAST, LUNCH, DINNER
+  items       Json     @default("[]")
+  total       Float    @default(0)
+  isAnonymous Boolean  @default(false)
+  comment     String?
+  status      String   @default("PENDING")  // PENDING, APPROVED, PREPARING, DELIVERING, COMPLETED, REJECTED
+  statusComment String?
+  deliveredAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  history     HelpHistory[]
+}
+
+enum MealTime {
+  BREAKFAST  // Завтрак 08:00-11:00
+  LUNCH      // Обед 12:00-16:00
+  DINNER     // Ужин 18:00-22:00
+}
+
+enum HelpStatus {
+  PENDING    // Ожидает проверки
+  APPROVED   // Одобрено
+  PREPARING  // Готовится
+  DELIVERING // В пути
+  COMPLETED  // Доставлено
+  REJECTED   // Отклонено
+}
+
+// История помощи
+model HelpHistory {
+  id          String   @id @default(cuid())
+  helpRequestId String
+  helpRequest  HelpRequest @relation(fields: [helpRequestId], references: [id], onDelete: Cascade)
+  beneficiaryId String
+  beneficiary  Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  mealTime    String
+  amount      Float
+  items       Json     @default("[]")
+  photoUrl    String?
+  comment     String?
+  createdAt   DateTime @default(now())
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+}
+
+enum DiscountApplies {
+  ALL // на все
+  CATEGORY // на категорию
+  DISH // конретное блюдо
+}
+
 enum Role {
   USER
   MANAGER
@@ -253,6 +531,13 @@ enum OrderStatus {
   COMPLETED
   CANCELLED
   REJECTED
+}
+
+enum PaymentStatus {
+  PENDING    // Ожидает оплаты
+  PAID       // Оплачен (клиент отметил)
+  CONFIRMED  // Подтвержден менеджером
+  EXPIRED    // Просрочен (не оплачен за 30 мин)
 }
 
 enum PaymentMethod {

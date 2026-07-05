@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const role = searchParams.get('role')
     const search = searchParams.get('search')
-    const blocked = searchParams.get('blocked') // 'true', 'false', 'all'
+    const blocked = searchParams.get('blocked')
     
     const where: any = {}
     if (role && role !== 'all') {
@@ -118,19 +118,99 @@ export async function PUT(request: NextRequest) {
 // DELETE - удалить пользователя
 export async function DELETE(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    if (!user || user.role !== 'ADMIN') {
+    const admin = await getCurrentUser()
+    if (!admin || admin.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
     }
     
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('id')
     
-    if (userId === user.id) {
+    if (!userId) {
+      return NextResponse.json({ error: 'ID пользователя обязателен' }, { status: 400 })
+    }
+    
+    if (userId === admin.id) {
       return NextResponse.json({ error: 'Нельзя удалить самого себя' }, { status: 400 })
     }
     
-    await prisma.user.delete({ where: { id: userId! } })
+    // 👇 УДАЛЯЕМ ВСЕ СВЯЗАННЫЕ ЗАПИСИ ПО ПОРЯДКУ
+    
+    // 1. Удаляем записи об использовании скидок
+    await prisma.discountUsage.deleteMany({
+      where: { userId }
+    })
+    
+    // 2. Удаляем записи о скидках пользователя
+    await prisma.userDiscount.deleteMany({
+      where: { userId }
+    })
+    
+    // 3. Удаляем корзины пользователя
+    await prisma.savedCart.deleteMany({
+      where: { userId }
+    })
+    
+    // 4. Удаляем избранное пользователя
+    await prisma.favorite.deleteMany({
+      where: { userId }
+    })
+    
+    // 5. Удаляем комментарии пользователя
+    await prisma.blogComment.deleteMany({
+      where: { userId }
+    })
+    
+    // 6. Удаляем отзывы пользователя
+    await prisma.review.deleteMany({
+      where: { userId }
+    })
+    
+    // 7. Удаляем бронирования пользователя
+    await prisma.booking.deleteMany({
+      where: { userId }
+    })
+    
+    // 8. Удаляем логи статусов заказов
+    await prisma.orderStatusLog.deleteMany({
+      where: { changedBy: userId }
+    })
+    
+    // 9. Получаем заказы пользователя и удаляем их элементы
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      select: { id: true }
+    })
+    
+    const orderIds = orders.map(o => o.id)
+    
+    if (orderIds.length > 0) {
+      // Удаляем элементы заказов
+      await prisma.orderItem.deleteMany({
+        where: { orderId: { in: orderIds } }
+      })
+      
+      // Удаляем логи статусов заказов
+      await prisma.orderStatusLog.deleteMany({
+        where: { orderId: { in: orderIds } }
+      })
+      
+      // Удаляем сами заказы
+      await prisma.order.deleteMany({
+        where: { userId }
+      })
+    }
+    
+    // 10. Обновляем заказы, где пользователь был менеджером
+    await prisma.order.updateMany({
+      where: { assignedTo: userId },
+      data: { assignedTo: null }
+    })
+    
+    // 11. Теперь удаляем пользователя
+    await prisma.user.delete({
+      where: { id: userId }
+    })
     
     return NextResponse.json({ success: true })
   } catch (error) {

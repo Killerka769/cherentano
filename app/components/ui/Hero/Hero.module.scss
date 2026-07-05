@@ -373,6 +373,26 @@
   font-size: 2.2rem;
 }
 
+.deliveryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #388e3c;
+    transform: translateY(-2px);
+  }
+}
+
 @keyframes floatElement {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-20px) rotate(10deg); }

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Phone, CheckCircle, Clock, Truck, Check, X, Eye } from 'lucide-react';
+import { Phone, CheckCircle, Clock, Truck, Check, X, Eye, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
 interface Order {
@@ -17,6 +18,7 @@ interface Order {
   orderType: string;
   createdAt: string;
   items: { dishName: string; quantity: number; price: number }[];
+  statusLogs?: { status: string; comment: string | null; createdAt: string; user?: { name: string } }[];
 }
 
 const statusSteps = [
@@ -36,6 +38,8 @@ export default function ManagerOrdersPage() {
   const [activeTab, setActiveTab] = useState('active');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [callModal, setCallModal] = useState<Order | null>(null);
+  const [cancelModal, setCancelModal] = useState<{ order: Order; status: string } | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
 
   useEffect(() => {
     if (!loading && (!user || (user.role !== 'MANAGER' && user.role !== 'ADMIN'))) {
@@ -46,7 +50,6 @@ export default function ManagerOrdersPage() {
   useEffect(() => {
     if (user && (user.role === 'MANAGER' || user.role === 'ADMIN')) {
       fetchOrders();
-      // Автообновление каждые 10 секунд
       const interval = setInterval(fetchOrders, 10000);
       return () => clearInterval(interval);
     }
@@ -58,17 +61,27 @@ export default function ManagerOrdersPage() {
     setOrders(data.orders || []);
   };
 
-  const updateStatus = async (orderId: number, newStatus: string) => {
+  const updateStatus = async (orderId: number, newStatus: string, reason?: string) => {
     const res = await fetch('/api/manager/orders', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId, status: newStatus })
+      body: JSON.stringify({ 
+        orderId, 
+        status: newStatus,
+        reason: reason || undefined
+      })
     });
     
     if (res.ok) {
+      toast.success(`Статус заказа #${orderId} обновлен`);
       fetchOrders();
       setSelectedOrder(null);
       setCallModal(null);
+      setCancelModal(null);
+      setCancelReason('');
+    } else {
+      const error = await res.json();
+      toast.error(error.error || 'Ошибка обновления');
     }
   };
 
@@ -141,8 +154,12 @@ export default function ManagerOrdersPage() {
                   {getNextAction(order.status) === 'call' ? '📞 Позвонить' : '➡️ Далее'}
                 </button>
               )}
-              {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && (
-                <button onClick={() => updateStatus(order.id, 'CANCELLED')} className={styles.cancelBtn}>
+              {order.status !== 'CANCELLED' && order.status !== 'COMPLETED' && order.status !== 'REJECTED' && (
+                <button 
+                  onClick={() => setCancelModal({ order, status: 'CANCELLED' })} 
+                  className={styles.cancelBtn}
+                  title="Отменить заказ"
+                >
                   ❌
                 </button>
               )}
@@ -212,8 +229,48 @@ export default function ManagerOrdersPage() {
               <button onClick={() => updateStatus(callModal.id, 'CALLED')} className={styles.confirmCallBtn}>
                 Подтвердить звонок
               </button>
-              <button onClick={() => updateStatus(callModal.id, 'CANCELLED')} className={styles.rejectBtn}>
+              <button onClick={() => setCancelModal({ order: callModal, status: 'CANCELLED' })} className={styles.rejectBtn}>
                 Отменить заказ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модалка отмены с причиной */}
+      {cancelModal && (
+        <div className={styles.modal} onClick={() => setCancelModal(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.cancelHeader}>
+              <AlertCircle size={24} className={styles.cancelIcon} />
+              <h3>Отмена заказа #{cancelModal.order.id}</h3>
+            </div>
+            <p className={styles.cancelDescription}>
+              Укажите причину отмены заказа:
+            </p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="Например: Нет в наличии ингредиентов, клиент не отвечает, ошибка в заказе..."
+              rows={4}
+              className={styles.reasonInput}
+              autoFocus
+            />
+            <div className={styles.modalActions}>
+              <button 
+                onClick={() => {
+                  if (!cancelReason.trim()) {
+                    toast.error('Укажите причину отмены');
+                    return;
+                  }
+                  updateStatus(cancelModal.order.id, cancelModal.status, cancelReason);
+                }} 
+                className={styles.confirmCancelBtn}
+              >
+                ❌ Отменить заказ
+              </button>
+              <button onClick={() => setCancelModal(null)} className={styles.cancelBtn}>
+                Отмена
               </button>
             </div>
           </div>
@@ -253,6 +310,31 @@ export default function ManagerOrdersPage() {
                 <div className={styles.detailSection}>
                   <h4>Комментарий</h4>
                   <p>{selectedOrder.comment}</p>
+                </div>
+              )}
+
+              {/* История статусов */}
+              {selectedOrder.statusLogs && selectedOrder.statusLogs.length > 0 && (
+                <div className={styles.detailSection}>
+                  <h4>История статусов</h4>
+                  <div className={styles.statusHistory}>
+                    {selectedOrder.statusLogs.map((log, idx) => (
+                      <div key={idx} className={styles.statusLogItem}>
+                        <span className={styles.logStatus}>
+                          {statusSteps.find(s => s.key === log.status)?.label || log.status}
+                        </span>
+                        <span className={styles.logDate}>
+                          {new Date(log.createdAt).toLocaleString('ru-RU')}
+                        </span>
+                        {log.comment && (
+                          <div className={styles.logComment}>
+                            <strong>Причина:</strong> {log.comment}
+                            {log.user && <span> (изменил: {log.user.name})</span>}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

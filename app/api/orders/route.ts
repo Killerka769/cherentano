@@ -2,6 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 
+// Вспомогательная функция для добавления часов
+function addHours(time: string, hours: number): string {
+  const [h, m] = time.split(':').map(Number)
+  const totalMinutes = h * 60 + m + hours * 60
+  const newH = Math.floor(totalMinutes / 60)
+  const newM = totalMinutes % 60
+  return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
+}
+
+// Проверка пересечения времени
+function isTimeOverlap(
+  newStart: string,
+  newEnd: string,
+  existingStart: string,
+  existingEnd: string | null
+): boolean {
+  const existingEndTime = existingEnd || addHours(existingStart, 2)
+  return (
+    (newStart >= existingStart && newStart < existingEndTime) ||
+    (newEnd > existingStart && newEnd <= existingEndTime) ||
+    (newStart <= existingStart && newEnd >= existingEndTime) ||
+    (newStart >= existingStart && newEnd <= existingEndTime)
+  )
+}
+
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser()
@@ -17,7 +42,16 @@ export async function GET(request: NextRequest) {
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
       include: {
-        items: true
+        items: true,
+        statusLogs: {
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          include: {
+            user: {
+              select: { id: true, name: true, role: true }
+            }
+          }
+        }
       }
     })
     
@@ -44,9 +78,19 @@ export async function POST(request: NextRequest) {
       total, 
       paymentMethod,
       needBooking,
+      tableId,
       bookingGuests,
       bookingTime,
-      bookingDate
+      bookingEndTime,
+      bookingDate,
+      isCharity,
+      charityRequestId,
+      charityBeneficiaryId,
+      mealTime,
+      // 👇 ВОЗВРАЩАЕМ СКИДКИ
+      discountId,
+      discountAmount,
+      isIndividualDiscount
     } = body
     
     const user = await getCurrentUser()
@@ -59,31 +103,79 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Преобразуем orderType в правильный enum
+    // Проверка доступности блюд
+    const dishIds = items.map((item: any) => item.id)
+    const availableDishes = await prisma.dish.findMany({
+      where: {
+        id: { in: dishIds },
+        isAvailable: true
+      },
+      select: { id: true }
+    })
+    
+    const availableIds = new Set(availableDishes.map(d => d.id))
+    const unavailableItems = items.filter((item: any) => !availableIds.has(item.id))
+    
+    if (unavailableItems.length > 0) {
+      return NextResponse.json({
+        error: `Некоторые блюда временно недоступны: ${unavailableItems.map((i: any) => i.name).join(', ')}`,
+        unavailableItems: unavailableItems.map((i: any) => i.name)
+      }, { status: 400 })
+    }
+    
+    // Преобразуем orderType
     const normalizedOrderType = orderType === 'pickup' ? 'PICKUP' : 'DELIVERY'
     const normalizedPaymentMethod = paymentMethod === 'cash' ? 'CASH' : 'CARD'
     
+    // 👇 СОЗДАЁМ ЗАКАЗ С ПОДДЕРЖКОЙ СКИДОК
+    const orderData: any = {
+      userId: user?.id || null,
+      customerName,
+      customerPhone,
+      orderType: normalizedOrderType,
+      deliveryAddress: normalizedOrderType === 'DELIVERY' ? deliveryAddress : null,
+      comment: comment || '',
+      total,
+      paymentMethod: normalizedPaymentMethod,
+      status: isCharity ? 'CONFIRMED' : 'NEW',
+      isCharity: isCharity || false,
+      items: {
+        create: items.map((item: any) => ({
+          dishId: item.id,
+          dishName: item.name,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      }
+    }
+    
+    // 👇 ДОБАВЛЯЕМ СКИДКУ ЕСЛИ ЕСТЬ
+    if (discountId && discountAmount) {
+      orderData.discountId = parseInt(discountId)
+      orderData.discountAmount = parseFloat(discountAmount)
+      
+      // Обновляем использование скидки
+      await prisma.discount.update({
+        where: { id: parseInt(discountId) },
+        data: { usedCount: { increment: 1 } }
+      })
+      
+      // Если скидка индивидуальная, отмечаем как использованную
+      if (isIndividualDiscount && user) {
+        await prisma.userDiscount.updateMany({
+          where: {
+            userId: user.id,
+            discountId: parseInt(discountId),
+            used: false
+          },
+          data: { used: true, usedAt: new Date() }
+        })
+      }
+    }
+    
     // Создаем заказ
     const order = await prisma.order.create({
-      data: {
-        userId: user?.id || null,
-        customerName,
-        customerPhone,
-        orderType: normalizedOrderType,
-        deliveryAddress: normalizedOrderType === 'DELIVERY' ? deliveryAddress : null,
-        comment: comment || '',
-        total,
-        paymentMethod: normalizedPaymentMethod,
-        status: 'NEW',
-        items: {
-          create: items.map((item: any) => ({
-            dishId: item.id,
-            dishName: item.name,
-            quantity: item.quantity,
-            price: item.price
-          }))
-        }
-      },
+      data: orderData,
       include: {
         items: true,
         user: true
@@ -94,59 +186,181 @@ export async function POST(request: NextRequest) {
     await prisma.orderStatusLog.create({
       data: {
         orderId: order.id,
-        status: 'NEW',
-        comment: 'Заказ создан'
+        status: isCharity ? 'CONFIRMED' : 'NEW',
+        comment: isCharity ? 'Благотворительный заказ создан' : 'Заказ создан'
       }
     })
     
+    // 👇 ЗАПИСЫВАЕМ ИСПОЛЬЗОВАНИЕ СКИДКИ
+    if (discountId && discountAmount) {
+      try {
+        await prisma.discountUsage.create({
+          data: {
+            discountId: parseInt(discountId),
+            userId: user?.id || 'guest',
+            orderId: order.id,
+            discountValue: parseFloat(discountAmount)
+          }
+        })
+        console.log('✅ Discount usage recorded')
+      } catch (error) {
+        console.error('Error recording discount usage:', error)
+      }
+    }
+    
     let bookingCreated = false
     let bookingId = null
+    let bookingError = null
     
     // Создаем бронирование столика если нужно
     if (needBooking && normalizedOrderType === 'PICKUP' && bookingDate) {
       const bookingDateTime = new Date(bookingDate)
+      const endTime = bookingEndTime || addHours(bookingTime, 2)
       
-      // Проверяем, что дата не в прошлом
       if (bookingDateTime < new Date()) {
-        // Не возвращаем ошибку, просто не создаем бронь
-        console.log('Booking date is in the past, skipping')
+        bookingError = 'Дата бронирования не может быть в прошлом'
+      } else if (!tableId) {
+        bookingError = 'Не выбран столик для бронирования'
       } else {
-        // Находим свободный столик
-        const availableTable = await prisma.table.findFirst({
-          where: {
-            isActive: true,
-            seats: { gte: bookingGuests || 2 },
-            bookings: {
-              none: {
-                date: bookingDateTime,
-                time: bookingTime,
-                status: { notIn: ['CANCELLED', 'NO_SHOW'] }
-              }
-            }
-          }
+        const selectedTable = await prisma.table.findUnique({
+          where: { id: tableId }
         })
         
-        if (availableTable) {
-          const newBooking = await prisma.booking.create({
-            data: {
-              tableId: availableTable.id,
-              userId: user?.id || null,
-              customerName,
-              customerPhone,
-              customerEmail: user?.email || null,
+        if (!selectedTable) {
+          bookingError = 'Выбранный столик не найден'
+        } else if (!selectedTable.isActive) {
+          bookingError = 'Выбранный столик временно недоступен'
+        } else if (selectedTable.seats < (bookingGuests || 2)) {
+          bookingError = `В кабинке ${selectedTable.seats} мест, а вы выбрали ${bookingGuests || 2} гостей`
+        } else {
+          const existingBookings = await prisma.booking.findMany({
+            where: {
+              tableId: tableId,
               date: bookingDateTime,
-              time: bookingTime,
-              guests: bookingGuests || 2,
-              status: 'PENDING',
-              comment: `Создано вместе с заказом #${order.id}. ${comment || ''}`
+              status: { in: ['CONFIRMED', 'PENDING'] }
             }
           })
-          bookingCreated = true
-          bookingId = newBooking.id
-          console.log(`Booking created for order #${order.id}, table #${availableTable.number}`)
-        } else {
-          console.log('No available table for booking')
+          
+          let hasConflict = false
+          let conflictingBooking = null
+          
+          for (const booking of existingBookings) {
+            const bookingEnd = booking.endTime || addHours(booking.time, 2)
+            if (isTimeOverlap(bookingTime, endTime, booking.time, bookingEnd)) {
+              hasConflict = true
+              conflictingBooking = booking
+              break
+            }
+          }
+          
+          if (hasConflict && conflictingBooking) {
+            bookingError = `Кабинка занята в это время. Бронь: ${conflictingBooking.customerName} (${conflictingBooking.time}${conflictingBooking.endTime ? ` - ${conflictingBooking.endTime}` : ''})`
+          } else if (!hasConflict) {
+            const newBooking = await prisma.booking.create({
+              data: {
+                tableId: tableId,
+                userId: user?.id || null,
+                customerName,
+                customerPhone,
+                customerEmail: user?.email || null,
+                date: bookingDateTime,
+                time: bookingTime,
+                endTime: endTime,
+                guests: bookingGuests || 2,
+                status: 'PENDING',
+                comment: `Создано вместе с заказом #${order.id}. ${comment || ''}`
+              }
+            })
+            bookingCreated = true
+            bookingId = newBooking.id
+          }
         }
+      }
+    }
+    
+    // Если бронирование не создано, но нужно было — возвращаем ошибку и откатываем заказ
+    if (needBooking && normalizedOrderType === 'PICKUP' && bookingDate && !bookingCreated) {
+      await prisma.order.delete({ where: { id: order.id } })
+      return NextResponse.json({
+        error: bookingError || 'Не удалось забронировать столик',
+        bookingFailed: true
+      }, { status: 409 })
+    }
+    
+    // 👇 БЛАГОТВОРИТЕЛЬНОСТЬ - СОЗДАНИЕ ИСТОРИИ
+    if (isCharity && charityRequestId) {
+      try {
+        const helpRequest = await prisma.helpRequest.findUnique({
+          where: { id: charityRequestId },
+          include: { beneficiary: true }
+        })
+        
+        if (helpRequest) {
+          await prisma.helpRequest.update({
+            where: { id: charityRequestId },
+            data: {
+              orderId: order.id,
+              items: items.map((item: any) => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price
+              })),
+              total: total,
+              status: 'APPROVED'
+            }
+          })
+          
+          const existingHistory = await prisma.helpHistory.findFirst({
+            where: { helpRequestId: charityRequestId }
+          })
+          
+          if (!existingHistory) {
+            await prisma.helpHistory.create({
+              data: {
+                helpRequestId: charityRequestId,
+                beneficiaryId: helpRequest.beneficiaryId,
+                userId: user?.id,
+                mealTime: helpRequest.mealTime || 'LUNCH',
+                amount: total,
+                items: items.map((item: any) => ({
+                  name: item.name,
+                  quantity: item.quantity,
+                  price: item.price
+                })),
+                comment: `Заказ #${order.id}`
+              }
+            })
+            console.log('✅ Charity history created for order #', order.id)
+          }
+          
+          // Обновляем статус нуждающегося
+          const completedHelps = await prisma.helpRequest.count({
+            where: {
+              beneficiaryId: helpRequest.beneficiaryId,
+              status: 'COMPLETED'
+            }
+          })
+          
+          const activeRequests = await prisma.helpRequest.count({
+            where: {
+              beneficiaryId: helpRequest.beneficiaryId,
+              status: { notIn: ['COMPLETED', 'REJECTED'] }
+            }
+          })
+          
+          if (completedHelps >= 3 && activeRequests === 0) {
+            await prisma.beneficiary.update({
+              where: { id: helpRequest.beneficiaryId },
+              data: { 
+                isCompleted: true,
+                isActive: false
+              }
+            })
+            console.log('✅ Beneficiary marked as completed')
+          }
+        }
+      } catch (charityError) {
+        console.error('Error processing charity:', charityError)
       }
     }
     

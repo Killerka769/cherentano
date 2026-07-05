@@ -1,0 +1,163 @@
+@use '../../../styles/variables' as *;
+
+.container {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid $border-light;
+  margin-top: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.iconWrapper {
+  background: #e3f2fd;
+  color: #2196f3;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: $text-gray;
+  margin: 0;
+}
+
+.details {
+  background: $bg-light;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+}
+
+.label {
+  color: $text-gray;
+  font-weight: 400;
+}
+
+.value {
+  font-weight: 500;
+  text-align: right;
+  max-width: 55%;
+  word-break: break-word;
+}
+
+.amount {
+  color: $primary;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.paymentType {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.copyBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.note {
+  display: flex;
+  gap: 12px;
+  background: #fff3e0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  
+  svg {
+    color: #ff9800;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  
+  strong {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+  
+  ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.8rem;
+    color: $text-gray;
+    
+    li {
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.7rem;
+  color: $text-gray;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .value {
+    text-align: left;
+    max-width: 100%;
+  }
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
@@ -24,11 +24,19 @@ interface Category {
   name: string;
 }
 
+interface DishOfDay {
+  id: number;
+  dishId: number;
+  date: string;
+  dish: Dish;
+}
+
 export default function AdminDishesPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [dishesOfDay, setDishesOfDay] = useState<DishOfDay[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +48,7 @@ export default function AdminDishesPage() {
     weight: '',
     imageUrl: ''
   });
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'ADMIN')) {
@@ -51,6 +60,7 @@ export default function AdminDishesPage() {
     if (user?.role === 'ADMIN') {
       fetchDishes();
       fetchCategories();
+      fetchDishesOfDay();
     }
   }, [user]);
 
@@ -74,6 +84,48 @@ export default function AdminDishesPage() {
     }
   };
 
+  const fetchDishesOfDay = async () => {
+    try {
+      const res = await fetch(`/api/admin/dishes/dish-of-day?date=${selectedDate}`);
+      const data = await res.json();
+      setDishesOfDay(data.dishesOfDay || []);
+    } catch (error) {
+      console.error('Failed to fetch dishes of day:', error);
+    }
+  };
+
+  const toggleDishOfDay = async (dishId: number) => {
+    const isAlreadyDishOfDay = dishesOfDay.some(d => d.dishId === dishId);
+    
+    try {
+      if (isAlreadyDishOfDay) {
+        // Удаляем из блюд дня
+        await fetch(`/api/admin/dishes/dish-of-day?dishId=${dishId}&date=${selectedDate}`, {
+          method: 'DELETE'
+        })
+        toast.success('Блюдо удалено из блюд дня');
+      } else {
+        // Добавляем в блюда дня
+        const res = await fetch('/api/admin/dishes/dish-of-day', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dishId, date: selectedDate })
+        })
+        
+        if (res.status === 400) {
+          const error = await res.json();
+          toast.error(error.error);
+          return;
+        }
+        toast.success('Блюдо добавлено в блюда дня!');
+      }
+      fetchDishesOfDay();
+      fetchDishes();
+    } catch (error) {
+      toast.error('Ошибка');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -85,10 +137,7 @@ export default function AdminDishesPage() {
     setIsSubmitting(true);
     
     try {
-      const url = editingDish 
-        ? '/api/admin/dishes'
-        : '/api/admin/dishes';
-      
+      const url = '/api/admin/dishes';
       const method = editingDish ? 'PUT' : 'POST';
       
       const body = editingDish 
@@ -160,13 +209,26 @@ export default function AdminDishesPage() {
 
   if (loading) return <div className={styles.loader}>Загрузка...</div>;
 
+  const dishOfDayIds = dishesOfDay.map(d => d.dishId);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Управление меню</h1>
-        <button onClick={() => setIsModalOpen(true)} className={styles.addBtn}>
-          <Plus size={18} /> Добавить блюдо
-        </button>
+        <div className={styles.headerActions}>
+          <div className={styles.dateSelector}>
+            <Calendar size={16} />
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className={styles.dateInput}
+            />
+          </div>
+          <button onClick={() => setIsModalOpen(true)} className={styles.addBtn}>
+            <Plus size={18} /> Добавить блюдо
+          </button>
+        </div>
       </div>
 
       <div className={styles.tableWrapper}>
@@ -183,47 +245,61 @@ export default function AdminDishesPage() {
             </tr>
           </thead>
           <tbody>
-            {dishes.map(dish => (
-              <tr key={dish.id}>
-                <td>{dish.id}</td>
-                <td className={styles.titleCell}>
-                  <div className={styles.dishName}>{dish.name}</div>
-                  {dish.imageUrl && (
-                    <div className={styles.imagePreview}>
-                      <img src={dish.imageUrl} alt={dish.name} width={40} height={40} />
+            {dishes.map(dish => {
+              const isDishOfDay = dishOfDayIds.includes(dish.id);
+              
+              return (
+                <tr key={dish.id} className={isDishOfDay ? styles.dishOfDayRow : ''}>
+                  <td>{dish.id}</td>
+                  <td className={styles.titleCell}>
+                    <div className={styles.dishName}>
+                      {dish.name}
+                      {isDishOfDay && <span className={styles.dishOfDayBadge}>⭐ Блюдо дня</span>}
                     </div>
-                  )}
-                </td>
-                <td>{dish.category?.name || '-'}</td>
-                <td>{dish.price} ₽</td>
-                <td>{dish.weight ? `${dish.weight}г` : '-'}</td>
-                <td>
-                  <button onClick={() => toggleAvailability(dish)} className={styles.statusBtn}>
-                    {dish.isAvailable ? <Eye size={16} /> : <EyeOff size={16} />}
-                    {dish.isAvailable ? ' Доступно' : ' Скрыто'}
-                  </button>
-                </td>
-                <td className={styles.actions}>
-                  <button onClick={() => {
-                    setEditingDish(dish);
-                    setFormData({
-                      name: dish.name,
-                      description: dish.description || '',
-                      price: String(dish.price),
-                      categoryId: String(dish.categoryId),
-                      weight: String(dish.weight || ''),
-                      imageUrl: dish.imageUrl || ''
-                    });
-                    setIsModalOpen(true);
-                  }} className={styles.editBtn}>
-                    <Edit2 size={16} />
-                  </button>
-                  <button onClick={() => deleteDish(dish.id)} className={styles.deleteBtn}>
-                    <Trash2 size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))}
+                    {dish.imageUrl && (
+                      <div className={styles.imagePreview}>
+                        <img src={dish.imageUrl} alt={dish.name} width={40} height={40} />
+                      </div>
+                    )}
+                  </td>
+                  <td>{dish.category?.name || '-'}</td>
+                  <td>{dish.price} ₽</td>
+                  <td>{dish.weight ? `${dish.weight}г` : '-'}</td>
+                  <td>
+                    <button onClick={() => toggleAvailability(dish)} className={styles.statusBtn}>
+                      {dish.isAvailable ? <Eye size={16} /> : <EyeOff size={16} />}
+                      {dish.isAvailable ? ' Доступно' : ' Скрыто'}
+                    </button>
+                  </td>
+                  <td className={styles.actions}>
+                    <button 
+                      onClick={() => toggleDishOfDay(dish.id)} 
+                      className={`${styles.dishOfDayBtn} ${isDishOfDay ? styles.active : ''}`}
+                      title={isDishOfDay ? 'Убрать из блюд дня' : 'Добавить в блюда дня'}
+                    >
+                      {isDishOfDay ? <Star size={16} fill="#ffd700" color="#ffd700" /> : <Star size={16} />}
+                    </button>
+                    <button onClick={() => {
+                      setEditingDish(dish);
+                      setFormData({
+                        name: dish.name,
+                        description: dish.description || '',
+                        price: String(dish.price),
+                        categoryId: String(dish.categoryId),
+                        weight: String(dish.weight || ''),
+                        imageUrl: dish.imageUrl || ''
+                      });
+                      setIsModalOpen(true);
+                    }} className={styles.editBtn}>
+                      <Edit2 size={16} />
+                    </button>
+                    <button onClick={() => deleteDish(dish.id)} className={styles.deleteBtn}>
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

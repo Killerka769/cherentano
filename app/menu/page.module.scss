@@ -366,3 +366,81 @@
     color: white;
   }
 }
+
+.loadIndicator {
+  max-width: 600px;
+  margin: 1rem auto 32px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border-light;
+  
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+    margin-bottom: 24px;
+  }
+}
+
+// Кнопки благотворительности
+.charityLinksWrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  justify-content: flex-end;
+}
+
+.charityLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #e91e63, #c2185b);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.35);
+  }
+  
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.charityLinkIcon {
+  color: white;
+  flex-shrink: 0;
+}
+
+.charityHistoryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1.5px solid $border-light;
+  padding: 8px 10px;
+  border-radius: 40px;
+  text-decoration: none;
+  color: $text-gray;
+  transition: all 0.25s ease;
+  gap: 0.5rem;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: scale(0.97);
+  }
+}

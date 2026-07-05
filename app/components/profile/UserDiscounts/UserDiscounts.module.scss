@@ -1,0 +1,170 @@
+@use '../../../styles/variables' as *;
+
+.container {
+  padding: 20px 0;
+  
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid $border-light;
+  transition: all $transition-base;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
+  }
+  
+  &.expired {
+    opacity: 0.6;
+  }
+  
+  &.individual {
+    border-color: #9c27b0;
+    background: rgba(156, 39, 176, 0.03);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.code {
+  font-weight: 700;
+  color: $primary;
+  font-size: 0.85rem;
+  background: rgba(196, 73, 44, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.badge {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: $primary;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: $text-gray;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.75rem;
+  color: $text-gray;
+  
+  .special {
+    color: #ff9800;
+  }
+  
+  .individualBadge {
+    background: #f3e5f5;
+    color: #9c27b0;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  
+  .date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.active {
+  color: #4caf50;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.inactive {
+  color: #f44336;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.useBtn {
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 20px;
+  }
+}
+
+.menuBtn {
+  display: inline-block;
+  background: $primary;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 500;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 40px;
+  color: $text-gray;
+}

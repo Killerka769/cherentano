@@ -7,11 +7,26 @@ import { Calendar, Clock, Users, Phone, User, Mail, MessageSquare, AlertCircle, 
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 import PhoneInput from '../components/ui/PhoneInput/PhoneInput';
+import ImageWithFallback from '../components/ui/ImageWithFallback/ImageWithFallback';
+import TableGallery from '../components/ui/TableGallery/TableGallery';
 
 interface Table {
   id: number;
   number: number;
   seats: number;
+  name: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  images: string[] | null;
+  purpose: string | null;
+  bookings: {
+    id: string;
+    date: string;
+    time: string;
+    endTime: string | null;
+    status: string;
+    customerName: string;
+  }[];
 }
 
 export default function BookingPage() {
@@ -19,26 +34,27 @@ export default function BookingPage() {
   const router = useRouter();
   const [tables, setTables] = useState<Table[]>([]);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
+  const [selectedTableForGallery, setSelectedTableForGallery] = useState<Table | null>(null);
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
     customerEmail: '',
     date: '',
     time: '19:00',
+    endTime: '21:00',
     guests: 2,
     comment: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
+  const [bookingDuration, setBookingDuration] = useState(2);
 
-  // Загружаем столики (доступно всем)
   useEffect(() => {
     fetchTables();
     generateAvailableTimes();
   }, []);
 
-  // Если пользователь авторизован - подставляем его данные
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -49,6 +65,31 @@ export default function BookingPage() {
       }));
     }
   }, [user]);
+
+  // Автоматически вычисляем время окончания
+  const getEndTime = (startTime: string, duration: number): string => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + duration * 60;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+  };
+
+  const handleTimeChange = (time: string) => {
+    setFormData(prev => ({
+      ...prev,
+      time: time,
+      endTime: getEndTime(time, bookingDuration)
+    }));
+  };
+
+  const handleDurationChange = (duration: number) => {
+    setBookingDuration(duration);
+    setFormData(prev => ({
+      ...prev,
+      endTime: getEndTime(prev.time, duration)
+    }));
+  };
 
   const fetchTables = async () => {
     try {
@@ -72,7 +113,6 @@ export default function BookingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Проверка авторизации при отправке
     if (!user) {
       toast.error('Для бронирования столика необходимо войти в аккаунт');
       router.push('/login?redirect=/booking');
@@ -102,13 +142,21 @@ export default function BookingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tableId: selectedTable,
-          ...formData
+          ...formData,
+          endTime: formData.endTime
         })
       });
       
       const data = await res.json();
       
       if (!res.ok) {
+        if (res.status === 409 && data.conflictingBookings) {
+          const conflictMessage = data.conflictingBookings.map((b: any) => 
+            `${b.customerName} (${b.time}${b.endTime ? ` - ${b.endTime}` : ''})`
+          ).join(', ');
+          toast.error(`❌ Столик занят в это время. Брони: ${conflictMessage}`);
+          return;
+        }
         throw new Error(data.error || 'Ошибка бронирования');
       }
       
@@ -124,6 +172,15 @@ export default function BookingPage() {
   const selectedTableObj = tables.find(t => t.id === selectedTable);
   const isAuthenticated = !!user;
 
+  // Проверяем занятость столика на выбранную дату
+  const isTableBooked = (table: Table) => {
+    if (!formData.date) return false;
+    return table.bookings.some(b => 
+      b.date === formData.date && 
+      (b.status === 'CONFIRMED' || b.status === 'PENDING')
+    );
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -134,26 +191,55 @@ export default function BookingPage() {
       <div className={styles.content}>
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.card}>
-            <h3>Выберите столик</h3>
+            <h3>Выберите кабинку</h3>
             <div className={styles.tablesGrid}>
-              {tables.map(table => (
-                <button
-                  key={table.id}
-                  type="button"
-                  onClick={() => setSelectedTable(table.id)}
-                  className={`${styles.tableCard} ${selectedTable === table.id ? styles.selected : ''}`}
-                >
-                  <div className={styles.tableNumber}>Столик №{table.number}</div>
-                  <div className={styles.tableSeats}>
-                    <Users size={14} />
-                    {table.seats} места
+              {tables.map(table => {
+                const booked = isTableBooked(table);
+                
+                return (
+                  <div 
+                    key={table.id}
+                    onClick={() => !booked && setSelectedTable(table.id)}
+                    className={`${styles.tableCard} ${selectedTable === table.id ? styles.selected : ''} ${booked ? styles.booked : ''}`}
+                  >
+                    <div className={styles.tableImage}>
+                      <ImageWithFallback
+                        src={table.imageUrl || ''}
+                        alt={`Кабинка ${table.number}`}
+                        fallback="default"
+                      />
+                      {table.images && table.images.length > 0 && (
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedTableForGallery(table);
+                          }}
+                          className={styles.galleryBtn}
+                        >
+                          📷 Смотреть фото
+                        </button>
+                      )}
+                      {booked && (
+                        <div className={styles.bookedBadge}>Занято</div>
+                      )}
+                    </div>
+                    <div className={styles.tableInfo}>
+                      <div className={styles.tableNumber}>Кабинка №{table.number}</div>
+                      {table.name && <div className={styles.tableName}>{table.name}</div>}
+                      <div className={styles.tableSeats}>
+                        <Users size={14} />
+                        {table.seats} места
+                      </div>
+                      {table.purpose && (
+                        <div className={styles.tablePurpose}>🎯 {table.purpose}</div>
+                      )}
+                    </div>
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
           </div>
 
-          {/* Если пользователь не авторизован - показываем предупреждение и блокируем форму */}
           {!isAuthenticated && (
             <div className={styles.authWarning}>
               <Lock size={24} />
@@ -228,7 +314,7 @@ export default function BookingPage() {
               <label><Clock size={18} /> Время *</label>
               <select
                 value={formData.time}
-                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                onChange={(e) => handleTimeChange(e.target.value)}
                 required
                 disabled={!isAuthenticated}
                 className={!isAuthenticated ? styles.disabled : ''}
@@ -237,6 +323,35 @@ export default function BookingPage() {
                   <option key={time} value={time}>{time}</option>
                 ))}
               </select>
+            </div>
+
+            <div className={styles.field}>
+              <label><Clock size={18} /> Длительность *</label>
+              <select
+                value={bookingDuration}
+                onChange={(e) => handleDurationChange(parseInt(e.target.value))}
+                required
+                disabled={!isAuthenticated}
+                className={!isAuthenticated ? styles.disabled : ''}
+              >
+                <option value={1}>1 час</option>
+                <option value={2}>2 часа</option>
+                <option value={3}>3 часа</option>
+                <option value={4}>4 часа</option>
+                <option value={5}>5 часов</option>
+                <option value={6}>6 часов</option>
+              </select>
+            </div>
+
+            <div className={styles.field}>
+              <label><Clock size={18} /> До</label>
+              <input
+                type="text"
+                value={formData.endTime}
+                readOnly
+                className={styles.endTimeDisplay}
+                disabled
+              />
             </div>
             
             <div className={styles.field}>
@@ -319,6 +434,13 @@ export default function BookingPage() {
           </div>
         </div>
       </div>
+
+      {selectedTableForGallery && (
+        <TableGallery 
+          table={selectedTableForGallery} 
+          onClose={() => setSelectedTableForGallery(null)} 
+        />
+      )}
     </div>
   );
 }

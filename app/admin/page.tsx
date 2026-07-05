@@ -9,7 +9,12 @@ import {
   Table,
   Settings,
   FileText,
-  MessageSquare
+  MessageSquare,
+  Text,
+  Percent,
+  Gift,
+  ChefHat,
+  Heart
 } from 'lucide-react';
 import Link from 'next/link';
 import styles from './page.module.scss';
@@ -207,6 +212,12 @@ export default function AdminDashboard() {
           <Link href="/admin/blog" className={styles.actionBtn}>
             <FileText size={20} /> Блог
           </Link>
+          <Link href="/admin/load-intervals" className={styles.actionBtn}>
+            <Clock size={20} /> Загруженность
+          </Link>
+          <Link href="/admin/banners" className={styles.actionBtn}>
+            <Text size={20} /> Баннер
+          </Link>
           <Link href="/admin/reviews" className={styles.actionBtn}>
             <MessageSquare size={20} /> Отзывы
           </Link>
@@ -227,6 +238,24 @@ export default function AdminDashboard() {
           </Link>
           <Link href="/admin/settings" className={styles.actionBtn}>
             <Settings size={20} /> Настройки
+          </Link>
+          <Link href="/admin/discounts" className={styles.actionBtn}>
+            <Percent size={20} /> Скидки
+          </Link>
+          <Link href="/admin/discounts/users" className={styles.actionBtn}>
+            <Users size={20} /> Использование скидок
+          </Link>
+          <Link href="/admin/recipes" className={styles.actionBtn}>
+            <ChefHat size={20} /> Рецепты
+          </Link>
+          <Link href="/admin/recipes/comments" className={styles.actionBtn}>
+            <ChefHat size={20} /> Комментарии к рецептам
+          </Link>
+          <Link href="/admin/recipes/categories" className={styles.actionBtn}>
+            <ChefHat size={20} /> Категории рецептов
+          </Link>
+          <Link href="/admin/charity" className={styles.actionBtn}>
+            <Heart size={20} /> Благотворительность
           </Link>
         </div>
       </div>

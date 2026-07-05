@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Trash2, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { Heart, Trash2, ShoppingCart, ArrowLeft, XCircle } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
@@ -20,6 +20,7 @@ interface Favorite {
     imageUrl: string | null;
     weight: number | null;
     description: string | null;
+    isAvailable: boolean;
   };
 }
 
@@ -65,6 +66,11 @@ export default function FavoritesPage() {
   };
 
   const addToCartHandler = (dish: Favorite['dish']) => {
+    if (!dish.isAvailable) {
+      toast.error('Блюдо временно недоступно');
+      return;
+    }
+    
     addToCart({
       id: dish.id,
       name: dish.name,
@@ -77,6 +83,9 @@ export default function FavoritesPage() {
   if (loading || isLoading) {
     return <div className={styles.loader}>Загрузка...</div>;
   }
+
+  const availableFavorites = favorites.filter(f => f.dish.isAvailable);
+  const unavailableFavorites = favorites.filter(f => !f.dish.isAvailable);
 
   return (
     <div className={styles.container}>
@@ -102,40 +111,87 @@ export default function FavoritesPage() {
           </Link>
         </div>
       ) : (
-        <div className={styles.grid}>
-          {favorites.map(fav => (
-            <div key={fav.id} className={styles.card}>
-              <Link href={`/menu/${fav.dish.slug}`} className={styles.cardLink}>
-                <div className={styles.imageWrapper}>
-                  <img 
-                    src={fav.dish.imageUrl || `/images/dishes/${fav.dish.id}.jpg`}
-                    alt={fav.dish.name}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
-                    }}
-                  />
-                  {fav.dish.weight && (
-                    <span className={styles.weight}>{fav.dish.weight}г</span>
-                  )}
+        <>
+          {/* Доступные блюда */}
+          {availableFavorites.length > 0 && (
+            <div className={styles.grid}>
+              {availableFavorites.map(fav => (
+                <div key={fav.id} className={styles.card}>
+                  <Link href={`/menu/${fav.dish.slug}`} className={styles.cardLink}>
+                    <div className={styles.imageWrapper}>
+                      <img 
+                        src={fav.dish.imageUrl || `/images/dishes/${fav.dish.id}.jpg`}
+                        alt={fav.dish.name}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                        }}
+                      />
+                      {fav.dish.weight && (
+                        <span className={styles.weight}>{fav.dish.weight}г</span>
+                      )}
+                    </div>
+                    <div className={styles.info}>
+                      <h3>{fav.dish.name}</h3>
+                      <p>{fav.dish.description?.slice(0, 80)}...</p>
+                      <div className={styles.price}>{fav.dish.price} ₽</div>
+                    </div>
+                  </Link>
+                  <div className={styles.actions}>
+                    <button onClick={() => addToCartHandler(fav.dish)} className={styles.cartBtn}>
+                      <ShoppingCart size={18} />
+                      В корзину
+                    </button>
+                    <button onClick={() => removeFromFavorites(fav.dishId)} className={styles.removeBtn}>
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </div>
-                <div className={styles.info}>
-                  <h3>{fav.dish.name}</h3>
-                  <p>{fav.dish.description?.slice(0, 80)}...</p>
-                  <div className={styles.price}>{fav.dish.price} ₽</div>
-                </div>
-              </Link>
-              <div className={styles.actions}>
-                <button onClick={() => addToCartHandler(fav.dish)} className={styles.cartBtn}>
-                  <ShoppingCart size={18} />
-                  В корзину
-                </button>
-                <button onClick={() => removeFromFavorites(fav.dishId)} className={styles.removeBtn}>
-                  <Trash2 size={18} />
-                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Недоступные блюда */}
+          {unavailableFavorites.length > 0 && (
+            <div className={styles.unavailableSection}>
+              <h3 className={styles.unavailableTitle}>
+                <XCircle size={18} />
+                Временно недоступны
+              </h3>
+              <div className={styles.grid}>
+                {unavailableFavorites.map(fav => (
+                  <div key={fav.id} className={`${styles.card} ${styles.unavailableCard}`}>
+                    <div className={styles.imageWrapper}>
+                      <img 
+                        src={fav.dish.imageUrl || `/images/dishes/${fav.dish.id}.jpg`}
+                        alt={fav.dish.name}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+                        }}
+                      />
+                      <div className={styles.unavailableOverlay}>
+                        <XCircle size={32} />
+                        <span>Временно недоступно</span>
+                      </div>
+                    </div>
+                    <div className={styles.info}>
+                      <h3>{fav.dish.name}</h3>
+                      <p>{fav.dish.description?.slice(0, 80)}...</p>
+                      <div className={styles.priceUnavailable}>Недоступно</div>
+                    </div>
+                    <div className={styles.actions}>
+                      <button 
+                        onClick={() => removeFromFavorites(fav.dishId)} 
+                        className={styles.removeBtn}
+                      >
+                        <Trash2 size={18} /> Удалить
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -34,6 +34,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Название и состав корзины обязательны' }, { status: 400 })
     }
     
+    // Проверяем, что все блюда в корзине доступны
+    const dishIds = items.map((item: any) => item.id)
+    const availableDishes = await prisma.dish.findMany({
+      where: {
+        id: { in: dishIds },
+        isAvailable: true
+      },
+      select: { id: true }
+    })
+    
+    const availableIds = new Set(availableDishes.map(d => d.id))
+    const unavailableItems = items.filter((item: any) => !availableIds.has(item.id))
+    
+    if (unavailableItems.length > 0) {
+      return NextResponse.json({
+        error: 'Некоторые блюда временно недоступны',
+        unavailableItems: unavailableItems.map((item: any) => item.name)
+      }, { status: 400 })
+    }
+    
     const savedCart = await prisma.savedCart.create({
       data: {
         userId: user.id,

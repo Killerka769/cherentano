@@ -1,0 +1,258 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.categoriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categoryCard {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: $shadow-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.categoryInfo {
+  flex: 1;
+}
+
+.categoryName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.categorySlug {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.categoryDesc {
+  font-size: 0.85rem;
+  color: $text-gray;
+  margin-top: 6px;
+}
+
+.categoryActions {
+  display: flex;
+  gap: 8px;
+}
+
+.editBtn, .deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $bg-light;
+  }
+}
+
+.editBtn {
+  color: $primary;
+}
+
+.deleteBtn {
+  color: $error;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 24px;
+  max-width: 450px;
+  width: 90%;
+  padding: 28px;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-gray;
+  padding: 4px;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.field {
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+  
+  textarea {
+    resize: vertical;
+  }
+}
+
+.hint {
+  font-size: 0.7rem;
+  color: $text-gray;
+  margin-top: 6px;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.saveBtn {
+  flex: 1;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 12px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+  
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+  }
+  
+  span {
+    font-size: 0.85rem;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}
+
+@media (max-width: 768px) {
+  .categoryCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .categoryActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

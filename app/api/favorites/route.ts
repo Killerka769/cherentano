@@ -21,7 +21,8 @@ export async function GET() {
             price: true,
             imageUrl: true,
             weight: true,
-            description: true
+            description: true,
+            isAvailable: true
           }
         }
       },
@@ -30,6 +31,7 @@ export async function GET() {
     
     return NextResponse.json({ favorites })
   } catch (error) {
+    console.error('Error fetching favorites:', error)
     return NextResponse.json({ error: 'Ошибка получения избранного' }, { status: 500 })
   }
 }
@@ -44,6 +46,20 @@ export async function POST(request: NextRequest) {
     
     const { dishId } = await request.json()
     
+    // Проверяем, существует ли блюдо и доступно ли оно
+    const dish = await prisma.dish.findUnique({
+      where: { id: dishId },
+      select: { isAvailable: true }
+    })
+    
+    if (!dish) {
+      return NextResponse.json({ error: 'Блюдо не найдено' }, { status: 404 })
+    }
+    
+    if (!dish.isAvailable) {
+      return NextResponse.json({ error: 'Блюдо временно недоступно' }, { status: 400 })
+    }
+    
     const favorite = await prisma.favorite.create({
       data: {
         userId: user.id,
@@ -56,7 +72,8 @@ export async function POST(request: NextRequest) {
             name: true,
             slug: true,
             price: true,
-            imageUrl: true
+            imageUrl: true,
+            isAvailable: true
           }
         }
       }
@@ -64,6 +81,7 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ favorite })
   } catch (error) {
+    console.error('Error adding favorite:', error)
     return NextResponse.json({ error: 'Ошибка добавления в избранное' }, { status: 500 })
   }
 }
@@ -79,17 +97,22 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const dishId = searchParams.get('dishId')
     
+    if (!dishId) {
+      return NextResponse.json({ error: 'Не указан ID блюда' }, { status: 400 })
+    }
+    
     await prisma.favorite.delete({
       where: {
         userId_dishId: {
           userId: user.id,
-          dishId: parseInt(dishId!)
+          dishId: parseInt(dishId)
         }
       }
     })
     
     return NextResponse.json({ success: true })
   } catch (error) {
+    console.error('Error removing favorite:', error)
     return NextResponse.json({ error: 'Ошибка удаления из избранного' }, { status: 500 })
   }
 }

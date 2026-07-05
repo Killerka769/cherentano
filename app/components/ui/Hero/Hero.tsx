@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, Play, ChefHat, Clock, Award, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ArrowRight, Play, ChefHat, Clock, Award, ChevronLeft, ChevronRight, Truck } from 'lucide-react';
 import styles from './Hero.module.scss';
 
 const slides = [
@@ -128,6 +128,10 @@ export default function Hero() {
                     <button onClick={handleBookingClick} className={styles.outlineBtn}>
                       <Play size={18} />
                       Забронировать стол
+                    </button>
+                    <button onClick={() => router.push('/delivery')} className={styles.deliveryBtn}>
+                      <Truck size={18} />
+                      Доставка еды
                     </button>
                   </motion.div>
 

@@ -538,3 +538,638 @@
     line-height: 1.4;
   }
 }
+
+.discountSection {
+  margin: 16px 0;
+}
+
+.discount {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+// Баннер с примененной скидкой
+.discountBanner {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid #a5d6a7;
+}
+
+.discountBannerContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  div {
+    display: flex;
+    flex-direction: column;
+    
+    strong {
+      font-size: 0.95rem;
+      color: #2e7d32;
+    }
+    
+    span {
+      font-size: 0.8rem;
+      color: #388e3c;
+    }
+  }
+}
+
+.discountBannerIcon {
+  color: #4caf50;
+  flex-shrink: 0;
+}
+
+// Строка со скидкой в итоге
+.discountRow {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.discountValue {
+  color: #4caf50;
+  font-weight: 700;
+}
+
+// Оплата онлайн
+.paymentContainer {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.paymentHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.paymentSuccessIcon {
+  color: #4caf50;
+  margin-bottom: 16px;
+}
+
+.paymentHeader h2 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+.paymentHeader p {
+  color: $text-gray;
+}
+
+.paymentActions {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.paymentCompleteBtn {
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.depositNote {
+  font-size: 0.8rem;
+  color: $text-gray;
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px;
+  background: $bg-light;
+  border-radius: 8px;
+}
+
+.paymentInfo {
+  font-size: 0.65rem;
+  color: $primary;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+// Тип оплаты для самовывоза
+.paymentTypeOptions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.paymentTypeOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  background: white;
+  min-width: 200px;
+  
+  input {
+    display: none;
+  }
+  
+  &:hover {
+    border-color: $primary;
+  }
+  
+  &.active {
+    border-color: $primary;
+    background: rgba(196, 73, 44, 0.05);
+  }
+  
+  div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    
+    strong {
+      font-size: 0.9rem;
+    }
+    
+    span {
+      font-size: 0.8rem;
+      color: $text-gray;
+    }
+  }
+}
+
+.balanceInfo {
+  font-size: 0.7rem !important;
+  color: $primary !important;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.paymentTypeHint {
+  font-size: 0.8rem;
+  color: $text-gray;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: $bg-light;
+  border-radius: 12px;
+}
+
+// Экран оплаты после заказа
+.paymentContainer {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.paymentCard {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: $shadow-lg;
+}
+
+.paymentCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.paymentDetails {
+  background: $bg-light;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.paymentRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+}
+
+.paymentLabel {
+  color: $text-gray;
+}
+
+.paymentValue {
+  font-weight: 500;
+}
+
+.amount {
+  color: $primary;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.paymentTextBlock {
+  margin: 20px 0;
+  
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+}
+
+.paymentText {
+  background: #1a1a2e;
+  color: #e8e8e8;
+  padding: 16px;
+  border-radius: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-bottom: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: inherit;
+  }
+}
+
+.copyPaymentBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.paymentInstructions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.instruction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: $primary;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.paymentNote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff3e0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #e65100;
+  margin: 16px 0;
+  
+  svg {
+    color: #ff9800;
+    flex-shrink: 0;
+  }
+}
+
+.paymentActions {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.paymentCompleteBtn {
+  width: 100%;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #388e3c;
+    transform: translateY(-2px);
+  }
+}
+
+.depositNote {
+  font-size: 0.8rem;
+  color: $text-gray;
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px;
+  background: $bg-light;
+  border-radius: 8px;
+}
+
+// Адаптив
+@media (max-width: 768px) {
+  .paymentContainer {
+    padding: 20px 0;
+  }
+  
+  .paymentCard {
+    padding: 16px;
+  }
+  
+  .paymentRow {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .paymentTypeOption {
+    min-width: 100%;
+  }
+  
+  .paymentText {
+    font-size: 0.7rem;
+    padding: 12px;
+  }
+}
+
+.endTimeDisplay {
+  background: #f5f5f5 !important;
+  color: $text-dark !important;
+  font-weight: 600 !important;
+  cursor: default !important;
+  border-color: $border-light !important;
+  
+  &:focus {
+    box-shadow: none !important;
+  }
+}
+
+// Добавьте в конец файла:
+
+.tableHint {
+  font-size: 0.7rem;
+  color: $text-gray;
+  margin-top: 4px;
+}
+
+.selectedTablePreview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: $bg-light;
+  border-radius: 12px;
+  margin-top: 12px;
+  
+  img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+}
+
+.selectedTableName {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.selectedTableSeats {
+  font-size: 0.75rem;
+  color: $text-gray;
+}
+
+.selectedTablePurpose {
+  font-size: 0.75rem;
+  color: $primary;
+  margin-top: 4px;
+}
+
+// Стили для красивого тоста с ошибкой
+.errorToast {
+  text-align: left;
+}
+
+.errorToastTitle {
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #c62828;
+}
+
+.errorToastList {
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: rgba(198, 40, 40, 0.05);
+  border-radius: 8px;
+}
+
+.errorToastItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 0.85rem;
+  color: #b71c1c;
+}
+
+.errorToastBullet {
+  color: #c62828;
+  font-weight: 700;
+}
+
+.errorToastHint {
+  font-size: 0.75rem;
+  color: #8d6e63;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ffcdd2;
+}
+
+// Благотворительность
+.charityBanner {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  border-radius: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  border: 1px solid #f48fb1;
+}
+
+.charityBannerContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  
+  div {
+    flex: 1;
+    
+    strong {
+      font-size: 0.95rem;
+      color: #880e4f;
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    p {
+      font-size: 0.85rem;
+      color: #4a148c;
+      margin: 0;
+    }
+  }
+}
+
+.charityHeartIcon {
+  color: #e91e63;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.charityAddress {
+  display: block;
+  font-size: 0.75rem;
+  color: #6a1b9a;
+  margin-top: 2px;
+}
+
+.charityUrgency {
+  display: inline-block;
+  background: rgba(233, 30, 99, 0.15);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #c2185b;
+  margin-top: 4px;
+}
+
+.heartTitleIcon {
+  color: #e91e63;
+  margin-right: 8px;
+}
+
+.readonlyInput {
+  background: #f5f5f5 !important;
+  cursor: not-allowed;
+  color: $text-dark !important;
+  font-weight: 500;
+}
+
+.emptyCharityItems {
+  text-align: center;
+  padding: 30px 20px;
+  
+  svg {
+    color: #e91e63;
+    margin-bottom: 12px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 12px;
+  }
+}
+
+.menuLink {
+  display: inline-block;
+  color: $primary;
+  text-decoration: none;
+  font-weight: 500;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.charityNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #880e4f;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 8px;
+  
+  svg {
+    color: #e91e63;
+  }
+}
+
+.heartIcon {
+  color: #e91e63;
+  display: inline;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.modalHeartIcon {
+  display: block;
+  margin: 0 auto 12px;
+  color: #e91e63;
+}
+
+.modalUrgency {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(233, 30, 99, 0.1);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #c2185b;
+}

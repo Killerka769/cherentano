@@ -28,6 +28,7 @@ interface Booking {
   customerEmail: string | null;
   date: string;
   time: string;
+  endTime: string | null;
   guests: number;
   comment: string | null;
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
@@ -250,14 +251,17 @@ export default function ManagerBookingsPage() {
           filteredBookings.map(booking => (
             <div key={booking.id} className={`${styles.bookingCard} ${booking.status === 'PENDING' ? styles.pendingCard : ''}`}>
               <div className={styles.cardHeader}>
-                <div className={styles.timeInfo}>
-                  <span className={styles.time}>{booking.time}</span>
-                  <span className={styles.table}>Стол №{booking.table.number} ({booking.table.seats} мест)</span>
-                  <span className={styles.guests}>
-                    <Users size={14} />
-                    {booking.guests} чел
-                  </span>
-                </div>
+              <div className={styles.timeInfo}>
+                <span className={styles.time}>
+                  {booking.time}
+                  {booking.endTime && <span className={styles.timeRange}> — {booking.endTime}</span>}
+                </span>
+                <span className={styles.table}>Стол №{booking.table.number} ({booking.table.seats} мест)</span>
+                <span className={styles.guests}>
+                  <Users size={14} />
+                  {booking.guests} чел
+                </span>
+              </div>
                 <div 
                   className={styles.status}
                   style={{ background: `${getStatusColor(booking.status)}20`, color: getStatusColor(booking.status) }}

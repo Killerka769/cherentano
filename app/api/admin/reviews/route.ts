@@ -18,6 +18,11 @@ export async function GET(request: NextRequest) {
     
     const reviews = await prisma.review.findMany({
       where,
+      include: {
+        user: {
+          select: { id: true, name: true, email: true }
+        }
+      },
       orderBy: { createdAt: 'desc' }
     })
     
@@ -27,22 +32,78 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Только PATCH часть, остальное без изменений
+
 export async function PATCH(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    if (!user || user.role !== 'ADMIN') {
+    const admin = await getCurrentUser()
+    if (!admin || admin.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
     }
     
     const { reviewId } = await request.json()
     
-    const review = await prisma.review.update({
+    const review = await prisma.review.findUnique({
+      where: { id: reviewId },
+      include: { user: true }
+    })
+    
+    if (!review) {
+      return NextResponse.json({ error: 'Отзыв не найден' }, { status: 404 })
+    }
+    
+    // Одобряем отзыв
+    const updatedReview = await prisma.review.update({
       where: { id: reviewId },
       data: { isApproved: true }
     })
     
-    return NextResponse.json({ review })
+    // ============ ВЫДАЁМ СКИДКУ ЗА ОТЗЫВ ============
+    if (review.userId && review.user) {
+      // Проверяем, есть ли уже скидка за отзыв у пользователя
+      const existing = await prisma.userDiscount.findFirst({
+        where: {
+          userId: review.userId,
+          discount: {
+            code: {
+              startsWith: 'REVIEW10_'
+            }
+          }
+        },
+        include: { discount: true }
+      })
+      
+      // Если скидки нет - создаём
+      if (!existing) {
+        const individualDiscount = await prisma.discount.create({
+          data: {
+            code: `REVIEW10_${review.userId.slice(0, 8)}`,
+            name: '10% за отзыв',
+            description: 'Скидка 10% за оставленный отзыв',
+            type: 'PERCENT',
+            value: 10,
+            isActive: true,
+            isIndividual: true,
+            usageLimit: 1,
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          }
+        })
+        
+        await prisma.userDiscount.create({
+          data: {
+            userId: review.userId,
+            discountId: individualDiscount.id,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            used: false
+          }
+        })
+      }
+    }
+    
+    return NextResponse.json({ review: updatedReview })
   } catch (error) {
+    console.error('Error approving review:', error)
     return NextResponse.json({ error: 'Ошибка одобрения отзыва' }, { status: 500 })
   }
 }

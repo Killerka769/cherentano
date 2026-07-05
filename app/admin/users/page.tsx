@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Search, User, Shield, Crown, Trash2, Edit2, X, 
-  Lock, Unlock, AlertCircle, Eye, Calendar, Mail, Phone 
+  Lock, Unlock, AlertCircle, Eye, Calendar, Mail, Phone, 
+  Percent
 } from 'lucide-react';
 import styles from './page.module.scss';
 
@@ -304,6 +305,13 @@ export default function AdminUsersPage() {
                   </button>
                   <Link href={`/profile/${userItem.id}`} className={styles.viewBtn} title="Просмотр профиля">
                     <Eye size={16} />
+                  </Link>
+                  <Link 
+                    href={`/admin/users/${userItem.id}/discounts`} 
+                    className={styles.discountsBtn}
+                    title="Управление скидками"
+                  >
+                    <Percent size={16} />
                   </Link>
                   {!userItem.isBlocked ? (
                     <button

@@ -16,6 +16,7 @@ export async function GET() {
     
     return NextResponse.json({ tables })
   } catch (error) {
+    console.error('Error fetching tables:', error)
     return NextResponse.json({ error: 'Ошибка получения столиков' }, { status: 500 })
   }
 }
@@ -28,18 +29,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
     }
     
-    const { number, seats, isActive } = await request.json()
+    const { number, seats, isActive, name, description, purpose, imageUrl, images } = await request.json()
     
     const table = await prisma.table.create({
       data: {
         number,
         seats,
-        isActive: isActive ?? true
+        isActive: isActive ?? true,
+        name: name || null,
+        description: description || null,
+        purpose: purpose || null,
+        imageUrl: imageUrl || null,
+        images: images || []
       }
     })
     
     return NextResponse.json({ table }, { status: 201 })
   } catch (error) {
+    console.error('Error creating table:', error)
     return NextResponse.json({ error: 'Ошибка создания столика' }, { status: 500 })
   }
 }
@@ -52,15 +59,25 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
     }
     
-    const { id, number, seats, isActive } = await request.json()
+    const { id, number, seats, isActive, name, description, purpose, imageUrl, images } = await request.json()
     
     const table = await prisma.table.update({
       where: { id: parseInt(id) },
-      data: { number, seats, isActive }
+      data: {
+        number,
+        seats,
+        isActive,
+        name: name || null,
+        description: description || null,
+        purpose: purpose || null,
+        imageUrl: imageUrl || null,
+        images: images || []
+      }
     })
     
     return NextResponse.json({ table })
   } catch (error) {
+    console.error('Error updating table:', error)
     return NextResponse.json({ error: 'Ошибка обновления столика' }, { status: 500 })
   }
 }
@@ -80,6 +97,7 @@ export async function DELETE(request: NextRequest) {
     
     return NextResponse.json({ success: true })
   } catch (error) {
+    console.error('Error deleting table:', error)
     return NextResponse.json({ error: 'Ошибка удаления столика' }, { status: 500 })
   }
 }

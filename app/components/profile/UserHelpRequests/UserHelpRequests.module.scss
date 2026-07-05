@@ -1,0 +1,180 @@
+@use '../../../styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mealBadge {
+  background: $bg-light;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.cardDate {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.cardBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.beneficiaryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.beneficiaryName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.beneficiaryAddress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: $text-gray;
+}
+
+.cardTotal {
+  font-size: 0.95rem;
+  
+  strong {
+    color: $primary;
+  }
+}
+
+.comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff3e0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: #e65100;
+  margin-bottom: 16px;
+  
+  svg {
+    color: #ff9800;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.viewLink {
+  color: $primary;
+  text-decoration: none;
+  font-size: 0.85rem;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.delivered {
+  font-size: 0.75rem;
+  color: #4caf50;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: $text-gray;
+    margin-bottom: 24px;
+  }
+}
+
+.goBtn {
+  display: inline-block;
+  background: $primary;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 40px;
+  text-decoration: none;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+}

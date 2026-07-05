@@ -27,7 +27,12 @@ export async function GET(request: NextRequest) {
         items: true,
         statusLogs: {
           orderBy: { createdAt: 'desc' },
-          take: 5
+          take: 5,
+          include: {
+            user: {
+              select: { id: true, name: true, role: true }
+            }
+          }
         },
         assignedManager: {
           select: { id: true, name: true, email: true }
@@ -64,19 +69,27 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Доступ запрещен' }, { status: 403 })
     }
     
-    const { orderId, status, comment } = await request.json()
+    const { orderId, status, comment, reason } = await request.json()
     
-    // Получаем заказ с пользователем
     const existingOrder = await prisma.order.findUnique({
       where: { id: orderId },
-      include: { user: true }
+      include: { 
+        user: true,
+        items: true  // 👈 ДОБАВЛЯЕМ items
+      }
     })
     
     if (!existingOrder) {
       return NextResponse.json({ error: 'Заказ не найден' }, { status: 404 })
     }
     
-    // Обновляем статус заказа
+    // Для отмены или отклонения требуется причина
+    if ((status === 'CANCELLED' || status === 'REJECTED') && !comment && !reason) {
+      return NextResponse.json({ error: 'Укажите причину отмены' }, { status: 400 })
+    }
+    
+    const finalComment = comment || reason || null
+    
     const order = await prisma.order.update({
       where: { id: orderId },
       data: {
@@ -98,34 +111,68 @@ export async function PATCH(request: NextRequest) {
       }
     })
     
-    // Логируем изменение статуса
+    // Логируем изменение статуса с комментарием
     await prisma.orderStatusLog.create({
       data: {
         orderId,
         status,
         changedBy: user.id,
-        comment
+        comment: finalComment
       }
     })
     
-    // АВТОМАТИЧЕСКАЯ ВЕРИФИКАЦИЯ ТЕЛЕФОНА
-    // Если заказ переведен в статус COMPLETED и у пользователя не подтвержден телефон
-    if (status === 'COMPLETED' && existingOrder.userId && existingOrder.user) {
-      const userToVerify = await prisma.user.findUnique({
+    // Автоматическая верификация телефона при выполнении заказа
+    if (status === 'COMPLETED' && existingOrder.userId) {
+      await prisma.user.update({
         where: { id: existingOrder.userId },
-        select: { phoneVerified: true, phone: true, id: true }
+        data: {
+          phoneVerified: true,
+          phoneVerifiedAt: new Date()
+        }
       })
-      
-      if (userToVerify && !userToVerify.phoneVerified) {
-        await prisma.user.update({
-          where: { id: existingOrder.userId },
-          data: {
-            phoneVerified: true,
-            phoneVerifiedAt: new Date()
-          }
+    }
+    
+    // 👇 СИНХРОНИЗАЦИЯ С БЛАГОТВОРИТЕЛЬНОСТЬЮ
+    if (status === 'COMPLETED' && existingOrder.isCharity) {
+      try {
+        const helpRequest = await prisma.helpRequest.findFirst({
+          where: { orderId: orderId }
         })
         
-        console.log(`✅ Телефон ${userToVerify.phone} автоматически подтвержден после выполнения заказа #${orderId}`)
+        if (helpRequest) {
+          await prisma.helpRequest.update({
+            where: { id: helpRequest.id },
+            data: {
+              status: 'COMPLETED',
+              deliveredAt: new Date()
+            }
+          })
+          
+          // Создаём или обновляем историю
+          const existingHistory = await prisma.helpHistory.findFirst({
+            where: { helpRequestId: helpRequest.id }
+          })
+          
+          if (!existingHistory) {
+            await prisma.helpHistory.create({
+              data: {
+                helpRequestId: helpRequest.id,
+                beneficiaryId: helpRequest.beneficiaryId,
+                userId: existingOrder.userId,
+                mealTime: helpRequest.mealTime || 'LUNCH',
+                amount: existingOrder.total,
+                items: existingOrder.items.map((item: any) => ({
+                  name: item.dishName,
+                  quantity: item.quantity,
+                  price: item.price
+                })),
+                comment: `Заказ #${orderId}`
+              }
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Error syncing charity on order complete:', error)
       }
     }
     

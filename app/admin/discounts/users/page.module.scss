@@ -1,0 +1,171 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card-bg);
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  padding: 12px 20px;
+  margin-bottom: 32px;
+  max-width: 400px;
+  
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--text-primary);
+  }
+  
+  svg {
+    color: $text-gray;
+  }
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: $shadow-sm;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+  }
+  
+  th {
+    font-weight: 600;
+    color: $text-gray;
+    background: $bg-light;
+  }
+  
+  tr:hover {
+    background: $bg-light;
+  }
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: $primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.contact {
+  font-size: 0.75rem;
+  color: $text-gray;
+}
+
+.discountCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  svg {
+    color: $primary;
+    flex-shrink: 0;
+  }
+}
+
+.code {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.amount {
+  font-weight: 700;
+  color: $primary;
+}
+
+.orderLink {
+  color: $primary;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.dateCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: $text-gray;
+  
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $error;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: rgba(244, 67, 54, 0.1);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+  
+  svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 0;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}

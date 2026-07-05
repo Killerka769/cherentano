@@ -206,3 +206,91 @@
   padding: 100px;
   color: $text-gray;
 }
+
+.passwordRequirements {
+  margin-top: 12px;
+  padding: 12px;
+  background: $bg-light;
+  border-radius: 12px;
+}
+
+.passwordStrength {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.strengthBar {
+  width: 100px;
+  height: 4px;
+  background: $border-light;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: 12px;
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.requirementsList {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+  
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    padding: 2px 0;
+    
+    &.valid {
+      color: #4caf50;
+    }
+    
+    &.invalid {
+      color: #f44336;
+    }
+    
+    svg {
+      flex-shrink: 0;
+    }
+  }
+}
+
+.strong {
+  color: #4caf50;
+}
+
+.medium {
+  color: #ff9800;
+}
+
+.weak {
+  color: #f44336;
+}
+
+.match {
+  display: block;
+  font-size: 0.75rem;
+  color: #4caf50;
+  margin-top: 6px;
+}
+
+.mismatch {
+  display: block;
+  font-size: 0.75rem;
+  color: #f44336;
+  margin-top: 6px;
+}

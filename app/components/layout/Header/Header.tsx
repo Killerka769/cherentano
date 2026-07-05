@@ -24,14 +24,12 @@ const baseNavLinks = [
 const managerLinks = [
   { href: '/manager/orders', label: 'Заказы' },
   { href: '/manager/bookings', label: 'Бронирования' },
+  { href: '/manager/charity', label: 'Заявки на помощь' },
 ];
 
 // Ссылки для админа (уникальные)
 const adminLinks = [
-  { href: '/admin', label: '👑 Дашборд' },
-  { href: '/admin/orders', label: 'Все заказы' },
-  { href: '/admin/dishes', label: 'Блюда' },
-  { href: '/admin/tables', label: 'Столики' },
+  { href: '/admin', label: '👑 Дашборд' }
 ];
 
 export default function Header() {
@@ -113,9 +111,9 @@ export default function Header() {
           {user ? (
             <div className={styles.userMenu}>
               {/* Избранное скрываем на мобильных */}
-              <Link href="/profile/favorites" className={`${styles.favoriteLink} ${styles.desktopOnly}`} title="Избранное">
+              {/* <Link href="/profile/favorites" className={`${styles.favoriteLink} ${styles.desktopOnly}`} title="Избранное">
                 <Heart size={20} />
-              </Link>
+              </Link> */}
               
               <div className={styles.userDropdown}>
                 <button className={styles.userBtn}>

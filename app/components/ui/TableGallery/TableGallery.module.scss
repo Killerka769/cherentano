@@ -1,0 +1,365 @@
+@use '../../../styles/variables' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal {
+  background: var(--card-bg, #ffffff);
+  border-radius: 28px;
+  max-width: 1000px;
+  width: 95%;
+  max-height: 90vh;
+  overflow: hidden;
+  position: relative;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.gallery {
+  flex: 1;
+  padding: 20px;
+  background: #f8f5f2;
+  min-height: 300px;
+  
+  @media (min-width: 768px) {
+    padding: 24px;
+    min-height: 400px;
+  }
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f0e6df;
+  
+  @media (min-width: 768px) {
+    height: 400px;
+  }
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.prevBtn {
+  left: 8px;
+}
+
+.nextBtn {
+  right: 8px;
+}
+
+.imageCounter {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #e0d6ce;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 10px;
+  }
+}
+
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  
+  &.active {
+    border-color: $primary;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.noImage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: $text-gray;
+  
+  svg {
+    opacity: 0.3;
+  }
+}
+
+.noImageIcon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.info {
+  flex: 0 0 40%;
+  padding: 24px;
+  overflow-y: auto;
+  max-height: 90vh;
+  background: white;
+  
+  @media (min-width: 768px) {
+    max-height: 600px;
+  }
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.name {
+  font-size: 0.9rem;
+  color: $primary;
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: $bg-light;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: $text-gray;
+}
+
+.purpose {
+  margin-top: 8px;
+  background: rgba(196, 73, 44, 0.1);
+  color: $primary;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  display: inline-block;
+}
+
+.description {
+  color: $text-gray;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.bookingSection {
+  background: $bg-light;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.bookingHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-weight: 500;
+  flex-wrap: wrap;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.dateInput {
+  padding: 4px 8px;
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  background: white;
+}
+
+.free {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 12px;
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.bookingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bookingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: white;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: 1px solid $border-light;
+}
+
+.bookingTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.bookingTimeRange {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+.bookingStatus {
+  font-size: 0.7rem;
+}
+
+.confirmed {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.pending {
+  color: #ff9800;
+  font-weight: 500;
+}
+
+.bookingCustomer {
+  font-size: 0.75rem;
+  color: $text-gray;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

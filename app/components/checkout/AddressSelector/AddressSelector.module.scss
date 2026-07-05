@@ -1,0 +1,137 @@
+@use '../../../styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addressList {
+  background: $bg-light;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-gray;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid $border-light;
+}
+
+.addressItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.85rem;
+  
+  &:hover {
+    background: white;
+  }
+  
+  &.selected {
+    background: white;
+    border: 1px solid $primary;
+  }
+}
+
+.addressActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkmark {
+  color: $primary;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-gray;
+  padding: 4px;
+  
+  &:hover {
+    color: $error;
+  }
+}
+
+.showMoreBtn {
+  background: none;
+  border: none;
+  color: $primary;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 8px;
+  width: 100%;
+  text-align: center;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.manualInput {
+  display: flex;
+  gap: 12px;
+}
+
+.input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+}
+
+.saveBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.selectedInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #4caf50;
+}
+
+.loader {
+  font-size: 0.85rem;
+  color: $text-gray;
+}

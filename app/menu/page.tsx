@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import DishCard from '@/app/components/menu/DishCard/DishCard';
-import { Search, X } from 'lucide-react';
+import { Heart, ChevronRight, Search, X, History } from 'lucide-react';
 import styles from './page.module.scss';
 import { MenuGridSkeleton } from '../components/ui/Skeleton/Skeleton';
+import Banner from '../components/ui/Banner/Banner';
+import DishOfDay from '../components/ui/DishOfDay/DishOfDay';
+import LoadIndicator from '../components/ui/LoadIndicator/LoadIndicator';
 
 interface Category {
   id: number;
@@ -20,6 +24,7 @@ interface Dish {
   imageUrl: string | null;
   weight: number | null;
   slug: string;
+  isAvailable: boolean;
   category: Category;
 }
 
@@ -93,8 +98,15 @@ export default function MenuPage() {
           <h1 className={styles.title}>Наше меню</h1>
           <p className={styles.subtitle}>Дагестанская и европейская кухня</p>
         </div>
-        <div className={styles.searchSection}>...</div>
-        <div className={styles.categories}>...</div>
+        <div className={styles.searchSection}>
+          <div className={styles.searchBox}>
+            <Search size={20} />
+            <input type="text" placeholder="Поиск..." />
+          </div>
+        </div>
+        <div className={styles.categories}>
+          <button className={styles.categoryBtn}>Все</button>
+        </div>
         <MenuGridSkeleton />
       </div>
     );
@@ -102,9 +114,27 @@ export default function MenuPage() {
 
   return (
     <div className={styles.container}>
+      <Banner />
+      
       <div className={styles.header}>
         <h1 className={styles.title}>Наше меню</h1>
         <p className={styles.subtitle}>Дагестанская и европейская кухня</p>
+        <div className={styles.loadIndicator}>
+          <LoadIndicator showTitle={false} />
+        </div>
+      </div>
+
+      <DishOfDay />
+
+      {/* Кнопки помощи */}
+      <div className={styles.charityLinksWrapper}>
+        <Link href="/charity" className={styles.charityLink}>
+          <Heart size={18} className={styles.charityLinkIcon} />
+          <span>Помочь</span>
+        </Link>
+        <Link href="/charity/history" className={styles.charityHistoryLink}>
+          <History size={16} /> История помощи
+        </Link>
       </div>
 
       {/* Поиск */}

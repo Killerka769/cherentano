@@ -412,3 +412,41 @@
   padding: 100px;
   color: $text-gray;
 }
+
+// Добавьте в конец файла:
+
+.timeRange {
+  font-weight: 400;
+  color: $text-gray;
+  font-size: 0.9rem;
+}
+
+// В модальном окне добавить интервал
+.detailRow {
+  margin-bottom: 12px;
+  
+  strong {
+    display: inline-block;
+    width: 100px;
+  }
+  
+  a {
+    color: $primary;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  .timeRange {
+    color: $primary;
+    font-weight: 600;
+  }
+}
+
+.timeRange {
+  font-weight: 400;
+  color: $text-gray;
+  font-size: 0.85rem;
+}

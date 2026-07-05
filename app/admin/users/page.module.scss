@@ -442,6 +442,32 @@
   }
 }
 
+.discountsBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  color: $text-gray;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all $transition-fast;
+  text-decoration: none;
+  width: 32px;
+  height: 32px;
+  
+  &:hover {
+    background: rgba(156, 39, 176, 0.1);
+    border-color: #9c27b0;
+    color: #9c27b0;
+  }
+  
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .empty {
   text-align: center;
   padding: 60px;

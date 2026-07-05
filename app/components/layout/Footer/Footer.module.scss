@@ -1,0 +1,147 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.footer {
+  background: $bg-light;
+  color: $text-dark;
+  padding: 60px 0 20px;
+  margin-top: 60px;
+  border-top: 3px solid $primary;
+}
+
+.container {
+  @include container;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr;
+  gap: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid $border-light;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.column {
+  .title {
+    color: $text-dark;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: $primary;
+    }
+  }
+}
+
+.description {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  color: $text-gray;
+}
+
+.socials {
+  display: flex;
+  gap: 12px;
+}
+
+.socialLink {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(196, 73, 44, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $primary;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(196, 73, 44, 0.3);
+  }
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  
+  svg {
+    color: $primary;
+    flex-shrink: 0;
+  }
+  
+  a, span {
+    color: $text-gray;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  
+  li {
+    margin-bottom: 10px;
+    
+    a {
+      color: $text-gray;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s ease;
+      
+      &:hover {
+        color: $primary;
+      }
+    }
+  }
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  font-size: 0.85rem;
+  color: $text-gray;
+  flex-wrap: wrap;
+  gap: 12px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.heart {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

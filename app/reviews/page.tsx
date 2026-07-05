@@ -6,6 +6,7 @@ import { useAuth } from '@/app/contexts/AuthContext';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
+import ReviewBanner from '../components/ui/ReviewBanner/ReviewBanner';
 
 interface Review {
   id: number;
@@ -252,6 +253,8 @@ export default function ReviewsPage() {
         <h1 className={styles.title}>Отзывы</h1>
         <p className={styles.subtitle}>Что говорят наши гости</p>
       </div>
+
+      <ReviewBanner />
 
       <div className={styles.statsCard}>
         <div className={styles.ratingBig}>

@@ -4,9 +4,8 @@ import { hashPassword } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, phone, password, name } = await request.json()
+    const { email, phone, password, name, birthDate } = await request.json()
     
-    // Валидация
     if (!email || !phone || !password) {
       return NextResponse.json(
         { error: 'Заполните все обязательные поля' },
@@ -14,7 +13,6 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Проверка существующего пользователя
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
@@ -31,7 +29,6 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Хэширование пароля и создание пользователя
     const passwordHash = await hashPassword(password)
     
     const user = await prisma.user.create({
@@ -40,7 +37,8 @@ export async function POST(request: NextRequest) {
         phone,
         name: name || '',
         passwordHash,
-        role: 'USER'
+        role: 'USER',
+        birthDate: birthDate ? new Date(birthDate) : null
       },
       select: {
         id: true,
@@ -48,9 +46,43 @@ export async function POST(request: NextRequest) {
         phone: true,
         name: true,
         role: true,
-        createdAt: true
+        createdAt: true,
+        birthDate: true
       }
     })
+    
+    // ============ ВЫДАЁМ ИНДИВИДУАЛЬНУЮ СКИДКУ FIRST10 ============
+    try {
+      // Создаём индивидуальную скидку для пользователя
+      const individualDiscount = await prisma.discount.create({
+        data: {
+          code: `FIRST10_${user.id.slice(0, 8)}`,
+          name: '10% на первый заказ',
+          description: 'Скидка 10% на первый заказ в ресторане',
+          type: 'PERCENT',
+          value: 10,
+          isFirstOrder: true,
+          isActive: true,
+          isIndividual: true,
+          usageLimit: 1,
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+      })
+      
+      await prisma.userDiscount.create({
+        data: {
+          userId: user.id,
+          discountId: individualDiscount.id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          used: false
+        }
+      })
+      
+      console.log(`✅ Скидка FIRST10 выдана пользователю ${user.id}`)
+    } catch (discountError) {
+      console.error('Error creating first order discount:', discountError)
+    }
     
     return NextResponse.json({ user }, { status: 201 })
   } catch (error) {

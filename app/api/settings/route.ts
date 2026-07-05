@@ -8,9 +8,24 @@ export async function GET() {
     let settings = await prisma.settings.findFirst()
     
     if (!settings) {
-      // Создаем настройки по умолчанию
       settings = await prisma.settings.create({
-        data: {}
+        data: {
+          workDays: {
+            monday: { open: "11:00", close: "23:00" },
+            tuesday: { open: "11:00", close: "23:00" },
+            wednesday: { open: "11:00", close: "23:00" },
+            thursday: { open: "11:00", close: "23:00" },
+            friday: { open: "11:00", close: "01:00" },
+            saturday: { open: "11:00", close: "01:00" },
+            sunday: { open: "11:00", close: "23:00" }
+          },
+          specialDays: [],
+          isSpecialDay: false,
+          specialMessage: null,
+          phone: "+7 (988) 293-89-07",
+          email: "info@cherentano.ru",
+          address: "Республика Дагестан, Махачкала, улица Агасиева, 5А"
+        }
       })
     }
     

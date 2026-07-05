@@ -7,13 +7,26 @@ import {
   User, Package, LogOut, Phone, Mail, CheckCircle, Clock, 
   Calendar, Star, Award, Coffee, Pizza, Crown, Shield,
   Settings, Heart, ShoppingBag, TrendingUp, Lock, ArrowLeft,
-  Users,
-  Share2
+  Users, Share2, Percent, Gift, Sparkles, AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import LevelProgress from '../components/ui/LevelProgress/LevelProgress';
 import styles from './page.module.scss';
+import UserDiscounts from '../components/profile/UserDiscounts/UserDiscounts';
+import UserHelpRequests from '../components/profile/UserHelpRequests/UserHelpRequests';
+
+interface StatusLog {
+  status: string;
+  comment: string | null;
+  createdAt: string;
+  changedBy: string | null;
+  user?: {
+    id: string;
+    name: string;
+    role: string;
+  };
+}
 
 interface Order {
   id: number;
@@ -21,7 +34,9 @@ interface Order {
   status: string;
   createdAt: string;
   orderType: string;
+  isCharity?: boolean
   items: OrderItem[];
+  statusLogs?: StatusLog[];
 }
 
 interface OrderItem {
@@ -53,6 +68,7 @@ interface PublicUser {
   favoriteDish?: string;
   level?: string;
   levelProgress?: number;
+  birthDate?: string | null;
 }
 
 export default function ProfilePage() {
@@ -62,10 +78,14 @@ export default function ProfilePage() {
   const [publicUser, setPublicUser] = useState<PublicUser | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'bookings' | 'stats'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'bookings' | 'stats' | 'discounts' | 'charity'>('profile');
   const [isViewingOther, setIsViewingOther] = useState(false);
   const [stats, setStats] = useState({ totalOrders: 0, totalSpent: 0, favoriteDish: '', averageCheck: 0 });
   const [isStatsLoading, setIsStatsLoading] = useState(true);
+  const [birthdayInfo, setBirthdayInfo] = useState<any>(null);
+  const [isBirthdayLoading, setIsBirthdayLoading] = useState(true);
+  const [birthdayChecked, setBirthdayChecked] = useState(false);
+  const [userBirthDate, setUserBirthDate] = useState<string | null>(null);
 
   const userId = params?.id as string;
   const isOwnProfile = !userId || userId === user?.id;
@@ -84,10 +104,14 @@ export default function ProfilePage() {
       fetchOrders();
       fetchBookings();
       setIsViewingOther(false);
+      if (!birthdayChecked) {
+        checkBirthday();
+        setBirthdayChecked(true);
+      }
+      fetchUserBirthDate();
     }
   }, [user, userId]);
 
-  // Пересчитываем статистику после загрузки заказов
   useEffect(() => {
     if (orders.length > 0 || !isViewingOther) {
       calculateStats();
@@ -99,8 +123,23 @@ export default function ProfilePage() {
       const res = await fetch(`/api/user/${userId}`);
       const data = await res.json();
       setPublicUser(data.user);
+      if (data.user?.birthDate) {
+        setUserBirthDate(data.user.birthDate);
+      }
     } catch (error) {
       console.error('Failed to fetch user:', error);
+    }
+  };
+
+  const fetchUserBirthDate = async () => {
+    try {
+      const res = await fetch('/api/user/birthdate');
+      const data = await res.json();
+      if (data.birthDate) {
+        setUserBirthDate(data.birthDate);
+      }
+    } catch (error) {
+      console.error('Failed to fetch birth date:', error);
     }
   };
 
@@ -121,6 +160,25 @@ export default function ProfilePage() {
       setBookings(data.bookings || []);
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
+    }
+  };
+
+  const checkBirthday = async () => {
+    setIsBirthdayLoading(true);
+    try {
+      const res = await fetch('/api/user/birthday-discount');
+      const data = await res.json();
+      setBirthdayInfo(data);
+      if (data.hasBirthday && data.discountGiven && !data.alreadyUsed) {
+        toast.success('🎉 С днём рождения! Скидка 15% активирована!', {
+          duration: 5000,
+          icon: '🎂',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to check birthday:', error);
+    } finally {
+      setIsBirthdayLoading(false);
     }
   };
 
@@ -167,7 +225,7 @@ export default function ProfilePage() {
     return roles[role] || roles.USER;
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string, order?: Order) => {
     const statusMap: Record<string, string> = {
       NEW: '🆕 Новый',
       CALLED: '📞 Позвонили',
@@ -178,6 +236,13 @@ export default function ProfilePage() {
       COMPLETED: '✅ Выполнен',
       CANCELLED: '❌ Отменен'
     };
+    
+    // Если это благотворительный заказ, меняем отображение
+    if (order?.isCharity) {
+      if (status === 'CONFIRMED') return '❤️ Одобрено';
+      if (status === 'COMPLETED') return '🎉 Доставлено нуждающемуся';
+    }
+    
     return statusMap[status] || status;
   };
 
@@ -205,6 +270,7 @@ export default function ProfilePage() {
 
   const displayUser = isViewingOther ? publicUser : user;
   const roleInfo = displayUser ? getRoleInfo(displayUser.role) : null;
+  const displayBirthDate = isViewingOther ? userBirthDate : user?.birthDate;
 
   if (loading) {
     return (
@@ -282,9 +348,14 @@ export default function ProfilePage() {
               <CheckCircle size={14} /> Телефон подтвержден
             </span>
           )}
+          {displayBirthDate && (
+            <span className={styles.birthDateBadge}>
+              <Gift size={14} />
+              ДР: {new Date(displayBirthDate).toLocaleDateString('ru-RU')}
+            </span>
+          )}
         </div>
         
-        {/* Кнопка поделиться */}
         <button onClick={() => {
           const url = `${window.location.origin}/profile/${displayUser.id}`;
           if (navigator.share) {
@@ -303,17 +374,49 @@ export default function ProfilePage() {
         </button>
       </div>
 
-    {/* Уровень пользователя */}
-    {!isViewingOther && (
-      <LevelProgress 
-        totalSpent={stats.totalSpent} 
-        totalOrders={stats.totalOrders}
-        isLoading={isStatsLoading}
-        onLevelUp={() => {
-          fetchOrders();
-        }}
-      />
-    )}
+      {/* Блок дня рождения */}
+      {!isViewingOther && !isBirthdayLoading && birthdayInfo && (
+        <div className={styles.birthdaySection}>
+          {birthdayInfo.hasBirthday ? (
+            <div className={styles.birthdayBanner}>
+              <div className={styles.birthdayIcon}>
+                <Gift size={24} />
+                <Sparkles size={16} className={styles.birthdaySparkle} />
+              </div>
+              <div className={styles.birthdayContent}>
+                <h3>🎉 С днём рождения!</h3>
+                <p>
+                  {birthdayInfo.discountGiven && !birthdayInfo.alreadyUsed
+                    ? 'Скидка 15% активирована! Действует 7 дней.'
+                    : 'Скидка на день рождения уже была активирована.'}
+                </p>
+              </div>
+              <span className={styles.birthdayBadge}>-15%</span>
+            </div>
+          ) : birthdayInfo.daysUntil !== undefined && (
+            <div className={styles.birthdayReminder}>
+              <Calendar size={18} />
+              <span>
+                {birthdayInfo.daysUntil === 0 
+                  ? '🎂 Сегодня день рождения! Зайдите в профиль для активации скидки!'
+                  : `До дня рождения осталось ${birthdayInfo.daysUntil} ${getDaysWord(birthdayInfo.daysUntil)}`}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Уровень пользователя */}
+      {!isViewingOther && (
+        <LevelProgress 
+          totalSpent={stats.totalSpent} 
+          totalOrders={stats.totalOrders}
+          isLoading={isStatsLoading}
+          onLevelUp={() => {
+            fetchOrders();
+          }}
+        />
+      )}
 
       {/* Статистика для своего профиля */}
       {!isViewingOther && (
@@ -389,6 +492,20 @@ export default function ProfilePage() {
               <TrendingUp size={18} />
               Статистика
             </button>
+            <button
+              onClick={() => setActiveTab('discounts')}
+              className={`${styles.tab} ${activeTab === 'discounts' ? styles.active : ''}`}
+            >
+              <Percent size={18} />
+              Скидки
+            </button>
+            <button
+              onClick={() => setActiveTab('charity')}
+              className={`${styles.tab} ${activeTab === 'charity' ? styles.active : ''}`}
+            >
+              <Heart size={18} />
+              Моя помощь
+            </button>
           </>
         )}
       </div>
@@ -435,6 +552,15 @@ export default function ProfilePage() {
                   </span>
                 </div>
               </div>
+              {displayBirthDate && (
+                <div className={styles.infoItem}>
+                  <Gift size={18} />
+                  <div>
+                    <label>Дата рождения</label>
+                    <span>{new Date(displayBirthDate).toLocaleDateString('ru-RU')}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -456,7 +582,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Контент - Заказы */}
+      {/* Контент - Заказы с причиной отмены */}
       {activeTab === 'orders' && !isViewingOther && (
         <div className={styles.ordersList}>
           {displayOrders.length === 0 ? (
@@ -469,40 +595,71 @@ export default function ProfilePage() {
               </Link>
             </div>
           ) : (
-            displayOrders.map(order => (
-              <div key={order.id} className={styles.orderCard}>
-                <div className={styles.orderHeader}>
-                  <div>
-                    <span className={styles.orderId}>Заказ #{order.id}</span>
-                    <span className={styles.orderDate}>
-                      <Clock size={14} />
-                      {new Date(order.createdAt).toLocaleDateString('ru-RU')}
+            displayOrders.map(order => {
+              // Находим лог с комментарием для отмены
+              const cancelLog = order.statusLogs?.find(log => 
+                (log.status === 'CANCELLED' || log.status === 'REJECTED') && log.comment
+              );
+              
+              return (
+                <div key={order.id} className={styles.orderCard}>
+                  <div className={styles.orderHeader}>
+                    <div>
+                      <span className={styles.orderId}>Заказ #{order.id}</span>
+                      <span className={styles.orderDate}>
+                        <Clock size={14} />
+                        {new Date(order.createdAt).toLocaleDateString('ru-RU')}
+                      </span>
+                    </div>
+                    <span className={`${styles.orderStatus} ${styles[order.status.toLowerCase()]}`}>
+                      {getStatusText(order.status, order)}
                     </span>
                   </div>
-                  <span className={`${styles.orderStatus} ${styles[order.status.toLowerCase()]}`}>
-                    {getStatusText(order.status)}
-                  </span>
-                </div>
-                
-                <div className={styles.orderItems}>
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className={styles.orderItem}>
-                      <span>{item.dishName} x{item.quantity}</span>
-                      <span>{item.price * item.quantity} ₽</span>
+                  
+                  <div className={styles.orderItems}>
+                    {order.items.map((item, idx) => (
+                      <div key={idx} className={styles.orderItem}>
+                        <span>{item.dishName} x{item.quantity}</span>
+                        <span>{item.price * item.quantity} ₽</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className={styles.orderFooter}>
+                    <div className={styles.orderType}>
+                      {order.orderType === 'PICKUP' ? '🏠 Самовывоз' : '🚚 Доставка'}
                     </div>
-                  ))}
-                </div>
-                
-                <div className={styles.orderFooter}>
-                  <div className={styles.orderType}>
-                    {order.orderType === 'PICKUP' ? '🏠 Самовывоз' : '🚚 Доставка'}
+                    <div className={styles.orderTotal}>
+                      Итого: <strong>{order.total} ₽</strong>
+                    </div>
                   </div>
-                  <div className={styles.orderTotal}>
-                    Итого: <strong>{order.total} ₽</strong>
-                  </div>
+
+                  {/* Блок с причиной отмены */}
+                  {cancelLog && (
+                    <div className={styles.cancelBlock}>
+                      <div className={styles.cancelHeader}>
+                        <AlertCircle size={16} className={styles.cancelIcon} />
+                        <strong>Причина отмены</strong>
+                      </div>
+                      <p className={styles.cancelReason}>{cancelLog.comment}</p>
+                      {cancelLog.user && cancelLog.user.id && (
+                        <div className={styles.cancelBy}>
+                          Отменил: 
+                          <Link href={`/profile/${cancelLog.user.id}`} className={styles.cancelByLink}>
+                            {cancelLog.user.name || 'Менеджер'}
+                          </Link>
+                        </div>
+                      )}
+                      {cancelLog.user && !cancelLog.user.id && (
+                        <div className={styles.cancelBy}>
+                          Отменил: {cancelLog.user.name || 'Менеджер'}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
@@ -581,6 +738,25 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Контент - Скидки */}
+      {activeTab === 'discounts' && (
+        <div className={styles.discountsSection}>
+          <UserDiscounts />
+        </div>
+      )}
+
+      {activeTab === 'charity' && (
+        <div className={styles.charitySection}>
+          <UserHelpRequests />
+        </div>
+      )}
     </div>
   );
+}
+
+function getDaysWord(days: number): string {
+  if (days === 1) return 'день';
+  if (days >= 2 && days <= 4) return 'дня';
+  return 'дней';
 }

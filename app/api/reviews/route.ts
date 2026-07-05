@@ -88,7 +88,6 @@ export async function PUT(request: NextRequest) {
     
     const { reviewId, text, rating } = await request.json()
     
-    // Проверяем, принадлежит ли отзыв пользователю
     const review = await prisma.review.findFirst({
       where: { id: reviewId, userId: user.id }
     })
@@ -97,13 +96,12 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Отзыв не найден' }, { status: 404 })
     }
     
-    // Обновляем отзыв и сбрасываем статус одобрения на false
     const updatedReview = await prisma.review.update({
       where: { id: reviewId },
       data: { 
         text, 
         rating,
-        isApproved: false  // После редактирования снова на модерацию
+        isApproved: false
       }
     })
     

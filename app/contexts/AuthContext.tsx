@@ -12,6 +12,7 @@ interface User {
   role: string;
   phoneVerified: boolean;
   createdAt?: string;
+  birthDate?: string | null;
 }
 
 interface AuthContextType {
@@ -27,6 +28,7 @@ interface RegisterData {
   phone: string;
   password: string;
   name: string;
+  birthDate?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

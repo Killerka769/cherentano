@@ -1,0 +1,260 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $text-gray;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 1rem;
+}
+
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-bottom: 50px;
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid $border-light;
+  }
+}
+
+// Секция 1: Как доставляем
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.icon {
+  width: 60px;
+  height: 60px;
+  background: $bg-light;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: $primary;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.card p {
+  color: $text-gray;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+// Секция 2: Зоны доставки
+.zones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.zoneCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: $shadow-sm;
+  
+  .zoneBadge {
+    font-size: 1.5rem;
+  }
+  
+  strong {
+    display: block;
+    font-size: 1rem;
+  }
+  
+  p {
+    color: $text-gray;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+}
+
+// Секция 3: Минимальная сумма
+.infoBox {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+}
+
+.infoItem {
+  text-align: center;
+  
+  .infoLabel {
+    display: block;
+    font-size: 0.8rem;
+    color: $text-gray;
+    margin-bottom: 4px;
+  }
+  
+  .infoValue {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: $primary;
+  }
+}
+
+// Секция 4: FAQ
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faqItem {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: $shadow-sm;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+  
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    color: $text-gray;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// Секция 5: Контакты
+.contactCard {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: $bg-light;
+  border-radius: 12px;
+  
+  svg {
+    color: $primary;
+    flex-shrink: 0;
+  }
+  
+  div {
+    display: flex;
+    flex-direction: column;
+    
+    strong {
+      font-size: 0.85rem;
+    }
+    
+    a, span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: $text-dark;
+      text-decoration: none;
+      
+      &:hover {
+        color: $primary;
+      }
+    }
+  }
+}
+
+// Адаптив
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 0 60px;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .infoBox {
+    grid-template-columns: 1fr;
+  }
+}

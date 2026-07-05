@@ -18,7 +18,7 @@ export async function GET(
         role: true,
         phoneVerified: true,
         createdAt: true,
-        // Не возвращаем email и телефон для неавторизованных
+        birthDate: true,  // 👈 Добавляем ДР
       }
     })
     
@@ -33,6 +33,7 @@ export async function GET(
       role: user.role,
       phoneVerified: user.phoneVerified,
       createdAt: user.createdAt,
+      birthDate: user.birthDate,
     }
     
     // Добавляем статистику (доступна всем)

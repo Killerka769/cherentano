@@ -1,0 +1,848 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 24px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  border: 1px solid $border-light;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &.inactive {
+    opacity: 0.6;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.code {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: $primary;
+  background: rgba(196, 73, 44, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.status {
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  
+  &.active {
+    background: #e8f5e9;
+    color: #4caf50;
+  }
+  
+  &.inactive {
+    background: #ffebee;
+    color: #f44336;
+  }
+}
+
+.name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: $text-gray;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: $text-gray;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.badgeFirst {
+  background: #e3f2fd;
+  color: #2196f3;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.badgeBirthday {
+  background: #fce4ec;
+  color: #e91e63;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.badgeIndividual {
+  background: #f3e5f5;
+  color: #9c27b0;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.badgeMin {
+  background: #fff3e0;
+  color: #ff9800;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.badgeDate {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: $bg-light;
+  color: $text-gray;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+}
+
+.usersList {
+  background: $bg-light;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.usersLabel {
+  display: block;
+  font-size: 0.7rem;
+  color: $text-gray;
+  margin-bottom: 6px;
+}
+
+.usersTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.userTag {
+  background: white;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  border: 1px solid $border-light;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+}
+
+.toggleBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 60px;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.giftBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+}
+
+.editBtn, .deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: $bg-light;
+  }
+}
+
+.editBtn {
+  color: $primary;
+}
+
+.deleteBtn {
+  color: $error;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px;
+  color: $text-gray;
+  
+  svg {
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+}
+
+.emptyBtn {
+  margin-top: 16px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+// Модальное окно
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modalContent {
+  background: #ffffff;
+  border-radius: 24px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: $text-dark;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: $bg-light;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 10px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  
+  label {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(196, 73, 44, 0.1);
+    }
+  }
+  
+  textarea {
+    resize: vertical;
+  }
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.modalButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.saveBtn {
+  flex: 1;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.cancelBtn {
+  flex: 1;
+  background: none;
+  border: 1px solid $border-light;
+  padding: 12px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.expireBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  align-items: center;
+}
+
+.searchBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-primary);
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  padding: 8px 16px;
+  min-width: 200px;
+  
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+  }
+}
+
+.clearSearch {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $text-gray;
+  padding: 4px;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
+.filterGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.filterSelect {
+  padding: 8px 16px;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  background: var(--bg-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  
+  &:focus {
+    border-color: $primary;
+  }
+}
+
+.bulkActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.bulkDeleteExpired {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  padding: 6px 16px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background: #f44336;
+    color: white;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.bulkDelete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background: #d32f2f;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.selected {
+  border-color: $primary;
+  background: rgba(196, 73, 44, 0.05);
+}
+
+// Ссылки на пользователей
+.usersTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.userTagLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: white;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  border: 1px solid $border-light;
+  text-decoration: none;
+  color: $text-dark;
+  transition: all 0.2s ease;
+  
+  svg {
+    color: $primary;
+  }
+  
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+    transform: translateY(-1px);
+  }
+}
+// Добавить в конец файла:
+
+.giftCreateBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #9c27b0;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #7b1fa2;
+    transform: translateY(-2px);
+  }
+}
+
+.gifted {
+  border-color: #9c27b0;
+  background: rgba(156, 39, 176, 0.03);
+}
+
+.badgeGifted {
+  background: #f3e5f5;
+  color: #9c27b0;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+// Блок дарения в модалке
+.giftSection {
+  background: #f3e5f5;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.giftDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #7b1fa2;
+  
+  span {
+    background: #f3e5f5;
+    padding: 0 12px;
+  }
+}
+
+.giftUserSearch {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.giftSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  padding: 8px 12px;
+  
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+  }
+}
+
+.giftUsersList {
+  max-height: 150px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 10px;
+  }
+}
+
+.giftUserItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  width: 100%;
+  text-align: left;
+  
+  &:hover {
+    border-color: $border-light;
+  }
+  
+  &.selected {
+    border-color: #9c27b0;
+    background: rgba(156, 39, 176, 0.05);
+  }
+}
+
+.giftUserAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $primary;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.giftUserEmail {
+  font-size: 0.7rem;
+  color: $text-gray;
+}
+
+.giftUserCheck {
+  margin-left: auto;
+  color: #9c27b0;
+  font-weight: 700;
+}
+
+.giftSettings {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid $border-light;
+  
+  label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: $text-gray;
+  }
+  
+  input {
+    width: 80px;
+    padding: 4px 8px;
+    border: 1px solid $border-light;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    
+    &:focus {
+      outline: none;
+      border-color: #9c27b0;
+    }
+  }
+}
+
+.createAndGiftBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #9c27b0;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  
+  &:hover {
+    background: #7b1fa2;
+  }
+}
+
+.giftConfirm {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid $border-light;
+  text-align: center;
+  
+  p {
+    margin-bottom: 12px;
+  }
+}
+
+.giftConfirmActions {
+  display: flex;
+  gap: 12px;
+}
+
+.giftConfirmBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 40px;
+  cursor: pointer;
+  
+  &:hover:not(:disabled) {
+    background: #388e3c;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
