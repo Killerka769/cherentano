@@ -9,6 +9,7 @@ import Reviews from './components/ui/Reviews/Reviews';
 import RecentlyViewed from './components/ui/RecentlyViewed/RecentlyViewed';
 import Banner from './components/ui/Banner/Banner';
 import RegistrationBanner from './components/ui/RegistrationBanner/RegistrationBanner';
+import BlogPreview from './components/ui/BlogPreview/BlogPreview';
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <Hero />
       {/* <RestaurantGallery /> */}
       <Banner />
+      <BlogPreview />
       <Features />
       <Reviews />
       <PopularDishes />

@@ -9,6 +9,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   imageUrl?: string;
+  menuType?: 'DELIVERY' | 'PICKUP' | 'BOTH';
 }
 
 interface CartContextType {

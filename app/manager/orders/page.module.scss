@@ -416,3 +416,62 @@
     color: $text-dark;
   }
 }
+
+.orderTypeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.pickupCount, .deliveryCount, .charityCount {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.pickupCount {
+  background: #fff3e0;
+  color: #ff9800;
+}
+
+.deliveryCount {
+  background: #e3f2fd;
+  color: #2196f3;
+}
+
+.charityCount {
+  background: #fce4ec;
+  color: #e91e63;
+}
+
+.pickupBadge {
+  background: #fff3e0;
+  color: #ff9800;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.deliveryBadge {
+  background: #e3f2fd;
+  color: #2196f3;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.charityBadge {
+  background: #fce4ec;
+  color: #e91e63;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}

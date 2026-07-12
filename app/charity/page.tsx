@@ -113,7 +113,7 @@ export default function CharityPage() {
         </button>
         <Link href="/charity/history" className={styles.historyBtn}>
         <History size={18} />
-        История помощи
+        История общей помощи
         </Link>
       </div>
 

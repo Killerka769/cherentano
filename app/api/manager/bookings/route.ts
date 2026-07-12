@@ -24,11 +24,39 @@ export async function GET(request: NextRequest) {
       where.status = status
     }
     
+    // 👇 АВТОМАТИЧЕСКАЯ ОТМЕНА ПРОСРОЧЕННЫХ БРОНЕЙ
+    const now = new Date()
+    
+    const expiredBookings = await prisma.booking.findMany({
+      where: {
+        status: { in: ['PENDING', 'CONFIRMED'] },
+        noShowTime: { lt: now },
+        date: { lt: now }
+      }
+    })
+    
+    for (const expired of expiredBookings) {
+      await prisma.booking.update({
+        where: { id: expired.id },
+        data: {
+          status: 'CANCELLED',
+          comment: 'Автоматическая отмена: неявка'
+        }
+      })
+    }
+    
     const bookings = await prisma.booking.findMany({
       where,
       include: { 
         table: true,
-        user: { select: { id: true, name: true, email: true } }
+        user: { 
+          select: { 
+            id: true, 
+            name: true, 
+            email: true,
+            phone: true
+          } 
+        }
       },
       orderBy: { time: 'asc' }
     })
@@ -56,7 +84,7 @@ export async function PATCH(request: NextRequest) {
         confirmedBy: user.id,
         comment: comment || undefined
       },
-      include: { table: true }
+      include: { table: true, user: true }
     })
     
     return NextResponse.json({ booking })

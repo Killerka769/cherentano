@@ -22,7 +22,7 @@ export default function CartItem({ id, name, price, quantity, imageUrl }: CartIt
           src={imageUrl || `/images/dishes/${id}.jpg`} 
           alt={name}
           onError={(e) => {
-            (e.target as HTMLImageElement).src = '/images/placeholder.jpg';
+            (e.target as HTMLImageElement).src = '/images/dish-placeholder.svg';
           }}
         />
       </div>

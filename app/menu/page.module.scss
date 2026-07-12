@@ -444,3 +444,42 @@
     transform: scale(0.97);
   }
 }
+
+.menuTabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: #f5f0eb;
+  border-radius: 16px;
+  padding: 4px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.menuTab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $text-gray;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  
+  &:hover {
+    color: $text-dark;
+  }
+  
+  &.active {
+    background: white;
+    color: $primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}

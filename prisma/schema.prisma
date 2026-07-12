@@ -102,6 +102,9 @@ model Booking {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   confirmedBy String?
+  noShowTime  DateTime?  // Время, после которого бронь считается неявкой
+  paymentData Json?      // Данные об оплате
+  paidAmount  Float?     // Сумма оплаты
 }
 
 enum BookingStatus {
@@ -202,11 +205,13 @@ model Dish {
   imageUrl    String?
   weight      Int?
   isAvailable Boolean   @default(true)
+  menuType    MenuType  @default(BOTH)
   sortOrder   Int       @default(0)
   createdAt   DateTime  @default(now())
   
   favorites   Favorite[]
   dishOfDay   DishOfDay[]  // Одно блюдо может быть в нескольких днях
+  weeklyMenu  WeeklyMenu[]
 }
 
 model DishOfDay {
@@ -218,6 +223,17 @@ model DishOfDay {
   updatedAt DateTime @updatedAt
   
   @@unique([date, dishId])  // Уникальная пара дата+блюдо
+}
+
+model WeeklyMenu {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  dishId    Int
+  dish      Dish     @relation(fields: [dishId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([date, dishId])
 }
 
 model BlogPost {
@@ -508,6 +524,12 @@ enum DiscountApplies {
   ALL // на все
   CATEGORY // на категорию
   DISH // конретное блюдо
+}
+
+enum MenuType {
+  DELIVERY   // Только для доставки
+  PICKUP     // Только для ресторана (на месте)
+  BOTH       // Для доставки и ресторана
 }
 
 enum Role {

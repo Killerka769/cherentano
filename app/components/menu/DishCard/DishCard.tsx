@@ -17,7 +17,8 @@ interface Dish {
   imageUrl: string | null;
   weight: number | null;
   slug: string;
-  isAvailable: boolean;  
+  isAvailable: boolean;
+  menuType?: 'DELIVERY' | 'PICKUP' | 'BOTH';
 }
 
 interface DishCardProps {
@@ -112,6 +113,7 @@ export default function DishCard({ dish }: DishCardProps) {
       name: dish.name,
       price: dish.price,
       imageUrl: dish.imageUrl || undefined,
+      menuType: dish.menuType,
     }, quantity);
     
     if (cartBtnRef.current) {

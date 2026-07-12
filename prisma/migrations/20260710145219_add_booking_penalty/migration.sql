@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "Booking" ADD COLUMN     "noShowTime" TIMESTAMP(3),
+ADD COLUMN     "penaltyAmount" DOUBLE PRECISION,
+ADD COLUMN     "penaltyPaid" BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "bookingPenalty" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "penaltyCount" INTEGER NOT NULL DEFAULT 0;

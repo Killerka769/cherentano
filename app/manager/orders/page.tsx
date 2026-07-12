@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Phone, CheckCircle, Clock, Truck, Check, X, Eye, AlertCircle } from 'lucide-react';
+import { Phone, CheckCircle, Clock, Truck, Check, X, Eye, AlertCircle, Utensils, Store, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
@@ -15,7 +15,8 @@ interface Order {
   comment?: string;
   total: number;
   status: string;
-  orderType: string;
+  orderType: string; // PICKUP, DELIVERY
+  isCharity?: boolean;
   createdAt: string;
   items: { dishName: string; quantity: number; price: number }[];
   statusLogs?: { status: string; comment: string | null; createdAt: string; user?: { name: string } }[];
@@ -101,8 +102,21 @@ export default function ManagerOrdersPage() {
     return statusSteps.findIndex(s => s.key === status);
   };
 
+  // 👇 Функция для отображения типа заказа
+  const getOrderTypeLabel = (order: Order) => {
+    if (order.isCharity) {
+      return { icon: Heart, label: 'Благотворительность', color: '#e91e63' };
+    }
+    if (order.orderType === 'PICKUP') {
+      return { icon: Store, label: 'Самовывоз', color: '#ff9800' };
+    }
+    return { icon: Truck, label: 'Доставка', color: '#2196f3' };
+  };
+
   const OrderCard = ({ order }: { order: Order }) => {
     const currentStepIndex = getStatusStepIndex(order.status);
+    const typeInfo = getOrderTypeLabel(order);
+    const TypeIcon = typeInfo.icon;
     
     return (
       <div className={styles.orderCard}>
@@ -111,6 +125,10 @@ export default function ManagerOrdersPage() {
             <span className={styles.orderId}>Заказ #{order.id}</span>
             <span className={styles.orderTime}>
               {new Date(order.createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+            <span className={styles.orderTypeBadge} style={{ background: typeInfo.color + '20', color: typeInfo.color }}>
+              <TypeIcon size={12} />
+              {typeInfo.label}
             </span>
           </div>
           <span className={`${styles.orderStatus} ${styles[order.status.toLowerCase()]}`}>
@@ -179,6 +197,11 @@ export default function ManagerOrdersPage() {
         <div className={styles.stats}>
           <span className={styles.newCount}>🆕 Новых: {orders.filter(o => o.status === 'NEW').length}</span>
           <span className={styles.progressCount}>⏳ В работе: {activeOrders.length}</span>
+          <span className={styles.pickupCount}>🏠 Самовывоз: {orders.filter(o => o.orderType === 'PICKUP' && !o.isCharity).length}</span>
+          <span className={styles.deliveryCount}>🚚 Доставка: {orders.filter(o => o.orderType === 'DELIVERY' && !o.isCharity).length}</span>
+          {orders.filter(o => o.isCharity).length > 0 && (
+            <span className={styles.charityCount}>❤️ Благотв: {orders.filter(o => o.isCharity).length}</span>
+          )}
         </div>
       </div>
 
@@ -215,6 +238,7 @@ export default function ManagerOrdersPage() {
             <div className={styles.callInfo}>
               <p><strong>Клиент:</strong> {callModal.customerName}</p>
               <p><strong>Телефон:</strong> <a href={`tel:${callModal.customerPhone}`}>{callModal.customerPhone}</a></p>
+              <p><strong>Тип заказа:</strong> {callModal.isCharity ? '❤️ Благотворительность' : callModal.orderType === 'PICKUP' ? '🏠 Самовывоз' : '🚚 Доставка'}</p>
               {callModal.orderType === 'DELIVERY' && callModal.deliveryAddress && (
                 <p><strong>Адрес:</strong> {callModal.deliveryAddress}</p>
               )}
@@ -290,6 +314,15 @@ export default function ManagerOrdersPage() {
                 <h4>Информация о клиенте</h4>
                 <p>👤 {selectedOrder.customerName}</p>
                 <p>📞 <a href={`tel:${selectedOrder.customerPhone}`}>{selectedOrder.customerPhone}</a></p>
+                <p>
+                  {selectedOrder.isCharity ? (
+                    <span className={styles.charityBadge}>❤️ Благотворительность</span>
+                  ) : selectedOrder.orderType === 'PICKUP' ? (
+                    <span className={styles.pickupBadge}>🏠 Самовывоз</span>
+                  ) : (
+                    <span className={styles.deliveryBadge}>🚚 Доставка</span>
+                  )}
+                </p>
                 {selectedOrder.orderType === 'DELIVERY' && selectedOrder.deliveryAddress && (
                   <p>📍 {selectedOrder.deliveryAddress}</p>
                 )}

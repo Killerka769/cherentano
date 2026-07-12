@@ -49,7 +49,7 @@ export default function CharityHistoryPage() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch('/api/charity/history');
+      const res = await fetch('/api/charity/history/all');
       const data = await res.json();
       setHistory(data.history || []);
     } catch (error) {

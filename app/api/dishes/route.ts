@@ -6,11 +6,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const search = searchParams.get('search')
+    const menuType = searchParams.get('menuType') || 'pickup'
     const limit = parseInt(searchParams.get('limit') || '9')
     const page = parseInt(searchParams.get('page') || '1')
     
     const where: any = {
-      isAvailable: true 
+      isAvailable: true
+    }
+    
+    // Фильтр по типу меню
+    if (menuType && menuType !== 'all') {
+      where.OR = [
+        { menuType: menuType === 'delivery' ? 'DELIVERY' : 'PICKUP' },
+        { menuType: 'BOTH' }
+      ]
     }
     
     if (category && category !== 'all') {
@@ -38,6 +47,7 @@ export async function GET(request: NextRequest) {
         imageUrl: true,
         weight: true,
         isAvailable: true,
+        menuType: true,
         sortOrder: true,
         category: {
           select: {

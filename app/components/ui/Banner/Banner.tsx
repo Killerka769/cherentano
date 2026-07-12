@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Calendar, Clock, Sparkles, Flame, Star, Gift, Megaphone } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Calendar, Sparkles, Flame, Star, Gift, Megaphone } from 'lucide-react';
 import styles from './Banner.module.scss';
 
 interface BannerItem {
@@ -31,6 +30,7 @@ export default function Banner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [direction, setDirection] = useState<'left' | 'right'>('right');
 
   useEffect(() => {
     fetchBanners();
@@ -39,8 +39,9 @@ export default function Banner() {
   useEffect(() => {
     if (!isAutoPlaying || banners.length === 0) return;
     const interval = setInterval(() => {
+      setDirection('right');
       setCurrentIndex((prev) => (prev + 1) % banners.length);
-    }, 6000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [isAutoPlaying, banners.length]);
 
@@ -57,15 +58,24 @@ export default function Banner() {
   };
 
   const nextSlide = () => {
+    setDirection('right');
     setCurrentIndex((prev) => (prev + 1) % banners.length);
     setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 8000);
+    setTimeout(() => setIsAutoPlaying(true), 4000);
   };
 
   const prevSlide = () => {
+    setDirection('left');
     setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
     setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 8000);
+    setTimeout(() => setIsAutoPlaying(true), 4000);
+  };
+
+  const goToSlide = (index: number) => {
+    setDirection(index > currentIndex ? 'right' : 'left');
+    setCurrentIndex(index);
+    setIsAutoPlaying(false);
+    setTimeout(() => setIsAutoPlaying(true), 4000);
   };
 
   if (isLoading) {
@@ -82,67 +92,76 @@ export default function Banner() {
 
   return (
     <section className={styles.banner}>
-      <div className={styles.container}>
-        <div className={styles.slider}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={banner.id}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.6 }}
-              className={styles.slide}
-              style={{ backgroundImage: `url(${banner.imageUrl})` }}
-            >
-              <div className={styles.overlay}>
-                <div className={styles.content}>
-                  <div className={styles.badge} style={{ background: badge.bg, color: badge.color }}>
-                    <BadgeIcon size={14} />
-                    {badge.label}
+      <div className={styles.slider}>
+        <div className={styles.sliderWrapper}>
+          <div 
+            className={styles.slideTrack}
+            style={{
+              transform: `translateX(-${currentIndex * 100}%)`,
+              transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            }}
+          >
+            {banners.map((item) => (
+              <div 
+                key={item.id}
+                className={styles.slide}
+                style={{ backgroundImage: `url(${item.imageUrl})` }}
+              >
+                <div className={styles.overlay}>
+                  <div className={styles.content}>
+                    <div className={styles.badge} style={{ background: badge.bg, color: badge.color }}>
+                      <BadgeIcon size={14} />
+                      {BADGE_CONFIG[item.type]?.label || 'Акция'}
+                    </div>
+                    <h2 className={styles.title}>{item.title}</h2>
+                    {item.subtitle && (
+                      <p className={styles.subtitle}>{item.subtitle}</p>
+                    )}
+                    {item.description && (
+                      <p className={styles.description}>{item.description}</p>
+                    )}
+                    {item.link && item.linkText && (
+                      <Link href={item.link} className={styles.button}>
+                        {item.linkText}
+                        <ChevronRight size={16} />
+                      </Link>
+                    )}
                   </div>
-                  <h2 className={styles.title}>{banner.title}</h2>
-                  {banner.subtitle && (
-                    <p className={styles.subtitle}>{banner.subtitle}</p>
-                  )}
-                  {banner.description && (
-                    <p className={styles.description}>{banner.description}</p>
-                  )}
-                  {banner.link && banner.linkText && (
-                    <Link href={banner.link} className={styles.button}>
-                      {banner.linkText}
-                      <ChevronRight size={16} />
-                    </Link>
-                  )}
                 </div>
               </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {banners.length > 1 && (
-            <>
-              <button onClick={prevSlide} className={`${styles.navBtn} ${styles.prevBtn}`}>
-                <ChevronLeft size={24} />
-              </button>
-              <button onClick={nextSlide} className={`${styles.navBtn} ${styles.nextBtn}`}>
-                <ChevronRight size={24} />
-              </button>
-
-              <div className={styles.dots}>
-                {banners.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setCurrentIndex(index);
-                      setIsAutoPlaying(false);
-                      setTimeout(() => setIsAutoPlaying(true), 8000);
-                    }}
-                    className={`${styles.dot} ${currentIndex === index ? styles.active : ''}`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+            ))}
+          </div>
         </div>
+
+        {banners.length > 1 && (
+          <>
+            <button 
+              onClick={prevSlide} 
+              className={`${styles.navBtn} ${styles.prevBtn}`}
+              aria-label="Предыдущий слайд"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <button 
+              onClick={nextSlide} 
+              className={`${styles.navBtn} ${styles.nextBtn}`}
+              aria-label="Следующий слайд"
+            >
+              <ChevronRight size={24} />
+            </button>
+
+            <div className={styles.dots}>
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`${styles.dot} ${currentIndex === index ? styles.active : ''}`}
+                  aria-label={`Перейти к слайду ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

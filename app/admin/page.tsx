@@ -14,7 +14,8 @@ import {
   Percent,
   Gift,
   ChefHat,
-  Heart
+  Heart,
+  Calendar
 } from 'lucide-react';
 import Link from 'next/link';
 import styles from './page.module.scss';
@@ -223,6 +224,9 @@ export default function AdminDashboard() {
           </Link>
           <Link href="/admin/orders" className={styles.actionBtn}>
             <Package size={20} /> Заказы
+          </Link>
+          <Link href="/admin/weekly-menu" className={styles.actionBtn}>
+            <Calendar size={20} /> Меню на неделю
           </Link>
           <Link href="/admin/dishes" className={styles.actionBtn}>
             <Pizza size={20} /> Меню

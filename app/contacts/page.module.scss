@@ -128,7 +128,7 @@
   }
 }
 
-.whatsappLink, .telegramLink {
+.whatsappLink, .telegramLink, .instagramLink {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -152,6 +152,11 @@
 
 .telegramLink {
   background: #26A5E4;
+  color: white;
+}
+
+.instagramLink {
+  background: #E1306C;
   color: white;
 }
 

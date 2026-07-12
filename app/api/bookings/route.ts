@@ -10,6 +10,14 @@ function addHours(time: string, hours: number): string {
   return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
 }
 
+function addMinutes(time: string, minutes: number): string {
+  const [h, m] = time.split(':').map(Number)
+  const totalMinutes = h * 60 + m + minutes
+  const newH = Math.floor(totalMinutes / 60)
+  const newM = totalMinutes % 60
+  return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
+}
+
 function isTimeOverlap(
   newStart: string,
   newEnd: string,
@@ -17,11 +25,15 @@ function isTimeOverlap(
   existingEnd: string | null
 ): boolean {
   const existingEndTime = existingEnd || addHours(existingStart, 2)
+  
+  const newStartWithBuffer = addMinutes(newStart, -15)
+  const newEndWithBuffer = addMinutes(newEnd, 15)
+  
   return (
-    (newStart >= existingStart && newStart < existingEndTime) ||
-    (newEnd > existingStart && newEnd <= existingEndTime) ||
-    (newStart <= existingStart && newEnd >= existingEndTime) ||
-    (newStart >= existingStart && newEnd <= existingEndTime)
+    (newStartWithBuffer >= existingStart && newStartWithBuffer < existingEndTime) ||
+    (newEndWithBuffer > existingStart && newEndWithBuffer <= existingEndTime) ||
+    (newStartWithBuffer <= existingStart && newEndWithBuffer >= existingEndTime) ||
+    (newStartWithBuffer >= existingStart && newEndWithBuffer <= existingEndTime)
   )
 }
 
@@ -73,7 +85,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Не авторизован' }, { status: 401 })
     }
     
-    const { tableId, customerName, customerPhone, customerEmail, date, time, endTime, guests, comment } = await request.json()
+    const { 
+      tableId, 
+      customerName, 
+      customerPhone, 
+      customerEmail, 
+      date, 
+      time, 
+      endTime, 
+      guests, 
+      comment,
+      paidAmount,
+      paymentMethod
+    } = await request.json()
     
     if (!tableId || !customerName || !customerPhone || !date || !time) {
       return NextResponse.json({ error: 'Заполните все обязательные поля' }, { status: 400 })
@@ -91,7 +115,7 @@ export async function POST(request: NextRequest) {
       }
     })
     
-    // Проверяем пересечение времени
+    // Проверяем пересечение времени (с 15-минутным буфером)
     const conflictingBookings = []
     for (const booking of existingBookings) {
       const bookingEnd = booking.endTime || addHours(booking.time, 2)
@@ -106,29 +130,56 @@ export async function POST(request: NextRequest) {
     
     if (conflictingBookings.length > 0) {
       return NextResponse.json({
-        error: 'Столик уже занят в это время',
+        error: 'Столик уже занят в это время (учитывается 15-минутный перерыв)',
         conflictingBookings
       }, { status: 409 })
     }
     
+    // 👇 СОЗДАЕМ БРОНЬ
+    const requiredAmount = 1000
+    const paidAmountNum = parseFloat(paidAmount) || 0
+    
+    const noShowTime = new Date(bookingDate)
+    const [hours, minutes] = time.split(':').map(Number)
+    noShowTime.setHours(hours + 1, minutes, 0, 0) // Через 1 час после начала
+    
+    // 👇 ФОРМИРУЕМ ДАННЫЕ ДЛЯ СОЗДАНИЯ
+    const bookingData: any = {
+      tableId,
+      userId: user.id,
+      customerName,
+      customerPhone,
+      customerEmail,
+      date: bookingDate,
+      time,
+      endTime: bookingEndTime,
+      guests: guests || 2,
+      comment,
+      status: 'PENDING',
+      noShowTime: noShowTime,
+    }
+    
+    // 👇 ДОБАВЛЯЕМ ПОЛЯ ОПЛАТЫ, ЕСЛИ ЕСТЬ
+    if (paidAmountNum > 0) {
+      bookingData.paidAmount = paidAmountNum
+      bookingData.paymentData = {
+        amount: paidAmountNum,
+        method: paymentMethod || 'ONLINE',
+        paidAt: new Date().toISOString()
+      }
+    }
+    
     const booking = await prisma.booking.create({
-      data: {
-        tableId,
-        userId: user.id,
-        customerName,
-        customerPhone,
-        customerEmail,
-        date: bookingDate,
-        time,
-        endTime: bookingEndTime,
-        guests: guests || 2,
-        comment,
-        status: 'PENDING'
-      },
+      data: bookingData,
       include: { table: true }
     })
     
-    return NextResponse.json({ booking }, { status: 201 })
+    return NextResponse.json({ 
+      booking,
+      message: paidAmountNum >= requiredAmount 
+        ? 'Бронирование создано. Ожидайте подтверждения менеджера.'
+        : 'Бронирование создано, но требуется оплата 1000 ₽ для подтверждения.'
+    }, { status: 201 })
   } catch (error) {
     console.error('Booking error:', error)
     return NextResponse.json({ error: 'Ошибка создания бронирования' }, { status: 500 })

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Calendar } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Calendar, Utensils, Truck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
@@ -16,6 +16,7 @@ interface Dish {
   weight: number | null;
   isAvailable: boolean;
   categoryId: number;
+  menuType: 'DELIVERY' | 'PICKUP' | 'BOTH';
   category: { name: string };
 }
 
@@ -30,6 +31,24 @@ interface DishOfDay {
   date: string;
   dish: Dish;
 }
+
+const menuTypeLabels: Record<string, { label: string; icon: any; color: string }> = {
+  DELIVERY: { 
+    label: '🚚 Доставка', 
+    icon: <Truck size={14} />, 
+    color: '#2196f3' 
+  },
+  PICKUP: { 
+    label: '🏠 Ресторан', 
+    icon: <Utensils size={14} />, 
+    color: '#ff9800' 
+  },
+  BOTH: { 
+    label: '🔄 Оба', 
+    icon: <span style={{ display: 'flex', gap: '4px' }}><Utensils size={12} /><Truck size={12} /></span>, 
+    color: '#4caf50' 
+  }
+};
 
 export default function AdminDishesPage() {
   const { user, loading } = useAuth();
@@ -46,7 +65,8 @@ export default function AdminDishesPage() {
     price: '',
     categoryId: '',
     weight: '',
-    imageUrl: ''
+    imageUrl: '',
+    menuType: 'BOTH'
   });
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
@@ -62,7 +82,7 @@ export default function AdminDishesPage() {
       fetchCategories();
       fetchDishesOfDay();
     }
-  }, [user]);
+  }, [user, selectedDate]);
 
   const fetchDishes = async () => {
     try {
@@ -99,18 +119,16 @@ export default function AdminDishesPage() {
     
     try {
       if (isAlreadyDishOfDay) {
-        // Удаляем из блюд дня
         await fetch(`/api/admin/dishes/dish-of-day?dishId=${dishId}&date=${selectedDate}`, {
           method: 'DELETE'
-        })
+        });
         toast.success('Блюдо удалено из блюд дня');
       } else {
-        // Добавляем в блюда дня
         const res = await fetch('/api/admin/dishes/dish-of-day', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ dishId, date: selectedDate })
-        })
+        });
         
         if (res.status === 400) {
           const error = await res.json();
@@ -154,7 +172,15 @@ export default function AdminDishesPage() {
         toast.success(editingDish ? 'Блюдо обновлено' : 'Блюдо добавлено');
         setIsModalOpen(false);
         setEditingDish(null);
-        setFormData({ name: '', description: '', price: '', categoryId: '', weight: '', imageUrl: '' });
+        setFormData({ 
+          name: '', 
+          description: '', 
+          price: '', 
+          categoryId: '', 
+          weight: '', 
+          imageUrl: '',
+          menuType: 'BOTH'
+        });
         fetchDishes();
       } else {
         const error = await res.json();
@@ -180,7 +206,8 @@ export default function AdminDishesPage() {
           categoryId: dish.categoryId,
           imageUrl: dish.imageUrl,
           weight: dish.weight,
-          isAvailable: !dish.isAvailable
+          isAvailable: !dish.isAvailable,
+          menuType: dish.menuType
         })
       });
       
@@ -239,7 +266,7 @@ export default function AdminDishesPage() {
               <th>Название</th>
               <th>Категория</th>
               <th>Цена</th>
-              <th>Вес</th>
+              <th>Тип меню</th>
               <th>Статус</th>
               <th>Действия</th>
             </tr>
@@ -247,6 +274,7 @@ export default function AdminDishesPage() {
           <tbody>
             {dishes.map(dish => {
               const isDishOfDay = dishOfDayIds.includes(dish.id);
+              const menuTypeInfo = menuTypeLabels[dish.menuType] || menuTypeLabels.BOTH;
               
               return (
                 <tr key={dish.id} className={isDishOfDay ? styles.dishOfDayRow : ''}>
@@ -264,7 +292,25 @@ export default function AdminDishesPage() {
                   </td>
                   <td>{dish.category?.name || '-'}</td>
                   <td>{dish.price} ₽</td>
-                  <td>{dish.weight ? `${dish.weight}г` : '-'}</td>
+                  <td>
+                    <span 
+                      className={styles.menuTypeBadge}
+                      style={{ 
+                        background: `${menuTypeInfo.color}20`, 
+                        color: menuTypeInfo.color,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        fontSize: '0.75rem',
+                        fontWeight: 500
+                      }}
+                    >
+                      {menuTypeInfo.icon}
+                      {menuTypeInfo.label}
+                    </span>
+                  </td>
                   <td>
                     <button onClick={() => toggleAvailability(dish)} className={styles.statusBtn}>
                       {dish.isAvailable ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -287,7 +333,8 @@ export default function AdminDishesPage() {
                         price: String(dish.price),
                         categoryId: String(dish.categoryId),
                         weight: String(dish.weight || ''),
-                        imageUrl: dish.imageUrl || ''
+                        imageUrl: dish.imageUrl || '',
+                        menuType: dish.menuType || 'BOTH'
                       });
                       setIsModalOpen(true);
                     }} className={styles.editBtn}>
@@ -349,6 +396,18 @@ export default function AdminDishesPage() {
                 value={formData.imageUrl} 
                 onChange={(e) => setFormData({...formData, imageUrl: e.target.value})} 
               />
+              <div className={styles.field}>
+                <label>Тип меню</label>
+                <select
+                  value={formData.menuType}
+                  onChange={(e) => setFormData({ ...formData, menuType: e.target.value })}
+                  className={styles.select}
+                >
+                  <option value="BOTH">🔄 Для ресторана и доставки</option>
+                  <option value="PICKUP">🏠 Только для ресторана</option>
+                  <option value="DELIVERY">🚚 Только для доставки</option>
+                </select>
+              </div>
               <div className={styles.modalButtons}>
                 <button type="submit" disabled={isSubmitting} className={styles.saveBtn}>
                   {isSubmitting ? 'Сохранение...' : 'Сохранить'}

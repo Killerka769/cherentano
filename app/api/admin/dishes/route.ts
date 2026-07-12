@@ -12,9 +12,20 @@ export async function GET(request: NextRequest) {
     
     const { searchParams } = new URL(request.url)
     const categoryId = searchParams.get('categoryId')
+    const menuType = searchParams.get('menuType')
     
     const where: any = {}
     if (categoryId) where.categoryId = parseInt(categoryId)
+    if (menuType && menuType !== 'all') {
+      if (menuType === 'BOTH') {
+        where.menuType = 'BOTH'
+      } else {
+        where.OR = [
+          { menuType: menuType },
+          { menuType: 'BOTH' }
+        ]
+      }
+    }
     
     const dishes = await prisma.dish.findMany({
       where,
@@ -24,6 +35,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ dishes })
   } catch (error) {
+    console.error('Error fetching dishes:', error)
     return NextResponse.json({ error: 'Ошибка получения блюд' }, { status: 500 })
   }
 }
@@ -36,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
     
     const body = await request.json()
-    const { name, description, price, categoryId, imageUrl, weight, isAvailable } = body
+    const { name, description, price, categoryId, imageUrl, weight, isAvailable, menuType } = body
     
     const slug = name.toLowerCase().replace(/[^а-яёa-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
     
@@ -50,6 +62,7 @@ export async function POST(request: NextRequest) {
         imageUrl: imageUrl || null,
         weight: weight ? parseInt(weight) : null,
         isAvailable: isAvailable !== undefined ? isAvailable : true,
+        menuType: menuType || 'BOTH',
         sortOrder: 0
       },
       include: { category: true }
@@ -70,7 +83,7 @@ export async function PUT(request: NextRequest) {
     }
     
     const body = await request.json()
-    const { id, name, description, price, categoryId, imageUrl, weight, isAvailable } = body
+    const { id, name, description, price, categoryId, imageUrl, weight, isAvailable, menuType } = body
     
     const slug = name.toLowerCase().replace(/[^а-яёa-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
     
@@ -84,7 +97,8 @@ export async function PUT(request: NextRequest) {
         categoryId: parseInt(categoryId),
         imageUrl: imageUrl || null,
         weight: weight ? parseInt(weight) : null,
-        isAvailable: isAvailable !== undefined ? isAvailable : true
+        isAvailable: isAvailable !== undefined ? isAvailable : true,
+        menuType: menuType || 'BOTH'
       },
       include: { category: true }
     })
@@ -110,6 +124,7 @@ export async function DELETE(request: NextRequest) {
     
     return NextResponse.json({ success: true })
   } catch (error) {
+    console.error('Error deleting dish:', error)
     return NextResponse.json({ error: 'Ошибка удаления блюда' }, { status: 500 })
   }
 }

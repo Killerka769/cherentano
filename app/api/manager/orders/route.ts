@@ -75,7 +75,7 @@ export async function PATCH(request: NextRequest) {
       where: { id: orderId },
       include: { 
         user: true,
-        items: true  // 👈 ДОБАВЛЯЕМ items
+        items: true
       }
     })
     
@@ -148,7 +148,6 @@ export async function PATCH(request: NextRequest) {
             }
           })
           
-          // Создаём или обновляем историю
           const existingHistory = await prisma.helpHistory.findFirst({
             where: { helpRequestId: helpRequest.id }
           })

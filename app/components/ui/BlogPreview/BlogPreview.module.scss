@@ -1,0 +1,556 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.section {
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fcf8f5 0%, white 100%);
+}
+
+// Декоративный фон
+.bgDecor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bgBlur1 {
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(196, 73, 44, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.bgBlur2 {
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(circle, rgba(244, 162, 97, 0.06) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.bgBlur3 {
+  position: absolute;
+  top: 40%;
+  left: 30%;
+  width: 30%;
+  height: 30%;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(100px);
+}
+
+.container {
+  @include container;
+  position: relative;
+  z-index: 1;
+}
+
+// Заголовок
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 60px;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.badgeWrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, $primary, $secondary);
+  color: white;
+  padding: 8px 24px;
+  border-radius: 40px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 20px rgba(196, 73, 44, 0.3);
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.badgeTrend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(233, 30, 99, 0.12);
+  color: #e91e63;
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.mainTitle {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 2rem;
+  }
+}
+
+.subtitle {
+  color: $text-gray;
+  font-size: 1.2rem;
+  font-weight: 400;
+  max-width: 600px;
+  line-height: 1.6;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+}
+
+// Сетка
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 35px;
+  margin-bottom: 60px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+// Карточка
+.card {
+  background: white;
+  border-radius: 28px;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1);
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.06);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 28px;
+    padding: 2px;
+    background: linear-gradient(135deg, $primary, $secondary, $primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.imageWrapper {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  background: $bg-light;
+  
+  @media (max-width: 768px) {
+    height: 220px;
+  }
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+  
+  .card:hover & {
+    transform: scale(1.1);
+  }
+}
+
+.imageOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.4) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+  
+  .card:hover & {
+    opacity: 1;
+  }
+}
+
+.readBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.categoryBadge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.content {
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+}
+
+.contentTop {
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 56px;
+  color: #1a1a2e;
+  transition: color 0.3s ease;
+  
+  .card:hover & {
+    color: $primary;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+}
+
+.excerpt {
+  font-size: 0.95rem;
+  color: $text-gray;
+  line-height: 1.6;
+  margin-bottom: 18px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 48px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 2px solid $border-light;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: $text-gray;
+  font-weight: 500;
+}
+
+.stats {
+  display: flex;
+  gap: 14px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: $text-gray;
+  font-weight: 500;
+}
+
+.readMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $primary;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-top: 18px;
+  transition: all 0.3s ease;
+  padding: 8px 0;
+  
+  svg {
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover & {
+    gap: 14px;
+    
+    svg {
+      transform: translateX(8px);
+    }
+  }
+}
+
+// Бонусный блок - изменен на мягкий светлый фон
+.bonusBlock {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: linear-gradient(135deg, #f5f0eb, #faf6f2);
+  border-radius: 28px;
+  padding: 32px 40px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(196, 73, 44, 0.08);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 28px 24px;
+  }
+}
+
+.bonusIcon {
+  font-size: 3.5rem;
+  background: rgba(196, 73, 44, 0.08);
+  padding: 16px;
+  border-radius: 24px;
+  line-height: 1;
+  
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    padding: 12px;
+  }
+}
+
+.bonusContent {
+  flex: 1;
+  
+  h4 {
+    color: #1a1a2e;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  
+  p {
+    color: $text-gray;
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.bonusBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, $primary, $secondary);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 20px rgba(196, 73, 44, 0.3);
+  
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(196, 73, 44, 0.4);
+    gap: 16px;
+  }
+  
+  svg {
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover svg {
+    transform: translateX(8px);
+  }
+}
+
+// Скелетоны
+.skeletonHeader {
+  margin-bottom: 50px;
+}
+
+.skeletonBadge {
+  width: 140px;
+  height: 40px;
+  background: $bg-light;
+  border-radius: 40px;
+  margin-bottom: 20px;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonTitle {
+  width: 350px;
+  height: 52px;
+  background: $bg-light;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  animation: shimmer 1.5s infinite;
+  
+  @media (max-width: 768px) {
+    width: 250px;
+    height: 38px;
+  }
+}
+
+.skeletonSubtitle {
+  width: 450px;
+  height: 28px;
+  background: $bg-light;
+  border-radius: 8px;
+  animation: shimmer 1.5s infinite;
+  
+  @media (max-width: 768px) {
+    width: 280px;
+  }
+}
+
+.skeletonCard {
+  height: 420px;
+  background: $bg-light;
+  border-radius: 24px;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.4; }
+}
+
+// Адаптив
+@media (max-width: 1024px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .viewAllBtn {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 60px 0;
+  }
+  
+  .meta {
+    gap: 10px;
+  }
+  
+  .meta span {
+    font-size: 0.7rem;
+  }
+  
+  .stats {
+    gap: 10px;
+  }
+  
+  .stat {
+    font-size: 0.7rem;
+  }
+}

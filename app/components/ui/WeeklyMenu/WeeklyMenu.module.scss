@@ -1,0 +1,365 @@
+@use '../../../styles/variables' as *;
+
+.weeklyMenu {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+  margin-bottom: 32px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  
+  svg {
+    color: $primary;
+  }
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navBtn {
+  background: $bg-light;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary;
+    color: white;
+  }
+}
+
+.todayBtn {
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $primary-dark;
+  }
+}
+
+.daysNav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  flex-wrap: nowrap;
+  
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $border-light;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $primary;
+    border-radius: 10px;
+  }
+}
+
+.dayBtn {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border: 1px solid $border-light;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-width: 100px;
+  position: relative;
+  
+  &:hover {
+    border-color: $primary;
+  }
+  
+  &.active {
+    border-color: $primary;
+    background: rgba(196, 73, 44, 0.05);
+    box-shadow: 0 2px 8px rgba(196, 73, 44, 0.1);
+  }
+  
+  &.today {
+    border-color: #ff9800;
+    background: rgba(255, 152, 0, 0.05);
+  }
+}
+
+.dayDate {
+  display: block;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.dishCount {
+  display: block;
+  font-size: 0.65rem;
+  color: $text-gray;
+  margin-top: 4px;
+}
+
+.todayBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ff9800;
+  color: white;
+  font-size: 0.55rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.noDays {
+  padding: 16px;
+  text-align: center;
+  color: $text-gray;
+  width: 100%;
+}
+
+.dishesList {
+  background: $bg-light;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.dayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid $border-light;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dayHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dayHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: $text-gray;
+}
+
+.mealIcon {
+  color: $primary;
+}
+
+.dayTitle {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.dishTotal {
+  font-size: 0.75rem;
+  color: $text-gray;
+}
+
+.clockIcon {
+  color: $text-gray;
+}
+
+.dayTotal {
+  font-weight: 600;
+  color: $primary;
+}
+
+.dishesGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dishCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-sm;
+  }
+}
+
+.dishImage {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: $bg-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.dishWeightBadge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  font-size: 0.55rem;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.dishInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.dishName {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dishCategory {
+  font-size: 0.65rem;
+  color: $text-gray;
+  background: $bg-light;
+  padding: 0 8px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.dishPrice {
+  font-weight: 700;
+  color: $primary;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.dishLink {
+  font-size: 0.7rem;
+  color: $primary;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid $primary;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  
+  &:hover {
+    background: $primary;
+    color: white;
+  }
+}
+
+.emptyDishes {
+  padding: 24px;
+  text-align: center;
+  color: $text-gray;
+}
+
+// Скелетон
+.skeleton {
+  background: white;
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.skeletonHeader {
+  height: 28px;
+  background: $bg-light;
+  border-radius: 8px;
+  width: 60%;
+  margin-bottom: 20px;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonDays {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.skeletonDay {
+  height: 60px;
+  width: 100px;
+  background: $bg-light;
+  border-radius: 12px;
+  animation: shimmer 1.5s infinite;
+  flex-shrink: 0;
+}
+
+.skeletonDishes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeletonDish {
+  height: 80px;
+  background: $bg-light;
+  border-radius: 14px;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.5; }
+}

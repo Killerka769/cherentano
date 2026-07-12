@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Calendar, Clock, Users, Phone, User, Mail, MessageSquare, AlertCircle, Lock } from 'lucide-react';
+import { Calendar, Clock, Users, Phone, User, Mail, MessageSquare, AlertCircle, Lock, CheckCircle, Copy, Banknote } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 import PhoneInput from '../components/ui/PhoneInput/PhoneInput';
@@ -29,6 +29,9 @@ interface Table {
   }[];
 }
 
+const BOOKING_PRICE = 1000;
+const PAYMENT_PHONE = '79034816223';
+
 export default function BookingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -49,6 +52,10 @@ export default function BookingPage() {
   const [availableTimes, setAvailableTimes] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
   const [bookingDuration, setBookingDuration] = useState(2);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [createdBookingId, setCreatedBookingId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'full' | 'deposit'>('full');
 
   useEffect(() => {
     fetchTables();
@@ -66,7 +73,6 @@ export default function BookingPage() {
     }
   }, [user]);
 
-  // Автоматически вычисляем время окончания
   const getEndTime = (startTime: string, duration: number): string => {
     const [hours, minutes] = startTime.split(':').map(Number);
     const totalMinutes = hours * 60 + minutes + duration * 60;
@@ -110,6 +116,16 @@ export default function BookingPage() {
     setAvailableTimes(times);
   };
 
+  const getPaymentText = (bookingId: string) => {
+    return `Перевод по номеру телефона: +${PAYMENT_PHONE}
+Сумма: ${BOOKING_PRICE} ₽
+Назначение: Бронирование столика #${bookingId} от ${new Date().toLocaleDateString('ru-RU')}
+Плательщик: ${formData.customerName || 'Клиент'} (${formData.customerPhone || 'телефон не указан'})
+Дата и время: ${formData.date} в ${formData.time}
+Гостей: ${formData.guests}
+Комментарий: ${formData.comment || '—'}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -137,31 +153,33 @@ export default function BookingPage() {
     setIsSubmitting(true);
     
     try {
+      // Создаем бронь со статусом PENDING (ожидает оплаты)
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           tableId: selectedTable,
           ...formData,
-          endTime: formData.endTime
+          endTime: formData.endTime,
+          paidAmount: BOOKING_PRICE,
+          paymentMethod: 'ONLINE'
         })
       });
       
       const data = await res.json();
       
       if (!res.ok) {
-        if (res.status === 409 && data.conflictingBookings) {
-          const conflictMessage = data.conflictingBookings.map((b: any) => 
-            `${b.customerName} (${b.time}${b.endTime ? ` - ${b.endTime}` : ''})`
-          ).join(', ');
-          toast.error(`❌ Столик занят в это время. Брони: ${conflictMessage}`);
+        if (res.status === 409) {
+          toast.error(`❌ ${data.error}`);
           return;
         }
         throw new Error(data.error || 'Ошибка бронирования');
       }
       
-      toast.success('Бронирование отправлено! Менеджер свяжется с вами для подтверждения.');
-      router.push('/profile/bookings');
+      setCreatedBookingId(data.booking.id);
+      setShowPaymentDetails(true);
+      toast.success('Бронирование создано! Оплатите 1000 ₽ для подтверждения.');
+      
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -169,32 +187,128 @@ export default function BookingPage() {
     }
   };
 
+  const copyPaymentText = async () => {
+    if (!createdBookingId) return;
+    await navigator.clipboard.writeText(getPaymentText(createdBookingId));
+    setCopied(true);
+    toast.success('✅ Данные для оплаты скопированы!');
+    setTimeout(() => setCopied(false), 3000);
+  };
+
   const selectedTableObj = tables.find(t => t.id === selectedTable);
   const isAuthenticated = !!user;
 
-  // Проверяем занятость столика на выбранную дату
-  const isTableBooked = (table: Table) => {
-    if (!formData.date) return false;
-    return table.bookings.some(b => 
-      b.date === formData.date && 
-      (b.status === 'CONFIRMED' || b.status === 'PENDING')
-    );
-  };
+  // Экран с реквизитами для оплаты
+  if (showPaymentDetails && createdBookingId) {
+    const paymentText = getPaymentText(createdBookingId);
 
+    return (
+      <div className={styles.container}>
+        <div className={styles.paymentContainer}>
+          <div className={styles.paymentHeader}>
+            <CheckCircle size={48} className={styles.paymentSuccessIcon} />
+            <h2>Бронирование создано!</h2>
+            <p>Оплатите 1000 ₽ для подтверждения бронирования</p>
+          </div>
+          
+          <div className={styles.paymentCard}>
+            <div className={styles.paymentCardHeader}>
+              <Banknote size={20} />
+              <span>Реквизиты для оплаты</span>
+            </div>
+            
+            <div className={styles.paymentDetails}>
+              <div className={styles.paymentRow}>
+                <span className={styles.paymentLabel}>Получатель</span>
+                <span className={styles.paymentValue}>Ресторан Челентано</span>
+              </div>
+              <div className={styles.paymentRow}>
+                <span className={styles.paymentLabel}>Телефон</span>
+                <span className={styles.paymentValue}>+{PAYMENT_PHONE}</span>
+              </div>
+              <div className={styles.paymentRow}>
+                <span className={styles.paymentLabel}>Сумма</span>
+                <span className={`${styles.paymentValue} ${styles.amount}`}>{BOOKING_PRICE} ₽</span>
+              </div>
+              <div className={styles.paymentRow}>
+                <span className={styles.paymentLabel}>Назначение</span>
+                <span className={styles.paymentValue}>Бронирование столика #{createdBookingId}</span>
+              </div>
+            </div>
+
+            <div className={styles.paymentTextBlock}>
+              <label>Текст для перевода (скопируйте и вставьте в комментарий)</label>
+              <div className={styles.paymentText}>
+                <pre>{paymentText}</pre>
+              </div>
+              <button onClick={copyPaymentText} className={styles.copyPaymentBtn}>
+                {copied ? <CheckCircle size={18} /> : <Copy size={18} />}
+                {copied ? 'Скопировано!' : 'Скопировать текст'}
+              </button>
+            </div>
+
+            <div className={styles.paymentInstructions}>
+              <div className={styles.instruction}>
+                <span className={styles.step}>1</span>
+                <span>Откройте приложение вашего банка</span>
+              </div>
+              <div className={styles.instruction}>
+                <span className={styles.step}>2</span>
+                <span>Выберите «Перевод по номеру телефона»</span>
+              </div>
+              <div className={styles.instruction}>
+                <span className={styles.step}>3</span>
+                <span>Вставьте скопированный текст в комментарий</span>
+              </div>
+              <div className={styles.instruction}>
+                <span className={styles.step}>4</span>
+                <span>Подтвердите перевод</span>
+              </div>
+            </div>
+
+            <div className={styles.paymentNote}>
+              <AlertCircle size={16} />
+              <span>После оплаты менеджер подтвердит бронирование в течение 5-10 минут</span>
+            </div>
+
+            <div className={styles.paymentActions}>
+              <button 
+                onClick={() => {
+                  router.push('/profile/bookings');
+                }}
+                className={styles.paymentCompleteBtn}
+              >
+                Я оплатил, перейти к моим броням
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Основная форма
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.title}>Бронирование столика</h1>
-        <p className={styles.subtitle}>Забронируйте столик в ресторане Челентано</p>
+        <p className={styles.subtitle}>
+          Забронируйте столик в ресторане Челентано — 
+          <strong className={styles.priceHighlight}> {BOOKING_PRICE} ₽</strong>
+        </p>
       </div>
 
       <div className={styles.content}>
         <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Выбор столика */}
           <div className={styles.card}>
             <h3>Выберите кабинку</h3>
             <div className={styles.tablesGrid}>
               {tables.map(table => {
-                const booked = isTableBooked(table);
+                const booked = table.bookings.some(b => 
+                  b.date === formData.date && 
+                  (b.status === 'CONFIRMED' || b.status === 'PENDING')
+                );
                 
                 return (
                   <div 
@@ -387,6 +501,24 @@ export default function BookingPage() {
             </div>
           </div>
 
+          {/* Стоимость бронирования */}
+          <div className={styles.priceBox}>
+            <div className={styles.priceBoxHeader}>
+              <Banknote size={20} />
+              <span>Стоимость бронирования</span>
+            </div>
+            <div className={styles.priceBoxContent}>
+              <div className={styles.priceAmount}>{BOOKING_PRICE} ₽</div>
+              <p className={styles.priceNote}>
+                Оплата бронирования гарантирует, что столик будет за вами.
+                <br />
+                <span className={styles.priceRefund}>
+                  💡 При неявке сумма не возвращается
+                </span>
+              </p>
+            </div>
+          </div>
+
           {isAuthenticated && (
             <>
               <div className={styles.agreement}>
@@ -408,13 +540,13 @@ export default function BookingPage() {
                 disabled={isSubmitting}
                 className={styles.submitBtn}
               >
-                {isSubmitting ? 'Отправка...' : 'Забронировать столик'}
+                {isSubmitting ? 'Отправка...' : `Забронировать за ${BOOKING_PRICE} ₽`}
               </button>
             </>
           )}
           
           <p className={styles.note}>
-            После бронирования с вами свяжется менеджер для подтверждения
+            После оплаты менеджер подтвердит бронирование
           </p>
         </form>
 

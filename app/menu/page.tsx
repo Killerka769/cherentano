@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import DishCard from '@/app/components/menu/DishCard/DishCard';
-import { Heart, ChevronRight, Search, X, History } from 'lucide-react';
+import { Heart, ChevronRight, Search, X, History, Utensils, Truck } from 'lucide-react';
 import styles from './page.module.scss';
 import { MenuGridSkeleton } from '../components/ui/Skeleton/Skeleton';
 import Banner from '../components/ui/Banner/Banner';
 import DishOfDay from '../components/ui/DishOfDay/DishOfDay';
 import LoadIndicator from '../components/ui/LoadIndicator/LoadIndicator';
+import WeeklyMenu from '../components/ui/WeeklyMenu/WeeklyMenu';
 
 interface Category {
   id: number;
@@ -25,6 +26,7 @@ interface Dish {
   weight: number | null;
   slug: string;
   isAvailable: boolean;
+  menuType: 'DELIVERY' | 'PICKUP' | 'BOTH';
   category: Category;
 }
 
@@ -37,6 +39,26 @@ export default function MenuPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [menuType, setMenuType] = useState<'pickup' | 'delivery'>('pickup');
+
+  // Загружаем тип меню из localStorage при монтировании
+  useEffect(() => {
+    const savedType = localStorage.getItem('selectedMenuType');
+    if (savedType === 'delivery' || savedType === 'pickup') {
+      setMenuType(savedType);
+    } else {
+      // По умолчанию - в ресторане
+      setMenuType('pickup');
+      localStorage.setItem('selectedMenuType', 'pickup');
+    }
+  }, []);
+
+  // Сохраняем тип в localStorage при изменении
+  const handleMenuTypeChange = (type: 'pickup' | 'delivery') => {
+    setMenuType(type);
+    localStorage.setItem('selectedMenuType', type);
+    setCurrentPage(1);
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -45,9 +67,9 @@ export default function MenuPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchDishes();
-    }, 1000);
+    }, 300);
     return () => clearTimeout(timer);
-  }, [selectedCategory, currentPage, searchQuery]);
+  }, [selectedCategory, currentPage, searchQuery, menuType]);
 
   const fetchCategories = async () => {
     try {
@@ -63,7 +85,7 @@ export default function MenuPage() {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `/api/dishes?category=${selectedCategory}&search=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=9`
+        `/api/dishes?category=${selectedCategory}&search=${encodeURIComponent(searchQuery)}&page=${currentPage}&limit=9&menuType=${menuType}`
       );
       const data = await res.json();
       setDishes(data.dishes || []);
@@ -98,6 +120,14 @@ export default function MenuPage() {
           <h1 className={styles.title}>Наше меню</h1>
           <p className={styles.subtitle}>Дагестанская и европейская кухня</p>
         </div>
+        <div className={styles.menuTabs}>
+          <button className={`${styles.menuTab} ${styles.active}`}>
+            <Utensils size={18} /> В ресторане
+          </button>
+          <button className={styles.menuTab}>
+            <Truck size={18} /> Доставка
+          </button>
+        </div>
         <div className={styles.searchSection}>
           <div className={styles.searchBox}>
             <Search size={20} />
@@ -113,8 +143,10 @@ export default function MenuPage() {
   }
 
   return (
-    <div className={styles.container}>
+    <>
       <Banner />
+    <div className={styles.container}>
+      
       
       <div className={styles.header}>
         <h1 className={styles.title}>Наше меню</h1>
@@ -124,6 +156,25 @@ export default function MenuPage() {
         </div>
       </div>
 
+      {/* Вкладки меню - сохраняем выбор */}
+      <div className={styles.menuTabs}>
+        <button
+          onClick={() => handleMenuTypeChange('pickup')}
+          className={`${styles.menuTab} ${menuType === 'pickup' ? styles.active : ''}`}
+        >
+          <Utensils size={18} />
+          В ресторане
+        </button>
+        <button
+          onClick={() => handleMenuTypeChange('delivery')}
+          className={`${styles.menuTab} ${menuType === 'delivery' ? styles.active : ''}`}
+        >
+          <Truck size={18} />
+          Доставка
+        </button>
+      </div>
+
+      <WeeklyMenu />
       <DishOfDay />
 
       {/* Кнопки помощи */}
@@ -229,5 +280,6 @@ export default function MenuPage() {
         </>
       )}
     </div>
+  </>
   );
 }

@@ -85,9 +85,6 @@ export async function POST(request: NextRequest) {
       bookingDate,
       isCharity,
       charityRequestId,
-      charityBeneficiaryId,
-      mealTime,
-      // 👇 ВОЗВРАЩАЕМ СКИДКИ
       discountId,
       discountAmount,
       isIndividualDiscount
@@ -123,22 +120,24 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
     
-    // Преобразуем orderType
+    // 👇 СОХРАНЯЕМ ТИП ЗАКАЗА (orderType)
     const normalizedOrderType = orderType === 'pickup' ? 'PICKUP' : 'DELIVERY'
     const normalizedPaymentMethod = paymentMethod === 'cash' ? 'CASH' : 'CARD'
     
-    // 👇 СОЗДАЁМ ЗАКАЗ С ПОДДЕРЖКОЙ СКИДОК
+    // 👇 СОЗДАЁМ ЗАКАЗ С ПОДДЕРЖКОЙ ВСЕХ ПОЛЕЙ
     const orderData: any = {
       userId: user?.id || null,
       customerName,
       customerPhone,
-      orderType: normalizedOrderType,
+      orderType: normalizedOrderType, // 👈 СОХРАНЯЕМ ТИП
       deliveryAddress: normalizedOrderType === 'DELIVERY' ? deliveryAddress : null,
       comment: comment || '',
       total,
       paymentMethod: normalizedPaymentMethod,
       status: isCharity ? 'CONFIRMED' : 'NEW',
       isCharity: isCharity || false,
+      paymentStatus: 'PENDING',
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 минут на оплату
       items: {
         create: items.map((item: any) => ({
           dishId: item.id,

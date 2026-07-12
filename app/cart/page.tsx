@@ -5,9 +5,10 @@ import { useCart } from '@/app/contexts/CartContext';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShoppingBag, ArrowLeft, AlertCircle } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, AlertCircle, Utensils, Truck } from 'lucide-react';
 import CartItem from '@/app/components/cart/CartItem/CartItem';
 import DiscountInput from '@/app/components/cart/DiscountInput/DiscountInput';
+import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
 export default function CartPage() {
@@ -16,10 +17,21 @@ export default function CartPage() {
   const router = useRouter();
   const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [menuType, setMenuType] = useState<'pickup' | 'delivery'>('pickup');
   
   const subtotal = getTotal();
-  const deliveryPrice = subtotal > 1000 ? 0 : 150;
-  const total = subtotal + deliveryPrice - discountAmount;
+  const total = subtotal - discountAmount;
+
+  // Загружаем тип меню из localStorage
+  useEffect(() => {
+    const savedType = localStorage.getItem('selectedMenuType');
+    if (savedType === 'delivery' || savedType === 'pickup') {
+      setMenuType(savedType);
+    } else {
+      setMenuType('pickup');
+      localStorage.setItem('selectedMenuType', 'pickup');
+    }
+  }, []);
 
   const handleDiscountApplied = (data: any) => {
     setAppliedDiscount(data);
@@ -31,14 +43,39 @@ export default function CartPage() {
     setDiscountAmount(0);
   };
 
+  const switchMenuType = (type: 'pickup' | 'delivery') => {
+    setMenuType(type);
+    localStorage.setItem('selectedMenuType', type);
+    toast.success(type === 'pickup' ? 'Выбрано: в ресторане' : 'Выбрано: доставка');
+  };
+
   const handleCheckout = () => {
     if (!user) {
       router.push('/login');
       return;
     }
+
+    // 👇 ПРОВЕРЯЕМ ВСЕ БЛЮДА В КОРЗИНЕ
+    const invalidItems = items.filter(item => {
+      if (menuType === 'pickup') {
+        // Для ресторана НЕ подходят только DELIVERY
+        return item.menuType === 'DELIVERY';
+      } else {
+        // Для доставки НЕ подходят только PICKUP
+        return item.menuType === 'PICKUP';
+      }
+    });
     
-    // Передаем данные скидки через URL параметры
+    // 🔴 ЕСЛИ ЕСТЬ НЕСООТВЕТСТВИЕ — ПОКАЗЫВАЕМ ОШИБКУ
+    if (invalidItems.length > 0) {
+      const names = invalidItems.map(i => i.name).join(', ');
+      toast.error(`⚠️ Блюда не соответствуют типу заказа: ${names}`);
+      return;
+    }
+    
+    localStorage.setItem('selectedMenuType', menuType);
     const params = new URLSearchParams();
+
     if (appliedDiscount) {
       params.set('discountId', appliedDiscount.discountId);
       params.set('discountCode', appliedDiscount.discountCode);
@@ -77,6 +114,27 @@ export default function CartPage() {
         </button>
       </div>
 
+      {/* Выбор типа заказа */}
+      <div className={styles.orderTypeSelector}>
+        <span className={styles.orderTypeLabel}>Тип заказа:</span>
+        <div className={styles.orderTypeButtons}>
+          <button
+            onClick={() => switchMenuType('pickup')}
+            className={`${styles.orderTypeBtn} ${menuType === 'pickup' ? styles.active : ''}`}
+          >
+            <Utensils size={18} />
+            В ресторане
+          </button>
+          <button
+            onClick={() => switchMenuType('delivery')}
+            className={`${styles.orderTypeBtn} ${menuType === 'delivery' ? styles.active : ''}`}
+          >
+            <Truck size={18} />
+            Доставка
+          </button>
+        </div>
+      </div>
+
       <div className={styles.content}>
         <div className={styles.items}>
           {items.map(item => (
@@ -99,20 +157,15 @@ export default function CartPage() {
             <span>{subtotal} ₽</span>
           </div>
           
-          <div className={styles.summaryRow}>
-            <span>Доставка</span>
-            <span>{deliveryPrice === 0 ? 'Бесплатно' : `${deliveryPrice} ₽`}</span>
-          </div>
-          
-          {deliveryPrice > 0 && (
-            <div className={styles.freeDeliveryNote}>
-              Закажите ещё на {1000 - subtotal} ₽ для бесплатной доставки
+          {menuType === 'delivery' && (
+            <div className={styles.deliveryInfo}>
+              <Truck size={16} />
+              <span>Доставка осуществляется такси. Оплата такси производится клиентом самостоятельно при получении заказа.</span>
             </div>
           )}
 
-          {/* Блок скидок */}
           <DiscountInput
-            orderTotal={subtotal + deliveryPrice}
+            orderTotal={subtotal}
             items={items}
             onDiscountApplied={handleDiscountApplied}
             onDiscountRemoved={handleDiscountRemoved}
