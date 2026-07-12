@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useCart } from '@/app/contexts/CartContext';
 import { useAuth } from '@/app/contexts/AuthContext';
@@ -9,8 +10,7 @@ import {
   ArrowLeft, Phone, MapPin, User, MessageSquare, CreditCard, 
   Store, AlertCircle, Calendar, Clock, Users,
   CheckCircle, Copy, Banknote, Lock,
-  Utensils,
-  Truck
+  Utensils, Truck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
@@ -33,7 +33,7 @@ interface FormData {
   bookingDate: string;
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const { items, getTotal, clearCart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
@@ -903,5 +903,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className={styles.loader}>Загрузка...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
