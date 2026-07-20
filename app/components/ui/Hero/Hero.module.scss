@@ -7,9 +7,10 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
+  background: #0a0a0a;
 }
 
-// Фоновые эффекты
+// === ФОНОВЫЕ ЭФФЕКТЫ ===
 .bgEffects {
   position: absolute;
   top: 0;
@@ -25,10 +26,10 @@
   left: -10%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(circle, rgba(196,73,44,0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(196, 73, 44, 0.2) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
-  animation: float 20s ease-in-out infinite;
+  animation: floatBlur 20s ease-in-out infinite;
 }
 
 .bgBlur2 {
@@ -37,31 +38,64 @@
   right: -10%;
   width: 50%;
   height: 50%;
-  background: radial-gradient(circle, rgba(244,162,97,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(244, 162, 97, 0.15) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(80px);
-  animation: float 25s ease-in-out infinite reverse;
+  animation: floatBlur 25s ease-in-out infinite reverse;
 }
 
 .bgBlur3 {
   position: absolute;
   top: 40%;
   left: 30%;
-  width: 40%;
-  height: 40%;
-  background: radial-gradient(circle, rgba(76,175,80,0.05) 0%, transparent 70%);
+  width: 30%;
+  height: 30%;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.06) 0%, transparent 70%);
   border-radius: 50%;
   filter: blur(100px);
-  animation: float 30s ease-in-out infinite;
+  animation: floatBlur 30s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(30px, -30px) rotate(5deg); }
-  66% { transform: translate(-20px, 20px) rotate(-3deg); }
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.02) 0%, transparent 1%),
+    radial-gradient(circle at 80% 50%, rgba(255,255,255,0.02) 0%, transparent 1%);
+  background-size: 60px 60px;
 }
 
-// Слайдер
+@keyframes floatBlur {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -40px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+// === ПЛАВАЮЩИЕ ИКОНКИ ===
+.floatingIcons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floatingIcon {
+  position: absolute;
+  font-size: 2.2rem;
+  opacity: 0.15;
+  
+  &:nth-child(1) { top: 12%; left: 4%; }
+  &:nth-child(2) { bottom: 20%; right: 6%; }
+  &:nth-child(3) { top: 45%; left: 2%; font-size: 1.8rem; }
+  &:nth-child(4) { bottom: 35%; right: 10%; font-size: 1.6rem; }
+  &:nth-child(5) { top: 25%; right: 3%; font-size: 1.4rem; }
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// === СЛАЙДЕР ===
 .sliderContainer {
   position: relative;
   width: 100%;
@@ -72,132 +106,177 @@
 
 .slide {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  will-change: transform;
 }
 
 .slideOverlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 100%);
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.5) 100%);
   display: flex;
   align-items: center;
 }
 
-// Контент
+// === КОНТЕЙНЕР с отступами по бокам ===
 .container {
   @include container;
   width: 100%;
   position: relative;
   z-index: 2;
+  padding-left: 60px;  // ← увеличил отступ слева
+  padding-right: 60px; // ← увеличил отступ справа
+  
+  @media (max-width: 1200px) {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
+  @media (max-width: 768px) {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  @media (max-width: 480px) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 .content {
-  max-width: 650px;
-  opacity: 0;
-  transform: translateX(-30px);
-  transition: all 0.8s ease;
-  
-  &.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 40px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.badgeDot {
-  font-size: 8px;
-  margin: 0 4px;
-}
-
-.badgeRating {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.title {
-  font-size: 3.8rem;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 16px;
-  color: white;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
   
   @media (max-width: 768px) {
-    font-size: 2.2rem;
+    max-width: 100%;
   }
 }
 
+// === ТЕГ ===
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 18px 8px 12px;
+  border-radius: 50px;
+  color: rgba(255,255,255,0.9);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.tagPulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4caf50;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+// === ЗАГОЛОВОК ===
+.title {
+  font-size: 4.2rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.3);
+  letter-spacing: -0.02em;
+  
+  @media (max-width: 992px) {
+    font-size: 3.2rem;
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 2.4rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.8rem;
+  }
+}
+
+.titleAccent {
+  color: $primary;
+}
+
+// === ПОДЗАГОЛОВОК ===
 .subtitle {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.6;
-  margin-bottom: 24px;
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  max-width: 520px;
+  font-weight: 400;
   
   @media (max-width: 768px) {
     font-size: 1rem;
+    max-width: 100%;
   }
 }
 
-.highlightTag {
-  display: inline-block;
+// === ХАЙЛАЙТ ===
+.highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   background: linear-gradient(135deg, $primary, $secondary);
-  padding: 6px 16px;
-  border-radius: 40px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  padding: 8px 20px 8px 16px;
+  border-radius: 50px;
   color: white;
-  margin-bottom: 32px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 40px;
 }
 
+.highlightIcon {
+  font-size: 1.2rem;
+}
+
+// === КНОПКИ ===
 .buttons {
   display: flex;
-  gap: 16px;
-  margin-bottom: 48px;
+  gap: 14px;
   flex-wrap: wrap;
+  margin-bottom: 50px;
 }
 
 .primaryBtn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: $primary;
   color: white;
   border: none;
-  padding: 14px 32px;
-  border-radius: 40px;
+  padding: 16px 36px;
+  border-radius: 50px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:hover {
     background: $primary-dark;
-    gap: 12px;
-    transform: translateY(-2px);
+    gap: 16px;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(196, 73, 44, 0.4);
+  }
+  
+  @media (max-width: 480px) {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
   }
 }
 
@@ -205,102 +284,138 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: transparent;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255,255,255,0.25);
   color: white;
-  padding: 14px 32px;
-  border-radius: 40px;
+  padding: 16px 32px;
+  border-radius: 50px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-3px);
+  }
+  
+  @media (max-width: 480px) {
+    flex: 1;
+    justify-content: center;
+    padding: 14px 20px;
   }
 }
 
-.stats {
+.deliveryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(76, 175, 80, 0.2);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(76, 175, 80, 0.4);
+  color: #81c784;
+  padding: 16px 28px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.6);
+    transform: translateY(-3px);
+  }
+  
+  @media (max-width: 480px) {
+    flex: 1;
+    justify-content: center;
+    padding: 14px 20px;
+  }
+}
+
+// === ПРЕИМУЩЕСТВА ===
+.advantages {
   display: flex;
-  gap: 32px;
+  gap: 24px;
+  flex-wrap: wrap;
   padding-top: 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
 
-.stat {
+.advantageItem {
   display: flex;
   align-items: center;
-  gap: 12px;
-  color: white;
+  gap: 10px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.statIcon {
-  font-size: 1.5rem;
+.advantageIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $primary;
 }
 
-.statValue {
-  font-size: 1.5rem;
-  font-weight: 800;
-  display: block;
-  line-height: 1.2;
+.advantageText {
+  white-space: nowrap;
+  
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+  }
 }
 
-.statLabel {
-  font-size: 0.7rem;
-  opacity: 0.8;
-}
-
-.statDivider {
-  width: 1px;
-  height: 30px;
-  background: rgba(255, 255, 255, 0.2);
-}
-
-// Кнопки навигации
+// === НАВИГАЦИЯ ===
 .navBtn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   color: white;
   z-index: 10;
   
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-50%) scale(1.05);
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-50%) scale(1.08);
   }
   
   @media (max-width: 768px) {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  @media (max-width: 480px) {
+    display: none;
   }
 }
 
 .prevBtn {
-  left: 20px;
+  left: 24px;
 }
 
 .nextBtn {
-  right: 20px;
+  right: 24px;
 }
 
-// Индикаторы
+// === ИНДИКАТОРЫ ===
 .dots {
   position: absolute;
-  bottom: 30px;
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -312,88 +427,129 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255,255,255,0.3);
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  
+  &:hover {
+    background: rgba(255,255,255,0.5);
+  }
   
   &.active {
-    width: 28px;
+    width: 32px;
     border-radius: 10px;
     background: $primary;
   }
-  
-  &:hover {
-    background: $primary;
-  }
 }
 
-// Плавающие элементы
-.floatingElements {
+// === СЧЁТЧИК ===
+.slideCounter {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.floating1, .floating2, .floating3, .floating4 {
-  position: absolute;
-  font-size: 2.5rem;
-  animation: floatElement 15s ease-in-out infinite;
-  opacity: 0.2;
-}
-
-.floating1 {
-  top: 15%;
-  left: 5%;
-  animation-delay: 0s;
-}
-
-.floating2 {
-  bottom: 20%;
-  right: 8%;
-  animation-delay: 2s;
-  font-size: 2rem;
-}
-
-.floating3 {
-  top: 50%;
-  left: 10%;
-  animation-delay: 4s;
-  font-size: 1.8rem;
-}
-
-.floating4 {
-  bottom: 30%;
-  right: 15%;
-  animation-delay: 6s;
-  font-size: 2.2rem;
-}
-
-.deliveryBtn {
-  display: inline-flex;
+  right: 40px;
+  bottom: 80px;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 40px;
-  font-size: 1rem;
+  gap: 6px;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.8rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  z-index: 10;
+  font-variant-numeric: tabular-nums;
   
-  &:hover {
-    background: #388e3c;
-    transform: translateY(-2px);
+  @media (max-width: 768px) {
+    right: 20px;
+    bottom: 60px;
+  }
+  
+  @media (max-width: 480px) {
+    display: none;
   }
 }
 
-@keyframes floatElement {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(10deg); }
+.counterCurrent {
+  color: white;
+  font-size: 1.2rem;
+}
+
+.counterSeparator {
+  opacity: 0.3;
+}
+
+.counterTotal {
+  opacity: 0.5;
+}
+
+// === АДАПТИВ ===
+@media (max-width: 768px) {
+  .sliderContainer {
+    min-height: 600px;
+  }
+  
+  .content {
+    max-width: 100%;
+  }
+  
+  .buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .advantages {
+    gap: 16px;
+  }
+  
+  .navBtn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .prevBtn {
+    left: 12px;
+  }
+  
+  .nextBtn {
+    right: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sliderContainer {
+    min-height: 500px;
+  }
+  
+  .tag {
+    font-size: 0.7rem;
+    padding: 6px 14px 6px 10px;
+  }
+  
+  .highlight {
+    font-size: 0.8rem;
+    padding: 6px 16px;
+  }
+  
+  .advantages {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .advantageItem {
+    font-size: 0.7rem;
+  }
+  
+  .dots {
+    gap: 8px;
+    bottom: 20px;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    
+    &.active {
+      width: 24px;
+    }
+  }
 }

@@ -15,7 +15,8 @@ import {
   Gift,
   ChefHat,
   Heart,
-  Calendar
+  Calendar,
+  Image
 } from 'lucide-react';
 import Link from 'next/link';
 import styles from './page.module.scss';
@@ -212,6 +213,9 @@ export default function AdminDashboard() {
         <div className={styles.actionsGrid}>
           <Link href="/admin/blog" className={styles.actionBtn}>
             <FileText size={20} /> Блог
+          </Link>
+          <Link href="/admin/media" className={styles.actionBtn}>
+            <Image size={20} />  Медиатека
           </Link>
           <Link href="/admin/load-intervals" className={styles.actionBtn}>
             <Clock size={20} /> Загруженность

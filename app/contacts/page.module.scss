@@ -109,55 +109,71 @@
   }
 }
 
-.schedule {
-  text-align: left;
-}
-
-.scheduleRow {
+.starsRow {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+.reviewLink {
+  display: inline-block;
+  margin-top: 8px;
+  color: $primary;
   font-size: 0.85rem;
-  margin-bottom: 8px;
+  text-decoration: none;
   
-  span:first-child {
-    color: $text-gray;
-  }
-  
-  span:last-child {
-    font-weight: 500;
+  &:hover {
+    text-decoration: underline;
   }
 }
 
-.whatsappLink, .telegramLink, .instagramLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 20px;
-  border-radius: 40px;
-  text-decoration: none;
+.socialLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.socialLink {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 1rem;
   font-weight: 500;
-  margin: 6px;
-  transition: all $transition-fast;
+  color: #fff !important;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
   
   &:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  &.whatsapp {
+    background: #25D366;
+  }
+  
+  &.telegram {
+    background: #26A5E4;
+  }
+  
+  &.instagram {
+    background: #212529;
   }
 }
 
-.whatsappLink {
-  background: #25D366;
-  color: white;
-}
-
-.telegramLink {
-  background: #26A5E4;
-  color: white;
-}
-
-.instagramLink {
-  background: #E1306C;
-  color: white;
+.legalDisclaimer {
+  font-size: 11px;
+  color: #868e96;
+  line-height: 1.4;
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f3f5;
+  width: 100%;
 }
 
 .mapSection {
@@ -168,8 +184,13 @@
 }
 
 .mapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px 24px;
   border-bottom: 1px solid $border-light;
+  flex-wrap: wrap;
+  gap: 12px;
   
   h3 {
     font-size: 1.3rem;
@@ -180,6 +201,25 @@
   p {
     color: $text-gray;
     font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+.openMapsBtn {
+  background: none;
+  border: 1px solid $primary;
+  color: $primary;
+  padding: 8px 20px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+  
+  &:hover {
+    background: $primary;
+    color: white;
   }
 }
 
@@ -223,144 +263,86 @@
   }
 }
 
-.howToGet {
-  background: $bg-light;
-  border-radius: 24px;
-  padding: 32px;
+.reviewWidget {
+  background: linear-gradient(135deg, #fef9f0, #fdf0e3);
+  border-radius: 20px;
+  padding: 24px 32px;
+  border: 1px solid #f0e0d0;
   
-  h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 24px;
-    text-align: center;
+  @media (max-width: 768px) {
+    padding: 20px;
   }
 }
 
-.transportGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+.reviewWidgetContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.transportItem {
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
+.reviewWidgetText {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   
-  strong {
-    display: block;
-    margin-bottom: 12px;
-    font-size: 1rem;
+  .reviewWidgetIcon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  
+  h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #333;
   }
   
   p {
     font-size: 0.9rem;
-    color: $text-gray;
-    line-height: 1.5;
+    color: #888;
+    margin: 2px 0 0 0;
   }
 }
-// Добавьте в конец файла:
 
-.starsRow {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+.reviewWidgetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: $primary;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  
+  svg {
+    transition: transform 0.3s ease;
   }
   
-  .reviewLink {
-    display: inline-block;
-    margin-top: 8px;
-    color: $primary;
-    font-size: 0.85rem;
-    text-decoration: none;
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(196, 73, 44, 0.35);
     
-    &:hover {
-      text-decoration: underline;
+    svg {
+      transform: translateX(4px);
     }
   }
   
-  .openMapsBtn {
-    background: none;
-    border: 1px solid $primary;
-    color: $primary;
-    padding: 8px 20px;
-    border-radius: 40px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all $transition-fast;
-    
-    &:hover {
-      background: $primary;
-      color: white;
-    }
-    
-    @media (max-width: 768px) {
-      margin-top: 12px;
-    }
+  &:active {
+    transform: scale(0.97);
   }
   
-  .yandexWidget {
-    background: linear-gradient(135deg, #fff8f0, #fff0e3);
-    border-radius: 20px;
-    padding: 20px 24px;
-    margin-top: 20px;
+  @media (max-width: 600px) {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
   }
-  
-  .widgetContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  
-  .widgetLeft {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  
-  .yandexLogo {
-    height: 32px;
-    width: auto;
-  }
-  
-  .widgetRating {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  
-  .ratingNumber {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: $primary;
-  }
-  
-  .ratingStars {
-    display: flex;
-    gap: 2px;
-  }
-  
-  .reviewsCount {
-    font-size: 0.85rem;
-    color: $text-gray;
-  }
-  
-  .writeReviewBtn {
-    background: $primary;
-    color: white;
-    padding: 10px 24px;
-    border-radius: 40px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all $transition-fast;
-    
-    &:hover {
-      background: $primary-dark;
-      transform: translateY(-2px);
-    }
-  }
+}

@@ -2,13 +2,19 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Доставка',
+    default: 'Доставка еды',
     template: '%s | Челентано'
   },
-  description: 'Информация о доставке ресторана Челентано',
+  description: 'Доставка еды из ресторана Челентано в Махачкале. Быстро, вкусно, горячо. Закажите прямо сейчас!',
+  keywords: 'доставка еды Махачкала, доставка Челентано, заказать еду, быстрая доставка, челентано доставка, доставка еды челентано, заказать еду челентано',
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: 'Доставка еды из Челентано',
+    description: 'Закажите доставку еды из ресторана Челентано в Махачкале',
+    type: 'website',
   },
 }
 

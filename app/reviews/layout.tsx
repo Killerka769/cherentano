@@ -2,14 +2,18 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Отзывы',
-    template: '%s | Блог Челентано'
+    default: 'Отзывы о ресторане',
+    template: '%s | Челентано'
   },
-  description: 'Что говорят наши гости о ресторане Челентано',
-  keywords: 'отзывы ресторана,отзывы, отзывы челентано',
+  description: 'Отзывы гостей о ресторане Челентано в Махачкале. Что говорят о нашей кухне, обслуживании и атмосфере.',
+  keywords: 'отзывы ресторана, отзывы Челентано, ресторан Махачкала отзывы',
+  robots: {
+    index: true,   
+    follow: true, 
+  },
   openGraph: {
-    title: 'Отзывы ресторана Челентано',
-    description: 'Отзывы',
+    title: 'Отзывы о ресторане Челентано',
+    description: 'Что говорят наши гости о ресторане Челентано',
     type: 'website',
   },
 }

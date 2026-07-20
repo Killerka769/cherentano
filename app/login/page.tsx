@@ -79,9 +79,9 @@ export default function LoginPage() {
         <p className={styles.register}>
           Нет аккаунта? <Link href="/register">Зарегистрироваться</Link>
         </p>
-        <p className={styles.hint}>
+        {/* <p className={styles.hint}>
           Подсказка: admin@cherentano.ru / admin123
-        </p>
+        </p> */}
       </div>
     </div>
   );

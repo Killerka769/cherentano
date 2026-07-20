@@ -527,3 +527,21 @@
     background: $primary-dark;
   }
 }
+
+.similarImageWrapper {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: $bg-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Phone, CheckCircle, Clock, Truck, Check, X, Eye, AlertCircle, Utensils, Store, Heart } from 'lucide-react';
+import { Phone, CheckCircle, Clock, Truck, Check, X, Eye, AlertCircle, Utensils, Store, Heart, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
@@ -15,7 +15,7 @@ interface Order {
   comment?: string;
   total: number;
   status: string;
-  orderType: string; // PICKUP, DELIVERY
+  orderType: string;
   isCharity?: boolean;
   createdAt: string;
   items: { dishName: string; quantity: number; price: number }[];
@@ -41,6 +41,11 @@ export default function ManagerOrdersPage() {
   const [callModal, setCallModal] = useState<Order | null>(null);
   const [cancelModal, setCancelModal] = useState<{ order: Order; status: string } | null>(null);
   const [cancelReason, setCancelReason] = useState('');
+  
+  // Поиск и фильтры
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   useEffect(() => {
     if (!loading && (!user || (user.role !== 'MANAGER' && user.role !== 'ADMIN'))) {
@@ -102,7 +107,6 @@ export default function ManagerOrdersPage() {
     return statusSteps.findIndex(s => s.key === status);
   };
 
-  // 👇 Функция для отображения типа заказа
   const getOrderTypeLabel = (order: Order) => {
     if (order.isCharity) {
       return { icon: Heart, label: 'Благотворительность', color: '#e91e63' };
@@ -111,6 +115,27 @@ export default function ManagerOrdersPage() {
       return { icon: Store, label: 'Самовывоз', color: '#ff9800' };
     }
     return { icon: Truck, label: 'Доставка', color: '#2196f3' };
+  };
+
+  // Фильтрация заказов
+  const filteredOrders = (ordersList: Order[]) => {
+    return ordersList.filter(order => {
+      const searchLower = searchQuery.toLowerCase();
+      const matchesSearch = 
+        String(order.id).includes(searchQuery) ||
+        order.customerName.toLowerCase().includes(searchLower) ||
+        order.customerPhone.includes(searchQuery) ||
+        (order.deliveryAddress && order.deliveryAddress.toLowerCase().includes(searchLower));
+
+      const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+      
+      const matchesType = typeFilter === 'all' || 
+        (typeFilter === 'pickup' && order.orderType === 'PICKUP' && !order.isCharity) ||
+        (typeFilter === 'delivery' && order.orderType === 'DELIVERY' && !order.isCharity) ||
+        (typeFilter === 'charity' && order.isCharity);
+
+      return matchesSearch && matchesStatus && matchesType;
+    });
   };
 
   const OrderCard = ({ order }: { order: Order }) => {
@@ -188,6 +213,9 @@ export default function ManagerOrdersPage() {
     );
   };
 
+  const filteredActive = filteredOrders(activeOrders);
+  const filteredCompleted = filteredOrders(completedOrders);
+
   if (loading) return <div className={styles.loader}>Загрузка...</div>;
 
   return (
@@ -205,27 +233,74 @@ export default function ManagerOrdersPage() {
         </div>
       </div>
 
+      {/* Поиск и фильтры */}
+      <div className={styles.filtersSection}>
+        <div className={styles.searchBox}>
+          <Search size={18} />
+          <input
+            type="text"
+            placeholder="Поиск по номеру, имени, телефону или адресу..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} className={styles.clearBtn}>
+              ✕
+            </button>
+          )}
+        </div>
+        
+        <div className={styles.filters}>
+          <select 
+            value={statusFilter} 
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">Все статусы</option>
+            <option value="NEW">Новые</option>
+            <option value="CALLED">Позвонили</option>
+            <option value="CONFIRMED">Подтверждены</option>
+            <option value="PREPARING">Готовятся</option>
+            <option value="READY">Готовы</option>
+            <option value="DELIVERING">В пути</option>
+            <option value="COMPLETED">Выполнены</option>
+            <option value="CANCELLED">Отменены</option>
+          </select>
+          
+          <select 
+            value={typeFilter} 
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">Все типы</option>
+            <option value="pickup">🏠 Самовывоз</option>
+            <option value="delivery">🚚 Доставка</option>
+            <option value="charity">❤️ Благотворительность</option>
+          </select>
+        </div>
+      </div>
+
       <div className={styles.tabs}>
         <button onClick={() => setActiveTab('active')} className={activeTab === 'active' ? styles.active : ''}>
-          Активные ({activeOrders.length})
+          Активные ({filteredActive.length})
         </button>
         <button onClick={() => setActiveTab('completed')} className={activeTab === 'completed' ? styles.active : ''}>
-          Завершенные
+          Завершенные ({filteredCompleted.length})
         </button>
       </div>
 
       <div className={styles.ordersList}>
         {activeTab === 'active' ? (
-          activeOrders.length === 0 ? (
+          filteredActive.length === 0 ? (
             <div className={styles.empty}>Нет активных заказов</div>
           ) : (
-            activeOrders.map(order => <OrderCard key={order.id} order={order} />)
+            filteredActive.map(order => <OrderCard key={order.id} order={order} />)
           )
         ) : (
-          completedOrders.length === 0 ? (
+          filteredCompleted.length === 0 ? (
             <div className={styles.empty}>Нет завершенных заказов</div>
           ) : (
-            completedOrders.map(order => <OrderCard key={order.id} order={order} />)
+            filteredCompleted.map(order => <OrderCard key={order.id} order={order} />)
           )
         )}
       </div>
@@ -346,7 +421,6 @@ export default function ManagerOrdersPage() {
                 </div>
               )}
 
-              {/* История статусов */}
               {selectedOrder.statusLogs && selectedOrder.statusLogs.length > 0 && (
                 <div className={styles.detailSection}>
                   <h4>История статусов</h4>

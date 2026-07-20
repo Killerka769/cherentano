@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /api/
+Disallow: /_next/
+
+Sitemap: https://chelentano05.ru/sitemap.xml
+Host: https://chelentano05.ru

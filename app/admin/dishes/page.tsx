@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Calendar, Utensils, Truck } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Calendar, Utensils, Truck, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import styles from './page.module.scss';
 
@@ -69,6 +69,12 @@ export default function AdminDishesPage() {
     menuType: 'BOTH'
   });
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Поиск и фильтры
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [menuTypeFilter, setMenuTypeFilter] = useState('all');
+  const [availabilityFilter, setAvailabilityFilter] = useState('all');
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'ADMIN')) {
@@ -234,6 +240,18 @@ export default function AdminDishesPage() {
     }
   };
 
+  // Фильтрация блюд
+  const filteredDishes = dishes.filter(dish => {
+    const matchesSearch = dish.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === 'all' || String(dish.categoryId) === categoryFilter;
+    const matchesMenuType = menuTypeFilter === 'all' || dish.menuType === menuTypeFilter;
+    const matchesAvailability = availabilityFilter === 'all' || 
+      (availabilityFilter === 'available' && dish.isAvailable) ||
+      (availabilityFilter === 'unavailable' && !dish.isAvailable);
+
+    return matchesSearch && matchesCategory && matchesMenuType && matchesAvailability;
+  });
+
   if (loading) return <div className={styles.loader}>Загрузка...</div>;
 
   const dishOfDayIds = dishesOfDay.map(d => d.dishId);
@@ -258,6 +276,58 @@ export default function AdminDishesPage() {
         </div>
       </div>
 
+      {/* Поиск и фильтры */}
+      <div className={styles.filtersSection}>
+        <div className={styles.searchBox}>
+          <Search size={18} />
+          <input
+            type="text"
+            placeholder="Поиск по названию блюда..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} className={styles.clearBtn}>
+              ✕
+            </button>
+          )}
+        </div>
+        
+        <div className={styles.filters}>
+          <select 
+            value={categoryFilter} 
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">Все категории</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={String(cat.id)}>{cat.name}</option>
+            ))}
+          </select>
+          
+          <select 
+            value={menuTypeFilter} 
+            onChange={(e) => setMenuTypeFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">Все типы</option>
+            <option value="BOTH">Оба</option>
+            <option value="PICKUP">Ресторан</option>
+            <option value="DELIVERY">Доставка</option>
+          </select>
+          
+          <select 
+            value={availabilityFilter} 
+            onChange={(e) => setAvailabilityFilter(e.target.value)}
+            className={styles.filterSelect}
+          >
+            <option value="all">Все</option>
+            <option value="available">Доступны</option>
+            <option value="unavailable">Скрыты</option>
+          </select>
+        </div>
+      </div>
+
       <div className={styles.tableWrapper}>
         <table className={styles.table}>
           <thead>
@@ -272,7 +342,7 @@ export default function AdminDishesPage() {
             </tr>
           </thead>
           <tbody>
-            {dishes.map(dish => {
+            {filteredDishes.map(dish => {
               const isDishOfDay = dishOfDayIds.includes(dish.id);
               const menuTypeInfo = menuTypeLabels[dish.menuType] || menuTypeLabels.BOTH;
               
@@ -347,6 +417,15 @@ export default function AdminDishesPage() {
                 </tr>
               );
             })}
+            {filteredDishes.length === 0 && (
+              <tr>
+                <td colSpan={7} className={styles.emptyRow}>
+                  <div className={styles.emptyState}>
+                    {searchQuery ? 'Блюда не найдены по вашему запросу' : 'Нет блюд'}
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

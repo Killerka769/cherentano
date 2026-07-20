@@ -1,0 +1,399 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.headerActions {
+  position: relative;
+}
+
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 40px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.fileInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.searchBox {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 20px;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  font-size: 0.95rem;
+  transition: all $transition-fast;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba(196,73,44,0.1);
+  }
+}
+
+.clearSearchBtn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $text-gray;
+  cursor: pointer;
+  font-size: 1.2rem;
+  
+  &:hover {
+    color: $text-dark;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
+  }
+}
+
+.preview {
+  height: 160px;
+  overflow: hidden;
+  background: $bg-light;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+}
+
+.info {
+  padding: 12px 14px;
+}
+
+.fileName {
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileMeta {
+  display: flex;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: $text-gray;
+  margin-top: 4px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 14px 14px;
+}
+
+.copyBtn, .deleteBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid $border-light;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: 0.75rem;
+  
+  &:hover {
+    border-color: $primary;
+  }
+}
+
+.copyBtn {
+  color: $primary;
+  
+  &.copied {
+    background: #e8f5e9;
+    border-color: #4caf50;
+    color: #4caf50;
+  }
+}
+
+.deleteBtn {
+  color: $error;
+  
+  &:hover {
+    border-color: $error;
+    background: #ffebee;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: $text-gray;
+  
+  svg {
+    color: $border-light;
+    margin-bottom: 16px;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px;
+  color: $text-gray;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 0;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+// Добавить в конец файла:
+
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 0;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  
+  .breadcrumbHome {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: $text-gray;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all $transition-fast;
+    
+    &:hover {
+      color: $primary;
+      background: $bg-light;
+    }
+  }
+  
+  .breadcrumbItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .breadcrumbSeparator {
+    color: $text-gray;
+  }
+  
+  .breadcrumbLink {
+    background: none;
+    border: none;
+    color: $text-gray;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    transition: all $transition-fast;
+    
+    &:hover {
+      color: $primary;
+      background: $bg-light;
+    }
+  }
+  
+  .folderBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all $transition-fast;
+    
+    &:hover {
+      background: #bbdefb;
+      transform: translateY(-2px);
+    }
+  }
+  
+  .folderCard {
+    cursor: pointer;
+    
+    &:hover {
+      .folderIcon {
+        color: $primary;
+      }
+    }
+  }
+  
+  .folderPreview {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+  }
+  
+  .folderIcon {
+    color: #ffb300;
+    transition: color 0.3s ease;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background: white;
+    border-radius: 24px;
+    padding: 28px;
+    max-width: 400px;
+    width: 90%;
+    
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+  }
+  
+  .modalSubtitle {
+    font-size: 0.85rem;
+    color: $text-gray;
+    margin-bottom: 16px;
+  }
+  
+  .folderInput {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border-light;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-bottom: 16px;
+    
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba(196,73,44,0.1);
+    }
+  }
+  
+  .modalActions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .createFolderBtn {
+    flex: 1;
+    background: $primary;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 40px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all $transition-fast;
+    
+    &:hover:not(:disabled) {
+      background: $primary-dark;
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }

@@ -362,3 +362,92 @@
 .menuTypeBadge {
   white-space: nowrap;
 }
+
+// Фильтры и поиск
+.filtersSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  padding: 10px 18px;
+  flex: 1;
+  min-width: 200px;
+  transition: all $transition-fast;
+  
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba(196,73,44,0.1);
+  }
+  
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    background: transparent;
+  }
+  
+  svg {
+    color: $text-gray;
+  }
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: $text-gray;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 1rem;
+  
+  &:hover {
+    color: $text-dark;
+  }
+}
+
+.filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filterSelect {
+  padding: 8px 16px;
+  border: 1px solid $border-light;
+  border-radius: 40px;
+  background: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+  transition: all $transition-fast;
+  min-width: 140px;
+  
+  &:focus {
+    border-color: $primary;
+  }
+}
+
+.emptyRow {
+  text-align: center;
+  padding: 40px !important;
+  color: $text-gray;
+}
+
+.emptyState {
+  font-size: 1rem;
+}

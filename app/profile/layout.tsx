@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   },
   description: 'Управляйте своим профилем, просматривайте историю заказов и бронирований в ресторане Челентано.',
   robots: {
-    index: false,
-    follow: false,
+    index: false,   
+    follow: false, 
   },
 }
 

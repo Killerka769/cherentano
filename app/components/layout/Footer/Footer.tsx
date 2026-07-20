@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Phone, MapPin, Clock, Mail, MessageSquare, Send, Heart } from 'lucide-react';
+import { Phone, MapPin, Clock, Mail, Heart } from 'lucide-react';
 import styles from './Footer.module.scss';
 
 interface Settings {
@@ -55,40 +55,9 @@ export default function Footer() {
           <div className={styles.column}>
             <h3 className={styles.title}>Челентано</h3>
             <p className={styles.description}>
-            Ресторан дагестанской и европейской кухни в Махачкале. 
-            Уютная атмосфера, авторские блюда и атмосфера, в которой каждый гость чувствует себя самым долгожданным.
+              Ресторан дагестанской и европейской кухни в Махачкале. 
+              Уютная атмосфера, авторские блюда и атмосфера, в которой каждый гость чувствует себя самым долгожданным.
             </p>
-            <div className={styles.socials}>
-              <a 
-                href={settings?.instagram || 'https://instagram.com/cherentano'} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className={styles.socialLink}
-                aria-label="Instagram"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.66 0 1.86.01 2.51.04.6.03 1 .13 1.36.27.37.14.69.34.99.65.32.3.51.61.65.99.14.36.24.76.27 1.36.03.65.04.85.04 2.51s-.01 1.86-.04 2.51c-.03.6-.13 1-.27 1.36-.14.37-.34.69-.65.99-.3.32-.61.51-.99.65-.36.14-.76.24-1.36.27-.65.03-.85.04-2.51.04s-1.86-.01-2.51-.04c-.6-.03-1-.13-1.36-.27-.37-.14-.69-.34-.99-.65-.32-.3-.51-.61-.65-.99-.14-.36-.24-.76-.27-.16l-.01-1.2c-.03-.65-.04-.85-.04-2.51s.01-1.86.04-2.51c.03-.6.13-1 .27-1.36.14-.37.34-.69.65-.99.3-.32.61-.51.99-.65.36-.14.76-.24 1.36-.27.65-.03.85-.04 2.51-.04zm0 1.8c-1.63 0-1.82.01-2.46.04-.59.03-.91.12-1.12.21-.29.11-.49.24-.71.46-.22.22-.35.42-.46.71-.09.21-.18.53-.21 1.12-.03.64-.04.83-.04 2.46s.01 1.82.04 2.46c.03.59.12.91.21 1.12.11.29.24.49.46.71.22.22.42.35.71.46.21.09.53.18 1.12.21.64.03.83.04 2.46.04s1.82-.01 2.46-.04c.59-.03.91-.12 1.12-.21.29-.11.49-.24.71-.46.22-.22.35-.42.46-.71.09-.21.18-.53.21-1.12.03-.64.04-.83.04-2.46s-.01-1.82-.04-2.46c-.03-.59-.12-.91-.21-1.12-.11-.29-.24-.49-.46-.71-.22-.22-.42-.35-.71-.46-.21-.09-.53-.18-.16-.01l-1.12-.21c-.64-.03-.83-.04-.04-.04zm0 2.4c1.99 0 3.6 1.61 3.6 3.6s-1.61 3.6-3.6 3.6-3.6-1.61-3.6-3.6 1.61-3.6 3.6-3.6zm0 1.8c-.99 0-1.8.81-1.8 1.8s.81 1.8 1.8 1.8 1.8-.81 1.8-1.8-.81-1.8-1.8-1.8zm3.74-2.9c0 .46-.38.84-.84.84s-.84-.38-.84-.84.38-.84.84-.84.84.38.84.84z"/>
-                </svg>
-              </a>
-              <a 
-                href={settings?.telegram || 'https://t.me/cherentano_bot'} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className={styles.socialLink}
-                aria-label="Telegram"
-              >
-                <Send size={20} />
-              </a>
-              <a 
-                href={settings?.whatsapp || 'https://wa.me/79882938907'} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className={styles.socialLink}
-                aria-label="WhatsApp"
-              >
-                <MessageSquare size={20} />
-              </a>
-            </div>
           </div>
 
           {/* Колонка 2: Контакты */}
@@ -113,6 +82,10 @@ export default function Footer() {
               <a href={`mailto:${settings?.email || 'info@cherentano.ru'}`}>
                 {settings?.email || 'info@cherentano.ru'}
               </a>
+            </div>
+            <div className={styles.contactItem}>
+              <span className={styles.socialLabel}>Мы в соцсетях:</span>
+              <span className={styles.socialHandle}>@chelentano</span>
             </div>
           </div>
 

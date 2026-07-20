@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://cherentano.ru'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chelentano05.ru'
   const currentDate = new Date()
   
   // Статические страницы
@@ -14,6 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/contacts`, priority: 0.7, changeFrequency: 'monthly' as const, lastModified: currentDate },
     { url: `${baseUrl}/about`, priority: 0.7, changeFrequency: 'monthly' as const, lastModified: currentDate },
     { url: `${baseUrl}/booking`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: currentDate },
+    { url: `${baseUrl}/delivery`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: currentDate },
+    { url: `${baseUrl}/weekly-menu`, priority: 0.7, changeFrequency: 'weekly' as const, lastModified: currentDate },
   ]
   
   // Динамические страницы блога
@@ -33,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Failed to fetch blog posts for sitemap:', error)
   }
   
-  // Динамические страницы блюд (без updatedAt, используем createdAt)
+  // Динамические страницы блюд
   let dishPages: MetadataRoute.Sitemap = []
   try {
     const dishes = await prisma.dish.findMany({
