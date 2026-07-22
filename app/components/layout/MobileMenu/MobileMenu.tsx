@@ -135,6 +135,10 @@ export default function MobileMenu({ navLinks }: MobileMenuProps) {
             </div>
 
             <div className={styles.drawerFooter}>
+              <a href="tel:+79882913293" className={styles.phoneLink}>
+                <Phone size={16} />
+                +7 (988) 291-32-93
+              </a>
               <a href="tel:+79882938907" className={styles.phoneLink}>
                 <Phone size={16} />
                 +7 (988) 293-89-07

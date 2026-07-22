@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       comment: comment || '',
       total,
       paymentMethod: normalizedPaymentMethod,
-      status: isCharity ? 'CONFIRMED' : 'NEW',
+      status: isCharity ? 'NEW' : 'NEW',
       isCharity: isCharity || false,
       paymentStatus: 'PENDING',
       expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 минут на оплату
@@ -185,8 +185,8 @@ export async function POST(request: NextRequest) {
     await prisma.orderStatusLog.create({
       data: {
         orderId: order.id,
-        status: isCharity ? 'CONFIRMED' : 'NEW',
-        comment: isCharity ? 'Благотворительный заказ создан' : 'Заказ создан'
+        status: isCharity ? 'NEW' : 'NEW',
+        comment: isCharity ? 'Благотворительный заказ создан, ожидает оплаты' : 'Заказ создан, ожидает оплаты'
       }
     })
     

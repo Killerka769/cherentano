@@ -95,16 +95,27 @@ export default function Header() {
         </nav>
 
         <div className={styles.right}>
-          {/* WorkingHours скрываем на мобильных */}
-          <div className={styles.desktopOnly}>
-            <WorkingHours />
-          </div>
           
-          {/* Телефон скрываем на мобильных */}
-          <a href="tel:+79882938907" className={`${styles.phone} ${styles.desktopOnly}`}>
-            <Phone size={18} />
-            <span>+7 (988) 293-89-07</span>
-          </a>
+          <div className={styles.contContacts}>
+            <div className={styles.contPhones}>
+              <Phone size={18} className={styles.phoneIcon}/>
+              {/* Телефон скрываем на мобильных */}
+              <div className={styles.contPhonesLinks}>
+                <a href="tel:+79882913293" className={`${styles.phone} ${styles.desktopOnly}`}>
+                  <span>+7 (988) 291-32-93</span>
+                </a>
+                {/* Телефон скрываем на мобильных */}
+                <a href="tel:+79882938907" className={`${styles.phone} ${styles.desktopOnly}`}>
+                  <span>+7 (988) 293-89-07</span>
+                </a>
+              </div>
+            </div>
+            {/* WorkingHours скрываем на мобильных */}
+            <div className={styles.desktopOnly}>
+              <WorkingHours />
+            </div>
+          </div>
+
           
           <CartIcon />
           

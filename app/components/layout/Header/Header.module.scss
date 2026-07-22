@@ -63,7 +63,7 @@
   color: $text-dark;
   transition: color $transition-fast;
   white-space: nowrap;
-  font-size: 0.9rem;
+  font-size: 1rem;
   
   &:hover {
     color: $primary;
@@ -92,6 +92,25 @@
 .desktopOnly {
   @media (max-width: 900px) {
     display: none !important;
+  }
+}
+
+.contContacts {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+
+  .contPhones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .phoneIcon {
+    flex-flow: row;
   }
 }
 

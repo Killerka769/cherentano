@@ -1,6 +1,6 @@
 'use client';
 
-import { Truck, Beer, Wifi, CreditCard, Coffee, Pizza, Sparkles, Award, Croissant } from 'lucide-react';
+import { Truck, Beer, Wifi, CreditCard, Coffee, Pizza, Sparkles, Award, Croissant, Flame } from 'lucide-react';
 import styles from './Features.module.scss';
 
 const features = [
@@ -19,18 +19,18 @@ const features = [
     iconColor: '#4caf50'
   },
   {
-    icon: Truck,
-    title: 'Бесплатная доставка',
-    description: 'При заказе от 1000 ₽ в пределах города',
-    color: '#fff3e0',
-    iconColor: '#ff9800'
-  },
-  {
     icon: Croissant,
     title: 'Своя выпечка',
     description: 'Хлеб, лепёшки и десерты собственного производства',
     color: '#f3e5f5',
     iconColor: '#9c27b0'
+  },
+  {
+    icon: Flame,
+    title: 'Наша обжарка',
+    description: 'Свежий кофе собственной обжарки',
+    color: '#fef3e2',
+    iconColor: '#8B4513'
   },
   {
     icon: Wifi,

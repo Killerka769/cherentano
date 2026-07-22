@@ -26,6 +26,8 @@ interface Order {
   items: OrderItem[];
   createdAt: string;
   paymentData: any;
+  isCharity?: boolean;
+  charityBeneficiary?: { name: string } | null;
 }
 
 export default function OrderReminder() {
@@ -56,6 +58,7 @@ export default function OrderReminder() {
   }, [order]);
 
   const fetchPendingOrder = async () => {
+    if (!user) return;
     try {
       const res = await fetch('/api/orders/payment');
       const data = await res.json();
@@ -85,7 +88,11 @@ export default function OrderReminder() {
         toast.success('✅ Спасибо! Заказ подтвержден.');
         setOrder(null);
         setIsModalOpen(false);
-        router.push('/profile');
+        if (order.isCharity) {
+          router.push('/charity/history');
+        } else {
+          router.push('/profile');
+        }
       }
     } catch (error) {
       toast.error('Ошибка подтверждения');
@@ -96,12 +103,17 @@ export default function OrderReminder() {
     if (!order) return '';
     const phone = '79034816223';
     const amount = order.paidAmount || order.total;
-    const typeLabel = order.orderType === 'DELIVERY' ? 'Доставка' : 'Самовывоз';
+    
+    let typeLabel = order.orderType === 'DELIVERY' ? 'Доставка' : 'Самовывоз';
+    if (order.isCharity) {
+      typeLabel = `Благотворительная помощь ${order.charityBeneficiary?.name ? `для ${order.charityBeneficiary.name}` : ''}`;
+    }
+    
     const paymentTypeLabel = order.paymentType === 'deposit' ? 'Аванс 50%' : 'Полная оплата';
     
     return `Перевод по номеру телефона: +7${phone}
 Сумма: ${amount.toFixed(2)} ₽
-Назначение: Оплата заказа #${order.id} (${typeLabel}, ${paymentTypeLabel}) от ${new Date(order.createdAt).toLocaleDateString('ru-RU')}
+Назначение: ${typeLabel} #${order.id} (${paymentTypeLabel}) от ${new Date(order.createdAt).toLocaleDateString('ru-RU')}
 Плательщик: ${order.customerName} (${order.customerPhone})
 Состав заказа: ${order.items.map(i => `${i.dishName} x${i.quantity}`).join(', ')}
 Комментарий: ${order.comment || '—'}`;
@@ -124,12 +136,13 @@ export default function OrderReminder() {
 
   return (
     <>
-      {/* Баннер-напоминание */}
       <div className={styles.reminderBanner} onClick={() => setIsModalOpen(true)}>
         <div className={styles.reminderContent}>
           <Bell size={18} className={styles.reminderIcon} />
           <div>
-            <span className={styles.reminderTitle}>Ожидается оплата заказа #{order.id}</span>
+            <span className={styles.reminderTitle}>
+              {order.isCharity ? '❤️ Ожидается оплата помощи' : `Ожидается оплата заказа #${order.id}`}
+            </span>
             <span className={styles.reminderTime}>
               <Clock size={14} />
               {formatTime(timeLeft)}
@@ -144,12 +157,13 @@ export default function OrderReminder() {
         </div>
       </div>
 
-      {/* Модальное окно с деталями */}
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>Оплата заказа #{order.id}</h2>
+              <h2>
+                {order.isCharity ? '❤️ Оплата благотворительной помощи' : `Оплата заказа #${order.id}`}
+              </h2>
               <button onClick={() => setIsModalOpen(false)} className={styles.closeBtn}>
                 <X size={20} />
               </button>
@@ -167,7 +181,12 @@ export default function OrderReminder() {
                 </div>
                 <div className={styles.summaryRow}>
                   <span>Тип:</span>
-                  <span>{order.orderType === 'DELIVERY' ? 'Доставка' : 'Самовывоз'}</span>
+                  <span>
+                    {order.isCharity 
+                      ? `❤️ Благотворительность ${order.charityBeneficiary?.name ? `(${order.charityBeneficiary.name})` : ''}`
+                      : order.orderType === 'DELIVERY' ? '🚚 Доставка' : '🏠 Самовывоз'
+                    }
+                  </span>
                 </div>
                 <div className={styles.summaryRow}>
                   <span>Сумма:</span>
@@ -193,7 +212,7 @@ export default function OrderReminder() {
 
               <button onClick={markAsPaid} className={styles.paidBtn}>
                 <CheckCircle size={18} />
-                Я оплатил, подтвердить заказ
+                Я оплатил, подтвердить
               </button>
             </div>
           </div>

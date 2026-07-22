@@ -232,7 +232,7 @@
 
 // Футер
 .drawerFooter {
-  padding: 20px;
+  padding: 10px;
   background: $bg-light;
   border-top: 1px solid $border-light;
   flex-shrink: 0;
@@ -250,7 +250,7 @@
   border-radius: 50px;
   font-weight: 600;
   font-size: 1rem;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   transition: all 0.2s ease;
   
   &:hover {

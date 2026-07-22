@@ -93,6 +93,9 @@ export default function ContactsPage() {
               <Phone size={24} />
             </div>
             <h3>Телефон</h3>
+            <a href="tel:+79882913293" className={styles.phoneLink}>
+                +7 (988) 291-32-93
+            </a>
             <a href="tel:+79882938907" className={styles.phoneLink}>
               +7 (988) 293-89-07
             </a>
@@ -133,13 +136,10 @@ export default function ContactsPage() {
             
             <div className={styles.socialLinks}>
               <span className={`${styles.socialLink} ${styles.whatsapp}`}>
-                +7 (988) 293-89-07
-              </span>
-              <span className={`${styles.socialLink} ${styles.telegram}`}>
-                @cherentano
+                +7 (988) 291-32-93
               </span>
               <span className={`${styles.socialLink} ${styles.instagram}`}>
-                @cherentano
+                @celentano_meat_restaurant_
               </span>
             </div>
             

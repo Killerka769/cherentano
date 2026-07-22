@@ -52,8 +52,6 @@ export default function WeeklyMenu({ onSelectDish }: WeeklyMenuProps) {
       const res = await fetch(`/api/weekly-menu?startDate=${startDateStr}`);
       const data = await res.json();
       
-      console.log('📥 Weekly menu data:', data);
-      
       setWeeklyMenu(data.menu || {});
       const daysList = Object.keys(data.menu || {});
       setDays(daysList);

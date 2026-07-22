@@ -36,6 +36,12 @@ interface HelpRequest {
 }
 
 const statusConfig: Record<string, { label: string; color: string; icon: any; actions: string[] }> = {
+  NEW: {
+    label: '🆕 Новый', 
+    color: '#ff9800', 
+    icon: Clock,
+    actions: ['APPROVED', 'REJECTED']
+  },
   PENDING: { 
     label: '⏳ Ожидает', 
     color: '#ff9800', 
@@ -46,7 +52,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: any; ac
     label: '✅ Одобрено', 
     color: '#2196f3', 
     icon: CheckCircle,
-    actions: ['PREPARING', 'CANCELLED']
+    actions: ['PREPARING', 'CANCELLED', 'REJECTED']
   },
   PREPARING: { 
     label: '🍳 Готовится', 

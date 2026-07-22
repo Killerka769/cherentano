@@ -1,0 +1,204 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.about {
+  padding: 48px 0;
+  background: linear-gradient(180deg, #fcf9f7 0%, white 100%);
+}
+
+.container {
+  @include container;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.text {
+  max-width: 850px;
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(196, 73, 44, 0.08);
+  color: $primary;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  color: #1a1a2e;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
+}
+
+.highlight {
+  background: linear-gradient(135deg, $primary, $secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.intro {
+  margin-bottom: 28px;
+}
+
+.description {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: $text-gray;
+  margin-bottom: 14px;
+
+  strong {
+    color: $text-dark;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+  }
+}
+
+.storyBlock {
+  margin-bottom: 32px;
+}
+
+.storyTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 10px;
+}
+
+.principles {
+  margin-bottom: 32px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  padding: 24px 28px;
+  border: 1px solid rgba(196, 73, 44, 0.04);
+}
+
+.principlesTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.principlesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.principle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  .principleIcon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: $text-gray;
+    margin: 2px 0 0 0;
+    line-height: 1.5;
+  }
+}
+
+.cuisineBlock {
+  margin-bottom: 28px;
+}
+
+.cuisineTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 10px;
+}
+
+.cuisineTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+
+  span {
+    background: white;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-gray;
+    border: 1px solid $border-light;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $primary;
+      color: $primary;
+    }
+  }
+}
+
+.teamBlock {
+  margin-bottom: 28px;
+}
+
+.teamTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $text-dark;
+  margin-bottom: 10px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: $primary;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  padding: 12px 24px;
+  border-radius: 40px;
+  background: rgba(196, 73, 44, 0.06);
+
+  &:hover {
+    gap: 16px;
+    background: rgba(196, 73, 44, 0.12);
+  }
+}

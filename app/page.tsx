@@ -7,6 +7,8 @@ import RecentlyViewed from './components/ui/RecentlyViewed/RecentlyViewed';
 import Banner from './components/ui/Banner/Banner';
 import RegistrationBanner from './components/ui/RegistrationBanner/RegistrationBanner';
 import BlogPreview from './components/ui/BlogPreview/BlogPreview';
+import AboutPreview from './components/ui/AboutPreview/AboutPreview';
+import CoffeePromo from './components/ui/CoffeePromo/CoffeePromo';
 
 export default function Home() {
   // Структурированные данные для ресторана (JSON-LD)
@@ -101,8 +103,10 @@ export default function Home() {
 
       {/* Основной контент */}
       <Hero />
+      <AboutPreview />
       <Banner />
       <BlogPreview />
+      <CoffeePromo />
       <PopularDishes />
       <Features />
       <Reviews />

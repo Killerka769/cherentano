@@ -78,18 +78,23 @@
       color: $primary;
     }
   }
+
+  .contPhones {
+    display: flex;
+    flex-flow: column wrap;
+  }
 }
 
 .socialLabel {
   font-weight: 500;
   color: $text-gray;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .socialHandle {
   font-weight: 600;
   color: $text-dark;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .links {

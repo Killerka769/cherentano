@@ -10,7 +10,7 @@ import {
   ArrowLeft, Phone, MapPin, User, MessageSquare, CreditCard, 
   Store, AlertCircle, Calendar, Clock, Users,
   CheckCircle, Copy, Banknote, Lock,
-  Utensils, Truck
+  Utensils, Truck, Heart
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
@@ -31,6 +31,15 @@ interface FormData {
   bookingTime: string;
   bookingEndTime: string;
   bookingDate: string;
+  charityRequestId: string | null;
+  charityBeneficiary: {
+    id: string;
+    name: string;
+    address: string;
+    phone: string | null;
+    needs: string;
+    urgency: string;
+  } | null;
 }
 
 function CheckoutContent() {
@@ -53,6 +62,11 @@ function CheckoutContent() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [menuType, setMenuType] = useState<'pickup' | 'delivery'>('pickup');
   
+  // Благотворительность
+  const [isCharity, setIsCharity] = useState(false);
+  const [charityDeliveryPrice, setCharityDeliveryPrice] = useState(0);
+  const [isOrderSubmitted, setIsOrderSubmitted] = useState(false);
+  
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
@@ -65,10 +79,12 @@ function CheckoutContent() {
     bookingGuests: 2,
     bookingTime: '19:00',
     bookingEndTime: '21:00',
-    bookingDate: ''
+    bookingDate: '',
+    charityRequestId: null,
+    charityBeneficiary: null
   });
 
-  // Загружаем тип меню из localStorage (блокируем его)
+  // Загружаем тип меню из localStorage
   useEffect(() => {
     const savedType = localStorage.getItem('selectedMenuType');
     if (savedType === 'delivery') {
@@ -81,19 +97,49 @@ function CheckoutContent() {
     }
   }, []);
 
-  // Если тип не выбран — устанавливаем по умолчанию
+  // Проверяем, пришли ли с благотворительности
   useEffect(() => {
-    const savedType = localStorage.getItem('selectedMenuType');
-    if (!savedType || (savedType !== 'delivery' && savedType !== 'pickup')) {
-      localStorage.setItem('selectedMenuType', 'pickup');
-      setMenuType('pickup');
+    const charityRequestId = searchParams.get('charityRequestId');
+    if (charityRequestId) {
+      setIsCharity(true);
+      setCharityDeliveryPrice(500);
+      setFormData(prev => ({ ...prev, paymentType: 'full' }));
+      fetchCharityRequest(charityRequestId);
     }
-  }, []);
+  }, [searchParams]);
+
+  const fetchCharityRequest = async (requestId: string) => {
+    try {
+      const res = await fetch(`/api/charity/requests/${requestId}`);
+      const data = await res.json();
+      if (data.request) {
+        setFormData(prev => ({
+          ...prev,
+          charityRequestId: requestId,
+          charityBeneficiary: {
+            id: data.request.beneficiaryId,
+            name: data.request.beneficiary.name,
+            address: data.request.beneficiary.address,
+            phone: data.request.beneficiary.phone || null,
+            needs: data.request.beneficiary.needs,
+            urgency: data.request.beneficiary.urgency
+          },
+          address: data.request.beneficiary.address,
+          comment: `Благотворительная помощь для ${data.request.beneficiary.name}`
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch charity request:', error);
+      toast.error('Ошибка загрузки данных благотворительности');
+      router.push('/charity');
+    }
+  };
 
   const subtotal = getTotal();
-  const isDelivery = menuType === 'delivery';
-  const isPickup = menuType === 'pickup';
-  const total = subtotal - discountAmount;
+  const isDelivery = menuType === 'delivery' || isCharity;
+  const isPickup = menuType === 'pickup' && !isCharity;
+  
+  const total = subtotal - discountAmount + (isCharity ? charityDeliveryPrice : 0);
   
   const depositAmount = Math.max(total * 0.5, 1000);
   const finalTotal = total;
@@ -143,10 +189,10 @@ function CheckoutContent() {
   }, []);
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !isCharity) {
       router.push('/cart');
     }
-  }, [items, router]);
+  }, [items, router, isCharity]);
 
   useEffect(() => {
     if (isPickup && formData.needBooking) {
@@ -188,7 +234,7 @@ function CheckoutContent() {
     }));
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isCharity) {
     return null;
   }
 
@@ -231,14 +277,20 @@ function CheckoutContent() {
 
   const getPaymentText = (orderId: number) => {
     const orderNumber = orderId || 'XXXX';
-    const typeLabel = isDelivery ? 'Доставка' : 'Самовывоз';
+    let typeLabel = isCharity ? 'Благотворительная помощь' : isDelivery ? 'Доставка' : 'Самовывоз';
+    
+    if (isCharity && formData.charityBeneficiary) {
+      typeLabel = `Благотворительная помощь для ${formData.charityBeneficiary.name}`;
+    }
+    
     const paymentTypeLabel = formData.paymentType === 'deposit' ? 'Аванс 50%' : 'Полная оплата';
     const amount = formData.paymentType === 'deposit' ? depositAmount : finalTotal;
     
     return `Перевод по номеру телефона: +${paymentPhone}
 Сумма: ${amount.toFixed(2)} ₽
-Назначение: Оплата заказа #${orderNumber} (${typeLabel}, ${paymentTypeLabel}) от ${new Date().toLocaleDateString('ru-RU')}
+Назначение: ${typeLabel} #${orderNumber} (${paymentTypeLabel}) от ${new Date().toLocaleDateString('ru-RU')}
 Плательщик: ${formData.name || 'Клиент'} (${formData.phone || 'телефон не указан'})
+${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${formData.charityBeneficiary?.address})` : ''}
 Состав заказа: ${items.map(i => `${i.name} x${i.quantity}`).join(', ')}
 Комментарий: ${formData.comment || '—'}`;
   };
@@ -267,7 +319,17 @@ function CheckoutContent() {
       }
     }
 
-    if (isPickup) {
+    if (isCharity && !formData.charityRequestId) {
+      toast.error('Ошибка: нет заявки на помощь');
+      return;
+    }
+
+    if (isCharity && items.length === 0) {
+      toast.error('Добавьте блюда для помощи');
+      return;
+    }
+
+    if (isPickup && !isCharity) {
       setShowPhoneAlert(true);
       return;
     }
@@ -276,6 +338,8 @@ function CheckoutContent() {
   };
 
   const submitOrder = async () => {
+    if (isOrderSubmitted) return;
+    
     if (!agreed) {
       toast.error('Необходимо согласие на обработку персональных данных');
       return;
@@ -287,7 +351,7 @@ function CheckoutContent() {
       const orderData = {
         customerName: formData.name,
         customerPhone: formData.phone,
-        orderType: menuType,
+        orderType: isCharity ? 'delivery' : menuType,
         deliveryAddress: isDelivery ? formData.address : null,
         comment: formData.comment,
         items: items.map(item => ({
@@ -308,7 +372,10 @@ function CheckoutContent() {
         bookingDate: formData.bookingDate,
         discountId: appliedDiscount?.discountId || null,
         discountAmount: discountAmount || 0,
-        isIndividualDiscount: appliedDiscount?.isIndividual || false
+        isIndividualDiscount: appliedDiscount?.isIndividual || false,
+        isCharity: isCharity,
+        charityRequestId: formData.charityRequestId,
+        charityDeliveryPrice: isCharity ? charityDeliveryPrice : 0
       };
 
       const res = await fetch('/api/orders', {
@@ -320,6 +387,42 @@ function CheckoutContent() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.unavailableItems && data.unavailableItems.length > 0) {
+          toast.error(
+            (t) => (
+              <div style={{ textAlign: 'left', padding: '4px 0', maxWidth: '350px' }}>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '8px', color: '#c62828' }}>
+                  ❌ Некоторые блюда недоступны
+                </div>
+                <div style={{ margin: '8px 0', padding: '8px 12px', background: 'rgba(198, 40, 40, 0.05)', borderRadius: '8px' }}>
+                  {data.unavailableItems.map((name: string, index: number) => (
+                    <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '3px 0', fontSize: '0.85rem', color: '#b71c1c' }}>
+                      <span style={{ color: '#c62828', fontWeight: 700 }}>•</span>
+                      <span>{name}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#8d6e63', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #ffcdd2' }}>
+                  Удалите эти блюда из корзины и повторите заказ
+                </div>
+              </div>
+            ),
+            {
+              duration: 6000,
+              style: {
+                background: '#fff5f5',
+                color: '#c62828',
+                border: '1px solid #ffcdd2',
+                borderRadius: '16px',
+                padding: '16px 20px',
+                maxWidth: '400px',
+                width: '100%',
+              },
+            }
+          );
+          return;
+        }
+        
         if (res.status === 409 && data.bookingFailed) {
           toast.error(`❌ ${data.error || 'Не удалось забронировать столик. Попробуйте другое время или выберите другую кабинку.'}`);
           return;
@@ -327,15 +430,23 @@ function CheckoutContent() {
         throw new Error(data.error || 'Ошибка при создании заказа');
       }
 
+      setIsOrderSubmitted(true);
       setCreatedOrderId(data.order.id);
       setShowPaymentDetails(true);
 
       fireConfetti();
       
-      toast.success('🎉 Заказ успешно оформлен!', {
-        duration: 5000,
-        icon: '🎉',
-      });
+      if (isCharity) {
+        toast.success('🎉 Благотворительная помощь оформлена! Спасибо за вашу доброту!', {
+          duration: 5000,
+          icon: '❤️',
+        });
+      } else {
+        toast.success('🎉 Заказ успешно оформлен!', {
+          duration: 5000,
+          icon: '🎉',
+        });
+      }
       
       if (data.bookingCreated) {
         setTimeout(() => {
@@ -346,8 +457,8 @@ function CheckoutContent() {
         }, 1000);
       }
       
-    } catch (error) {
-      toast.error('Ошибка при оформлении заказа. Попробуйте позже.');
+    } catch (error: any) {
+      toast.error(error.message || 'Ошибка при оформлении заказа. Попробуйте позже.');
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -376,8 +487,8 @@ function CheckoutContent() {
         <div className={styles.paymentContainer}>
           <div className={styles.paymentHeader}>
             <CheckCircle size={48} className={styles.paymentSuccessIcon} />
-            <h2>Заказ #{createdOrderId} оформлен!</h2>
-            <p>{isDelivery ? 'Оплатите доставку для подтверждения' : 'Оплатите заказ для подтверждения'}</p>
+            <h2>{isCharity ? 'Благотворительная помощь' : 'Заказ'} #{createdOrderId} оформлен!</h2>
+            <p>{isCharity ? 'Оплатите помощь для отправки нуждающемуся' : isDelivery ? 'Оплатите доставку для подтверждения' : 'Оплатите заказ для подтверждения'}</p>
           </div>
           
           <div className={styles.paymentCard}>
@@ -402,9 +513,18 @@ function CheckoutContent() {
               <div className={styles.paymentRow}>
                 <span className={styles.paymentLabel}>Тип оплаты</span>
                 <span className={styles.paymentValue}>
-                  {isDelivery ? 'Полная оплата' : formData.paymentType === 'deposit' ? 'Аванс 50%' : 'Полная оплата'}
+                  {isCharity ? 'Полная оплата' : isDelivery ? 'Полная оплата' : formData.paymentType === 'deposit' ? 'Аванс 50%' : 'Полная оплата'}
                 </span>
               </div>
+              {isCharity && formData.charityBeneficiary && (
+                <div className={styles.paymentRow}>
+                  <span className={styles.paymentLabel}>Получатель помощи</span>
+                  <span className={styles.paymentValue}>
+                    <Heart size={14} className={styles.heartIcon} />
+                    {formData.charityBeneficiary.name}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className={styles.paymentTextBlock}>
@@ -439,18 +559,18 @@ function CheckoutContent() {
 
             <div className={styles.paymentNote}>
               <AlertCircle size={16} />
-              <span>После оплаты менеджер подтвердит заказ в течение 5-10 минут</span>
+              <span>{isCharity ? 'После оплаты заявка будет отправлена нуждающемуся' : 'После оплаты менеджер подтвердит заказ в течение 5-10 минут'}</span>
             </div>
 
             <div className={styles.paymentActions}>
               <button 
                 onClick={() => {
                   clearCart();
-                  router.push('/profile');
+                  router.push(isCharity ? '/charity/history' : '/profile');
                 }}
                 className={styles.paymentCompleteBtn}
               >
-                Я оплатил, перейти в профиль
+                {isCharity ? '❤️ Я оплатил, перейти в историю' : 'Я оплатил, перейти в профиль'}
               </button>
             </div>
           </div>
@@ -470,9 +590,22 @@ function CheckoutContent() {
             </div>
             <h3 className={styles.modalTitle}>Важно!</h3>
             <p className={styles.modalText}>
-              {formData.needBooking 
-                ? 'Вы выбрали бронирование столика. Наш менеджер свяжется с вами.'
-                : 'Перед приходом в ресторан рекомендуем позвонить и уточнить наличие свободных столиков.'}
+              {isCharity ? (
+                <>
+                  <Heart size={20} className={styles.modalHeartIcon} />
+                  Вы помогаете <strong>{formData.charityBeneficiary?.name}</strong>
+                  <br />
+                  {formData.charityBeneficiary?.address}
+                  <br />
+                  <span className={styles.modalUrgency}>
+                    Срочность: {formData.charityBeneficiary?.urgency}
+                  </span>
+                </>
+              ) : formData.needBooking ? (
+                'Вы выбрали бронирование столика. Наш менеджер свяжется с вами.'
+              ) : (
+                'Перед приходом в ресторан рекомендуем позвонить и уточнить наличие свободных столиков.'
+              )}
             </p>
             <div className={styles.modalButtons}>
               <a href="tel:+79882938907" className={styles.modalCallBtn}>
@@ -486,7 +619,7 @@ function CheckoutContent() {
                 }} 
                 className={styles.modalContinueBtn}
               >
-                Продолжить без звонка
+                {isCharity ? 'Продолжить без звонка (помощь будет отправлена)' : 'Продолжить без звонка'}
               </button>
             </div>
           </div>
@@ -494,34 +627,42 @@ function CheckoutContent() {
       )}
 
       <div className={styles.header}>
-        <Link href="/cart" className={styles.backLink}>
+        <Link href={isCharity ? '/charity' : '/cart'} className={styles.backLink}>
           <ArrowLeft size={20} />
-          Вернуться в корзину
+          {isCharity ? 'Вернуться к списку помощи' : 'Вернуться в корзину'}
         </Link>
-        <h1 className={styles.title}>Оформление заказа</h1>
-      </div>
-
-      {/* Тип заказа - ЗАБЛОКИРОВАН */}
-      <div className={styles.menuTypeIndicator}>
-        <div className={styles.menuTypeBadge}>
-          {isPickup ? (
+        <h1 className={styles.title}>
+          {isCharity ? (
             <>
-              <Utensils size={16} />
-              Заказ в ресторане
-              <Lock size={14} className={styles.lockIcon} />
+              <Heart size={24} className={styles.heartTitleIcon} />
+              Помощь {formData.charityBeneficiary?.name}
             </>
           ) : (
-            <>
-              <Truck size={16} />
-              Заказ с доставкой
-              <Lock size={14} className={styles.lockIcon} />
-            </>
+            'Оформление заказа'
           )}
-        </div>
-        <p className={styles.menuTypeHint}>
-          Тип заказа выбран в меню. Изменение недоступно.
-        </p>
+        </h1>
       </div>
+
+      {isCharity && formData.charityBeneficiary && (
+        <div className={styles.charityBanner}>
+          <div className={styles.charityBannerContent}>
+            <Heart size={24} className={styles.charityHeartIcon} />
+            <div>
+              <strong>Благотворительная помощь</strong>
+              <p>
+                Вы помогаете <strong>{formData.charityBeneficiary.name}</strong>
+                <br />
+                <span className={styles.charityAddress}>
+                  📍 {formData.charityBeneficiary.address}
+                </span>
+                <span className={styles.charityUrgency}>
+                  Срочность: {formData.charityBeneficiary.urgency}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {appliedDiscount && discountAmount > 0 && (
         <div className={styles.discountBanner}>
@@ -567,191 +708,229 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Способ получения - ЗАБЛОКИРОВАН И СКРЫТ */}
-          {isPickup && (
+          {/* Способ получения — показываем только если не благотворительность */}
+          {!isCharity && (
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>
                 <Store size={20} />
-                Самовывоз
+                Способ получения
               </h2>
-              <div className={styles.lockedInfo}>
-                <div className={styles.lockedIcon}>
-                  <Utensils size={24} />
-                </div>
-                <div>
-                  <strong>Самовывоз из ресторана</strong>
-                  <p>Вы выбрали меню для ресторана. Заказ будет самовывозом.</p>
-                  <p className={styles.lockedNote}>
-                    <Lock size={12} /> Тип заказа заблокирован и не может быть изменён
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {isPickup && (
-            <div className={styles.pickupInfo}>
-              <div className={styles.pickupAddress}>
-                <strong>📍 Адрес ресторана:</strong>
-                <p>Республика Дагестан, Махачкала, улица Агасиева, 5А</p>
-              </div>
               
-              <div className={styles.bookingSection}>
-                <div className={styles.bookingToggle}>
-                  <label className={styles.checkbox}>
-                    <input
-                      type="checkbox"
-                      checked={formData.needBooking}
-                      onChange={(e) => updateField('needBooking', e.target.checked)}
-                    />
-                    <span>Забронировать столик в ресторане</span>
-                  </label>
-                  <p className={styles.bookingHint}>
-                    🪑 10 уютных кабинок для вашего комфорта
-                  </p>
-                </div>
+              <div className={styles.orderTypes}>
+                <label className={`${styles.orderType} ${menuType === 'delivery' ? styles.active : ''}`}>
+                  <input
+                    type="radio"
+                    name="orderType"
+                    value="delivery"
+                    checked={menuType === 'delivery'}
+                    onChange={() => {
+                      setMenuType('delivery');
+                      localStorage.setItem('selectedMenuType', 'delivery');
+                    }}
+                  />
+                  <MapPin size={20} />
+                  <div>
+                    <strong>Доставка</strong>
+                    <span>Привезём к вам домой</span>
+                  </div>
+                </label>
                 
-                {formData.needBooking && (
-                  <div className={styles.bookingOptions}>
-                    <div className={styles.bookingField}>
-                      <label>
-                        <Calendar size={16} />
-                        Дата *
+                <label className={`${styles.orderType} ${menuType === 'pickup' ? styles.active : ''}`}>
+                  <input
+                    type="radio"
+                    name="orderType"
+                    value="pickup"
+                    checked={menuType === 'pickup'}
+                    onChange={() => {
+                      setMenuType('pickup');
+                      localStorage.setItem('selectedMenuType', 'pickup');
+                    }}
+                  />
+                  <Store size={20} />
+                  <div>
+                    <strong>В ресторане</strong>
+                    <span>Самовывоз или еда на месте</span>
+                  </div>
+                </label>
+              </div>
+
+              {menuType === 'pickup' && (
+                <div className={styles.pickupInfo}>
+                  <div className={styles.pickupAddress}>
+                    <strong>📍 Адрес ресторана:</strong>
+                    <p>Республика Дагестан, Махачкала, улица Агасиева, 5А</p>
+                  </div>
+                  
+                  <div className={styles.bookingSection}>
+                    <div className={styles.bookingToggle}>
+                      <label className={styles.checkbox}>
+                        <input
+                          type="checkbox"
+                          checked={formData.needBooking}
+                          onChange={(e) => updateField('needBooking', e.target.checked)}
+                        />
+                        <span>Забронировать столик в ресторане</span>
                       </label>
-                      <input
-                        type="date"
-                        value={formData.bookingDate}
-                        onChange={(e) => updateField('bookingDate', e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                        required
-                      />
-                    </div>
-                    <div className={styles.bookingField}>
-                      <label>
-                        <Clock size={16} />
-                        Время *
-                      </label>
-                      <select
-                        value={formData.bookingTime}
-                        onChange={(e) => handleTimeChange(e.target.value)}
-                        required
-                      >
-                        {availableTimes.map(time => (
-                          <option key={time} value={time}>{time}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className={styles.bookingField}>
-                      <label>
-                        <Clock size={16} />
-                        Длительность *
-                      </label>
-                      <select
-                        value={bookingDuration}
-                        onChange={(e) => handleDurationChange(parseInt(e.target.value))}
-                        required
-                      >
-                        <option value={1}>1 час</option>
-                        <option value={2}>2 часа</option>
-                        <option value={3}>3 часа</option>
-                        <option value={4}>4 часа</option>
-                        <option value={5}>5 часов</option>
-                        <option value={6}>6 часов</option>
-                      </select>
-                    </div>
-                    <div className={styles.bookingField}>
-                      <label>
-                        <Clock size={16} />
-                        До
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.bookingEndTime}
-                        readOnly
-                        className={styles.endTimeDisplay}
-                      />
-                    </div>
-                    <div className={styles.bookingField}>
-                      <label>
-                        <Users size={16} />
-                        Количество гостей *
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={10}
-                        value={formData.bookingGuests}
-                        onChange={(e) => updateField('bookingGuests', parseInt(e.target.value))}
-                        required
-                      />
-                    </div>
-                    <div className={styles.bookingField}>
-                      <label>
-                        🪑 Выберите кабинку *
-                      </label>
-                      <select
-                        value={formData.tableId || ''}
-                        onChange={(e) => updateField('tableId', parseInt(e.target.value) || null)}
-                        required
-                      >
-                        <option value="">Выберите кабинку</option>
-                        {tables.map(table => (
-                          <option key={table.id} value={table.id}>
-                            №{table.number} {table.name ? `- ${table.name}` : ''} ({table.seats} мест)
-                          </option>
-                        ))}
-                      </select>
-                      <p className={styles.tableHint}>
-                        Выберите кабинку, которую хотите забронировать
+                      <p className={styles.bookingHint}>
+                        🪑 10 уютных кабинок для вашего комфорта
                       </p>
                     </div>
-                    {formData.tableId && (
-                      <div className={styles.selectedTablePreview}>
-                        <div>
-                          <div className={styles.selectedTableName}>
-                            Кабинка №{tables.find(t => t.id === formData.tableId)?.number}
-                            {tables.find(t => t.id === formData.tableId)?.name && (
-                              <> — {tables.find(t => t.id === formData.tableId)?.name}</>
-                            )}
-                          </div>
-                          <div className={styles.selectedTableSeats}>
-                            {tables.find(t => t.id === formData.tableId)?.seats} места
-                          </div>
-                          {tables.find(t => t.id === formData.tableId)?.purpose && (
-                            <div className={styles.selectedTablePurpose}>
-                              🎯 {tables.find(t => t.id === formData.tableId)?.purpose}
-                            </div>
-                          )}
+                    
+                    {formData.needBooking && (
+                      <div className={styles.bookingOptions}>
+                        <div className={styles.bookingField}>
+                          <label>
+                            <Calendar size={16} />
+                            Дата *
+                          </label>
+                          <input
+                            type="date"
+                            value={formData.bookingDate}
+                            onChange={(e) => updateField('bookingDate', e.target.value)}
+                            min={new Date().toISOString().split('T')[0]}
+                            required
+                          />
                         </div>
+                        <div className={styles.bookingField}>
+                          <label>
+                            <Clock size={16} />
+                            Время *
+                          </label>
+                          <select
+                            value={formData.bookingTime}
+                            onChange={(e) => handleTimeChange(e.target.value)}
+                            required
+                          >
+                            {availableTimes.map(time => (
+                              <option key={time} value={time}>{time}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className={styles.bookingField}>
+                          <label>
+                            <Clock size={16} />
+                            Длительность *
+                          </label>
+                          <select
+                            value={bookingDuration}
+                            onChange={(e) => handleDurationChange(parseInt(e.target.value))}
+                            required
+                          >
+                            <option value={1}>1 час</option>
+                            <option value={2}>2 часа</option>
+                            <option value={3}>3 часа</option>
+                            <option value={4}>4 часа</option>
+                            <option value={5}>5 часов</option>
+                            <option value={6}>6 часов</option>
+                          </select>
+                        </div>
+                        <div className={styles.bookingField}>
+                          <label>
+                            <Clock size={16} />
+                            До
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.bookingEndTime}
+                            readOnly
+                            className={styles.endTimeDisplay}
+                          />
+                        </div>
+                        <div className={styles.bookingField}>
+                          <label>
+                            <Users size={16} />
+                            Количество гостей *
+                          </label>
+                          <input
+                            type="number"
+                            min={1}
+                            max={10}
+                            value={formData.bookingGuests}
+                            onChange={(e) => updateField('bookingGuests', parseInt(e.target.value))}
+                            required
+                          />
+                        </div>
+                        <div className={styles.bookingField}>
+                          <label>
+                            🪑 Выберите кабинку *
+                          </label>
+                          <select
+                            value={formData.tableId || ''}
+                            onChange={(e) => updateField('tableId', parseInt(e.target.value) || null)}
+                            required
+                          >
+                            <option value="">Выберите кабинку</option>
+                            {tables.map(table => (
+                              <option key={table.id} value={table.id}>
+                                №{table.number} {table.name ? `- ${table.name}` : ''} ({table.seats} мест)
+                              </option>
+                            ))}
+                          </select>
+                          <p className={styles.tableHint}>
+                            Выберите кабинку, которую хотите забронировать
+                          </p>
+                        </div>
+                        {formData.tableId && (
+                          <div className={styles.selectedTablePreview}>
+                            <div>
+                              <div className={styles.selectedTableName}>
+                                Кабинка №{tables.find(t => t.id === formData.tableId)?.number}
+                                {tables.find(t => t.id === formData.tableId)?.name && (
+                                  <> — {tables.find(t => t.id === formData.tableId)?.name}</>
+                                )}
+                              </div>
+                              <div className={styles.selectedTableSeats}>
+                                {tables.find(t => t.id === formData.tableId)?.seats} места
+                              </div>
+                              {tables.find(t => t.id === formData.tableId)?.purpose && (
+                                <div className={styles.selectedTablePurpose}>
+                                  🎯 {tables.find(t => t.id === formData.tableId)?.purpose}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Адрес доставки */}
+          {(isDelivery || isCharity) && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                <MapPin size={20} />
+                {isCharity ? 'Адрес получателя помощи' : 'Адрес доставки'}
+              </h2>
+              
+              <div className={styles.field}>
+                <label htmlFor="address">
+                  {isCharity ? 'Адрес доставки помощи' : 'Адрес доставки *'}
+                </label>
+                {isCharity ? (
+                  <input
+                    type="text"
+                    id="address"
+                    value={formData.address}
+                    readOnly
+                    className={styles.readonlyInput}
+                  />
+                ) : (
+                  <AddressSelector
+                    value={formData.address}
+                    onChange={(value) => updateField('address', value)}
+                    onAddressSaved={() => {}}
+                  />
                 )}
               </div>
             </div>
           )}
 
-          {/* Адрес доставки */}
-          {isDelivery && (
-            <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>
-                <MapPin size={20} />
-                Адрес доставки
-              </h2>
-              
-              <div className={styles.field}>
-                <label htmlFor="address">Адрес доставки *</label>
-                <AddressSelector
-                  value={formData.address}
-                  onChange={(value) => updateField('address', value)}
-                  onAddressSaved={() => {}}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Тип оплаты */}
-          {isPickup && (
+          {/* Тип оплаты — только для самовывоза (НЕ для благотворительности) */}
+          {menuType === 'pickup' && !isCharity && (
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>
                 <CreditCard size={20} />
@@ -800,20 +979,39 @@ function CheckoutContent() {
             </div>
           )}
 
+          {/* Для благотворительности — блок с информацией о полной оплате */}
+          {isCharity && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                <CreditCard size={20} />
+                Оплата
+              </h2>
+              <div className={styles.charityPaymentInfo}>
+                <div className={styles.paymentInfoIcon}>💳</div>
+                <div>
+                  <strong>Полная оплата</strong>
+                  <p>Благотворительный заказ оплачивается полностью. Аванс не предусмотрен.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Комментарий */}
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>
               <MessageSquare size={20} />
-              Комментарий к заказу
+              {isCharity ? 'Комментарий к помощи' : 'Комментарий к заказу'}
             </h2>
             
             <div className={styles.field}>
               <textarea
                 value={formData.comment}
                 onChange={(e) => updateField('comment', e.target.value)}
-                placeholder={isPickup 
-                  ? "Пожелания, особые указания, количество персон..." 
-                  : "Пожелания, особые указания, домофон..."}
+                placeholder={isCharity 
+                  ? "Особые указания для доставки помощи..." 
+                  : menuType === 'pickup'
+                    ? "Пожелания, особые указания, количество персон..."
+                    : "Пожелания, особые указания, домофон..."}
                 rows={3}
               />
             </div>
@@ -822,7 +1020,9 @@ function CheckoutContent() {
 
         {/* Итого */}
         <div className={styles.summary}>
-          <h3 className={styles.summaryTitle}>Ваш заказ</h3>
+          <h3 className={styles.summaryTitle}>
+            {isCharity ? 'Состав помощи' : 'Ваш заказ'}
+          </h3>
           
           <div className={styles.orderItems}>
             {items.map(item => (
@@ -831,6 +1031,15 @@ function CheckoutContent() {
                 <span>{item.price * item.quantity} ₽</span>
               </div>
             ))}
+            {isCharity && items.length === 0 && (
+              <div className={styles.emptyCharityItems}>
+                <Heart size={24} />
+                <p>Выберите блюда для помощи</p>
+                <Link href="/menu" className={styles.menuLink}>
+                  Перейти в меню
+                </Link>
+              </div>
+            )}
           </div>
           
           <div className={styles.divider}></div>
@@ -840,13 +1049,10 @@ function CheckoutContent() {
             <span>{subtotal} ₽</span>
           </div>
           
-          {isDelivery && (
-            <div className={styles.deliveryInfoBlock}>
-              <Truck size={18} className={styles.deliveryInfoIcon} />
-              <div>
-                <strong>Доставка такси</strong>
-                <p>Оплата производится на месте при получении заказа. Стоимость зависит от расстояния и тарифов такси.</p>
-              </div>
+          {isCharity && (
+            <div className={styles.summaryRow}>
+              <span>🚚 Доставка (такси)</span>
+              <span>500 ₽</span>
             </div>
           )}
 
@@ -861,12 +1067,13 @@ function CheckoutContent() {
           
           <div className={`${styles.summaryRow} ${styles.total}`}>
             <span>К оплате</span>
-            <span>{isPickup && formData.paymentType === 'deposit' ? depositAmount : finalTotal} ₽</span>
+            <span>{finalTotal} ₽</span>
           </div>
 
-          {isPickup && formData.paymentType === 'deposit' && (
-            <div className={styles.depositNote}>
-              Остаток: {(finalTotal - depositAmount).toFixed(0)} ₽ при получении
+          {isCharity && (
+            <div className={styles.charityNote}>
+              <Heart size={16} />
+              <span>Спасибо за вашу доброту! ❤️</span>
             </div>
           )}
 
@@ -886,19 +1093,21 @@ function CheckoutContent() {
           
           <button 
             onClick={handleSubmit}
-            disabled={isSubmitting}
+            disabled={isSubmitting || (isCharity && items.length === 0)}
             className={styles.submitBtn}
           >
             {isSubmitting 
               ? 'Оформление...' 
-              : isPickup && formData.paymentType === 'deposit'
-                ? `Внести аванс ${depositAmount} ₽`
-                : `Оплатить ${finalTotal} ₽`
+              : isCharity
+                ? `❤️ Помочь за ${finalTotal} ₽`
+                : menuType === 'pickup' && formData.paymentType === 'deposit'
+                  ? `Внести аванс ${depositAmount} ₽`
+                  : `Оплатить ${finalTotal} ₽`
             }
           </button>
           
           <p className={styles.agreement}>
-            Нажимая «{isPickup && formData.paymentType === 'deposit' ? 'Внести аванс' : 'Оплатить'}», вы соглашаетесь с условиями обработки персональных данных
+            Нажимая «{isCharity ? 'Помочь' : menuType === 'pickup' && formData.paymentType === 'deposit' ? 'Внести аванс' : 'Оплатить'}», вы соглашаетесь с условиями обработки персональных данных
           </p>
         </div>
       </div>

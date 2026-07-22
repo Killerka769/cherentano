@@ -65,9 +65,14 @@ export default function Footer() {
             <h3 className={styles.title}>Контакты</h3>
             <div className={styles.contactItem}>
               <Phone size={18} />
-              <a href={`tel:${settings?.phone || '+79882938907'}`}>
-                {settings?.phone || '+7 (988) 293-89-07'}
-              </a>
+              <div className={styles.contPhones}>
+                <a href={`tel:+79882913293`}>
+                  +7 (988) 291-32-93
+                </a>
+                <a href={`tel:${settings?.phone || '+79882938907'}`}>
+                  {settings?.phone || '+7 (988) 293-89-07'}
+                </a>
+              </div>
             </div>
             <div className={styles.contactItem}>
               <MapPin size={18} />
@@ -85,7 +90,7 @@ export default function Footer() {
             </div>
             <div className={styles.contactItem}>
               <span className={styles.socialLabel}>Мы в соцсетях:</span>
-              <span className={styles.socialHandle}>@chelentano</span>
+              <span className={styles.socialHandle}>@celentano_meat_restaurant_</span>
             </div>
           </div>
 
