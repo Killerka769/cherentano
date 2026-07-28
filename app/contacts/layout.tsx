@@ -11,10 +11,14 @@ export const metadata: Metadata = {
     index: true,  
     follow: true, 
   },
+  alternates: {
+    canonical: 'https://chelentano05.ru/contacts', 
+  },
   openGraph: {
     title: 'Контакты ресторана Челентано',
     description: 'Адрес, телефон и режим работы ресторана в Махачкале',
     type: 'website',
+    url: 'https://chelentano05.ru/contacts',
   },
 }
 

@@ -11,10 +11,14 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  alternates: {
+    canonical: 'https://chelentano05.ru/booking', 
+  },
   openGraph: {
     title: 'Бронирование столика в Челентано',
     description: 'Забронируйте столик в ресторане Челентано в Махачкале',
     type: 'website',
+    url: 'https://chelentano05.ru/booking',
   },
 }
 

@@ -11,10 +11,14 @@ export const metadata: Metadata = {
     index: true,  
     follow: true,  
   },
+  alternates: {
+    canonical: 'https://chelentano05.ru/menu', 
+  },
   openGraph: {
     title: 'Меню ресторана Челентано',
     description: 'Ознакомьтесь с нашим меню: дагестанская и европейская кухня в Махачкале',
     type: 'website',
+    url: 'https://chelentano05.ru/menu',
   },
 }
 

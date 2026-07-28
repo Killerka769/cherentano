@@ -11,10 +11,14 @@ export const metadata: Metadata = {
     index: true,   
     follow: true, 
   },
+  alternates: {
+    canonical: 'https://chelentano05.ru/reviews', 
+  },
   openGraph: {
     title: 'Отзывы о ресторане Челентано',
     description: 'Что говорят наши гости о ресторане Челентано',
     type: 'website',
+    url: 'https://chelentano05.ru/reviews',
   },
 }
 

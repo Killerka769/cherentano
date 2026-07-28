@@ -11,10 +11,14 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  alternates: {
+    canonical: 'https://chelentano05.ru/delivery', 
+  },
   openGraph: {
     title: 'Доставка еды из Челентано',
     description: 'Закажите доставку еды из ресторана Челентано в Махачкале',
     type: 'website',
+    url: 'https://chelentano05.ru/delivery',
   },
 }
 
