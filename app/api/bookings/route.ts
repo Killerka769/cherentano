@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
+import { sendBookingNotification } from '@/lib/email'
 
 function addHours(time: string, hours: number): string {
   const [h, m] = time.split(':').map(Number)
@@ -173,6 +174,19 @@ export async function POST(request: NextRequest) {
       data: bookingData,
       include: { table: true }
     })
+
+    await sendBookingNotification({
+      id: booking.id,
+      customerName: booking.customerName,
+      customerPhone: booking.customerPhone,
+      customerEmail: booking.customerEmail,
+      tableNumber: booking.table.number,
+      tableName: booking.table.name,
+      date: booking.date,
+      time: booking.time,
+      guests: booking.guests,
+      comment: booking.comment,
+    });
     
     return NextResponse.json({ 
       booking,

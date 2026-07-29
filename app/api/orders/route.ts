@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
+import { sendOrderNotification } from '@/lib/email'
 
 // Вспомогательная функция для добавления часов
 function addHours(time: string, hours: number): string {
@@ -180,6 +181,19 @@ export async function POST(request: NextRequest) {
         user: true
       }
     })
+
+    await sendOrderNotification({
+      id: order.id,
+      customerName: order.customerName,
+      customerPhone: order.customerPhone,
+      orderType: order.orderType,
+      deliveryAddress: order.deliveryAddress,
+      total: order.total,
+      items: order.items,
+      comment: order.comment,
+      createdAt: order.createdAt,
+      isCharity: order.isCharity || false,
+    });
     
     // Логируем создание заказа
     await prisma.orderStatusLog.create({
