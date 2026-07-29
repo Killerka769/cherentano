@@ -20,7 +20,6 @@ export default function CartIcon() {
     if (newCount > count && iconRef.current) {
       setIsAnimating(true);
       
-      // Получаем позицию иконки для частиц
       const rect = iconRef.current.getBoundingClientRect();
       setParticlePosition({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
       setShowParticles(true);
@@ -46,12 +45,13 @@ export default function CartIcon() {
         />
       )}
       
-      <Link href="/cart" className={styles.cartIcon}>
+      <Link href="/cart" className={styles.cartLink}>
         <div 
           ref={iconRef}
           className={`${styles.iconWrapper} ${isAnimating ? styles.animate : ''}`}
         >
-          <ShoppingBag size={22} />
+          <ShoppingBag size={24} className={styles.icon} />
+          <span className={styles.label}>Корзина</span>
         </div>
         {count > 0 && (
           <span className={`${styles.badge} ${isAnimating ? styles.badgeAnimate : ''}`}>
