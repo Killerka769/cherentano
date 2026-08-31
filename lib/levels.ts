@@ -34,7 +34,8 @@ export interface Level {
       minSpent: 1500,
       minOrders: 1,
       xpRequired: 300,
-      perks: ['Участие в розыгрышах', 'Уведомления об акциях']
+      perks: ["-"]
+      // perks: ['Участие в розыгрышах', 'Уведомления об акциях']
     },
     {
       id: 'EXPLORER',
@@ -46,7 +47,8 @@ export interface Level {
       minSpent: 3500,
       minOrders: 3,
       xpRequired: 700,
-      perks: ['Ранний доступ к новинкам', 'Приоритетная поддержка']
+      perks: ['Приоритетная поддержка']
+      // perks: ['Ранний доступ к новинкам', 'Приоритетная поддержка']
     },
     {
       id: 'GOURMET',
@@ -58,7 +60,8 @@ export interface Level {
       minSpent: 7500,
       minOrders: 7,
       xpRequired: 1500,
-      perks: ['Приоритетное бронирование', 'Персональные рекомендации']
+      // perks: ['Приоритетное бронирование', 'Персональные рекомендации']
+      perks: ["-"]
     },
     {
       id: 'CONNOISSEUR',
@@ -70,7 +73,8 @@ export interface Level {
       minSpent: 15000,
       minOrders: 15,
       xpRequired: 3000,
-      perks: ['Бесплатная доставка от 500₽', 'Дегустация новинок']
+      // perks: ['Бесплатная доставка от 500₽', 'Дегустация новинок']
+      perks: ["-"]
     },
     {
       id: 'EXPERT',
@@ -82,7 +86,8 @@ export interface Level {
       minSpent: 30000,
       minOrders: 25,
       xpRequired: 6000,
-      perks: ['Подарок на ДР', 'Скидка для друзей 5%']
+      // perks: ['Подарок на ДР', 'Скидка для друзей 5%']
+      perks: ['Приоритетное бронирование']
     },
     {
       id: 'MASTER',
@@ -94,7 +99,8 @@ export interface Level {
       minSpent: 60000,
       minOrders: 40,
       xpRequired: 12000,
-      perks: ['Индивидуальные сеты', 'Приоритетная поддержка 24/7']
+      // perks: ['Индивидуальные сеты', 'Приоритетная поддержка 24/7']
+      perks: ["-"]
     },
     {
       id: 'LEGEND',
@@ -118,7 +124,8 @@ export interface Level {
       minSpent: 150000,
       minOrders: 85,
       xpRequired: 30000,
-      perks: ['Закрытые мероприятия', 'Секретное меню']
+      // perks: ['Закрытые мероприятия', 'Секретное меню']
+      perks: ['Закрытые мероприятия']
     },
     {
       id: 'AMBASSADOR',
@@ -130,7 +137,8 @@ export interface Level {
       minSpent: 220000,
       minOrders: 120,
       xpRequired: 45000,
-      perks: ['Пожизненный статус', 'Приглашение на кулинарные мастер-классы']
+      // perks: ['Пожизненный статус', 'Приглашение на кулинарные мастер-классы']
+      perks: ['Пожизненный статус']
     },
     {
       id: 'GRAND_MASTER',
@@ -154,7 +162,8 @@ export interface Level {
       minSpent: 500000,
       minOrders: 250,
       xpRequired: 100000,
-      perks: ['Бесплатный банкет на 10 персон', 'Именное блюдо в меню', 'Вечный статус']
+      // perks: ['Бесплатный банкет на 10 персон', 'Именное блюдо в меню', 'Вечный статус']
+      perks: ['Бесплатный банкет на 10 персон', 'Вечный статус']
     }
   ];
   

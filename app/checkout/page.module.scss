@@ -1346,3 +1346,90 @@
     margin: 0;
   }
 }
+
+// Модалка успешного заказа
+.successModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.successModal {
+  background: white;
+  border-radius: 32px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  animation: slideUp 0.4s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.successIcon {
+  margin-bottom: 16px;
+}
+
+.successIconColor {
+  color: #4caf50;
+}
+
+.successTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #1a1a2e;
+}
+
+.successText {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.successBookingText {
+  font-size: 0.9rem;
+  color: #ff9800;
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: #fff3e0;
+  border-radius: 12px;
+}
+
+.successBtn {
+  margin-top: 24px;
+  background: $primary;
+  color: white;
+  border: none;
+  padding: 14px 48px;
+  border-radius: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: $primary-dark;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(196, 73, 44, 0.3);
+  }
+}

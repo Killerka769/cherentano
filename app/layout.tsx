@@ -7,7 +7,7 @@ import './globals.scss';
 import { Toaster } from 'react-hot-toast';
 import PageTransition from './components/ui/PageTransition/PageTransition';
 import Footer from './components/layout/Footer/Footer';
-import OrderReminder from './components/ui/OrderReminder/OrderReminder';
+// import OrderReminder from './components/ui/OrderReminder/OrderReminder';
 import YandexMetrika from './components/YandexMetrika/YandexMetrika';
 
 const inter = Inter({ subsets: ['cyrillic', 'latin'] });
@@ -82,7 +82,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <Header />
-            <OrderReminder />
+            {/* <OrderReminder /> */}
             <main><PageTransition>{children}</PageTransition></main>
             <Toaster position="bottom-right" />
             <Footer />

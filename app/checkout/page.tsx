@@ -54,6 +54,7 @@ function CheckoutContent() {
   const [agreed, setAgreed] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<number | null>(null);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [bookingDuration, setBookingDuration] = useState(2);
   const [tables, setTables] = useState<any[]>([]);
@@ -432,21 +433,20 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
 
       setIsOrderSubmitted(true);
       setCreatedOrderId(data.order.id);
-      setShowPaymentDetails(true);
+      // setShowPaymentDetails(true);
 
       fireConfetti();
       
-      if (isCharity) {
-        toast.success('🎉 Благотворительная помощь оформлена! Спасибо за вашу доброту!', {
-          duration: 5000,
-          icon: '❤️',
-        });
-      } else {
-        toast.success('🎉 Заказ успешно оформлен!', {
-          duration: 5000,
-          icon: '🎉',
-        });
-      }
+      // toast.success(
+      //   isCharity 
+      //     ? '❤️ Благотворительная помощь оформлена! С вами свяжется менеджер для подтверждения.' 
+      //     : '✅ Заказ оформлен! С вами свяжется менеджер для подтверждения.',
+      //   { duration: 6000, icon: '📞' }
+      // );
+      // router.push(isCharity ? '/charity/history' : '/profile');
+
+      setShowSuccessModal(true);
+      // clearCart();      
       
       if (data.bookingCreated) {
         setTimeout(() => {
@@ -582,6 +582,41 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
   // Основная форма
   return (
     <div className={styles.container}>
+      {/* Модалка успешного заказа */}
+      {showSuccessModal && (
+        <div className={styles.successModalOverlay}>
+          <div className={styles.successModal}>
+            <div className={styles.successIcon}>
+              <CheckCircle size={64} className={styles.successIconColor} />
+            </div>
+            <h2 className={styles.successTitle}>
+              {isCharity ? '❤️ Спасибо за помощь!' : '✅ Заказ оформлен!'}
+            </h2>
+            <p className={styles.successText}>
+              {isCharity 
+                ? 'Благотворительная помощь оформлена. С вами свяжется менеджер для подтверждения.'
+                : 'Ваш заказ принят. С вами свяжется менеджер для подтверждения.'
+              }
+            </p>
+            {formData.needBooking && (
+              <p className={styles.successBookingText}>
+                🍽️ Столик забронирован! Менеджер свяжется с вами.
+              </p>
+            )}
+            <button 
+              onClick={() => {
+                clearCart();
+                setShowSuccessModal(false);
+                // router.push(isCharity ? '/charity/history' : '/profile');
+                router.push('/profile')
+              }}
+              className={styles.successBtn}
+            >
+              Понятно
+            </button>
+          </div>
+        </div>
+      )}
       {showPhoneAlert && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
