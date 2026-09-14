@@ -164,12 +164,25 @@ export default function CharityDetailPage() {
       </div>
 
       <div className={styles.card}>
-        <div className={styles.cardImage}>
+        {/* <div className={styles.cardImage}>
           <ImageWithFallback
             src={beneficiary.imageUrl || ''}
             alt={beneficiary.name}
             fallback="default"
           />
+          <div className={styles.cardBadges}>
+            <span 
+              className={styles.urgencyBadge}
+              style={{ background: urgencyColors[urgency] }}
+            >
+              {urgencyIcons[urgency]} {beneficiary.urgency}
+            </span>
+            <span className={styles.needsBadge}>
+              📦 {beneficiary.needs}
+            </span>
+          </div>
+        </div> */}
+        <div className={styles.cardHeader}>
           <div className={styles.cardBadges}>
             <span 
               className={styles.urgencyBadge}
@@ -188,7 +201,7 @@ export default function CharityDetailPage() {
           <p className={styles.description}>{beneficiary.description}</p>
 
           <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
+            {/* <div className={styles.infoItem}>
               <MapPin size={18} />
               <div>
                 <div className={styles.infoLabel}>Адрес</div>
@@ -203,6 +216,27 @@ export default function CharityDetailPage() {
                   <div className={styles.infoValue}>{beneficiary.phone}</div>
                 </div>
               </div>
+            )} */}
+            {/* Адрес и телефон показываем только админам */}
+            {user?.role === 'ADMIN' && (
+              <>
+                <div className={styles.infoItem}>
+                  <MapPin size={18} />
+                  <div>
+                    <div className={styles.infoLabel}>Адрес</div>
+                    <div className={styles.infoValue}>{beneficiary.address}</div>
+                  </div>
+                </div>
+                {beneficiary.phone && (
+                  <div className={styles.infoItem}>
+                    <Phone size={18} />
+                    <div>
+                      <div className={styles.infoLabel}>Телефон</div>
+                      <div className={styles.infoValue}>{beneficiary.phone}</div>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             <div className={styles.infoItem}>
               <Users size={18} />

@@ -63,6 +63,37 @@
   }
 }
 
+.historyIconWrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.historyIcon {
+  color: #e91e63;
+}
+
+.historyCard {
+  display: flex;
+  gap: 20px;
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  transition: all $transition-base;
+  align-items: flex-start;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+}
+
 .historyImage {
   width: 80px;
   height: 80px;

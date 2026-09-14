@@ -308,14 +308,29 @@
   gap: 12px;
 }
 
+// .historyCard {
+//   display: flex;
+//   gap: 16px;
+//   background: white;
+//   border-radius: 16px;
+//   padding: 16px;
+//   box-shadow: $shadow-sm;
+//   transition: all $transition-base;
+  
+//   &:hover {
+//     box-shadow: $shadow-md;
+//   }
+// }
+
 .historyCard {
   display: flex;
   gap: 16px;
   background: white;
   border-radius: 16px;
-  padding: 16px;
+  padding: 16px 20px;
   box-shadow: $shadow-sm;
   transition: all $transition-base;
+  align-items: center;
   
   &:hover {
     box-shadow: $shadow-md;
@@ -522,6 +537,112 @@
       background: $primary-dark;
     }
   }
+
+  // Заголовок карточки (вместо фото)
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 0 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.urgencyBadge {
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.helpCount {
+  font-size: 0.7rem;
+  color: $text-gray;
+  white-space: nowrap;
+}
+
+// Карточка без фото
+.card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all $transition-base;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.cardContent {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.cardDescription {
+  font-size: 0.85rem;
+  color: $text-gray;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.cardMeta {
+  margin-bottom: 12px;
+}
+
+.cardNeeds {
+  background: rgba(196, 73, 44, 0.08);
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  color: $primary;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid $border-light;
+  margin-top: auto;
+}
+
+.helpBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: $primary;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  
+  .card:hover & {
+    gap: 10px;
+  }
+}
   
   @keyframes fadeIn {
     from { opacity: 0; }

@@ -89,7 +89,7 @@ export default function CharityHistoryPage() {
         </div>
       ) : (
         <div className={styles.historyList}>
-          {history.map(item => (
+          {/* {history.map(item => (
             <div key={item.id} className={styles.historyCard}>
               <div className={styles.historyImage}>
                 <ImageWithFallback
@@ -109,6 +109,44 @@ export default function CharityHistoryPage() {
                         {item.beneficiary.address}
                       </div>
                     )}
+                  </div>
+                  <div className={styles.historyAmount}>{item.amount} ₽</div>
+                </div>
+                <div className={styles.historyFooter}>
+                  <span className={styles.historyHelper}>
+                    <User size={14} />
+                    {item.user?.name || 'Анонимный помощник'}
+                  </span>
+                  <span className={styles.historyDate}>
+                    <Calendar size={14} />
+                    {new Date(item.createdAt).toLocaleDateString('ru-RU')}
+                  </span>
+                </div>
+                {item.items && item.items.length > 0 && (
+                  <div className={styles.historyItems}>
+                    {item.items.slice(0, 3).map((product: any, idx: number) => (
+                      <span key={idx} className={styles.historyItem}>
+                        {product.name} x{product.quantity}
+                      </span>
+                    ))}
+                    {item.items.length > 3 && (
+                      <span className={styles.historyMore}>+ ещё {item.items.length - 3}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))} */}
+          {history.map(item => (
+            <div key={item.id} className={styles.historyCard}>
+              <div className={styles.historyIconWrapper}>
+                <Heart size={24} className={styles.historyIcon} />
+              </div>
+              <div className={styles.historyContent}>
+                <div className={styles.historyHeader}>
+                  <div>
+                    <div className={styles.historyName}>{item.beneficiary.name}</div>
+                    <div className={styles.historyMeal}>{mealLabels[item.mealTime] || item.mealTime}</div>
                   </div>
                   <div className={styles.historyAmount}>{item.amount} ₽</div>
                 </div>

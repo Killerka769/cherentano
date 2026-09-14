@@ -630,8 +630,8 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
                   <Heart size={20} className={styles.modalHeartIcon} />
                   Вы помогаете <strong>{formData.charityBeneficiary?.name}</strong>
                   <br />
-                  {formData.charityBeneficiary?.address}
-                  <br />
+                  {/* {formData.charityBeneficiary?.address} */}
+                  {/* <br /> */}
                   <span className={styles.modalUrgency}>
                     Срочность: {formData.charityBeneficiary?.urgency}
                   </span>
@@ -687,9 +687,9 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
               <p>
                 Вы помогаете <strong>{formData.charityBeneficiary.name}</strong>
                 <br />
-                <span className={styles.charityAddress}>
+                {/* <span className={styles.charityAddress}>
                   📍 {formData.charityBeneficiary.address}
-                </span>
+                </span> */}
                 <span className={styles.charityUrgency}>
                   Срочность: {formData.charityBeneficiary.urgency}
                 </span>
@@ -943,15 +943,16 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
               
               <div className={styles.field}>
                 <label htmlFor="address">
-                  {isCharity ? 'Адрес доставки помощи' : 'Адрес доставки *'}
+                  {isCharity ? 'Адрес доставки помощи: скрыто' : 'Адрес доставки *'}
                 </label>
                 {isCharity ? (
                   <input
-                    type="text"
+                    type="hidden"
                     id="address"
                     value={formData.address}
                     readOnly
                     className={styles.readonlyInput}
+                    
                   />
                 ) : (
                   <AddressSelector

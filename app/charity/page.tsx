@@ -171,7 +171,7 @@ export default function CharityPage() {
                   href={`/charity/${beneficiary.id}`}
                   className={styles.card}
                 >
-                  <div className={styles.cardImage}>
+                  {/* <div className={styles.cardImage}>
                     <ImageWithFallback
                       src={beneficiary.imageUrl || ''}
                       alt={beneficiary.name}
@@ -183,16 +183,27 @@ export default function CharityPage() {
                     >
                       {beneficiary.urgency}
                     </span>
+                  </div> */}
+                  <div className={styles.cardHeader}>
+                    <span 
+                      className={styles.urgencyBadge}
+                      style={{ background: urgencyColors[beneficiary.urgency] }}
+                    >
+                      {beneficiary.urgency}
+                    </span>
+                    <span className={styles.helpCount}>
+                      {beneficiary.helpRequests.length} помощь оказана
+                    </span>
                   </div>
                   <div className={styles.cardContent}>
                     <h3 className={styles.cardName}>{beneficiary.name}</h3>
                     <p className={styles.cardDescription}>{beneficiary.description}</p>
                     <div className={styles.cardMeta}>
                       <span className={styles.cardNeeds}>📦 {beneficiary.needs}</span>
-                      <span className={styles.cardAddress}>
+                      {/* <span className={styles.cardAddress}>
                         <MapPin size={14} />
                         {beneficiary.address}
-                      </span>
+                      </span> */}
                     </div>
                     <div className={styles.cardFooter}>
                       <span className={styles.helpCount}>
@@ -224,13 +235,13 @@ export default function CharityPage() {
             <div className={styles.historyList}>
               {history.map(item => (
                 <div key={item.id} className={styles.historyCard}>
-                  <div className={styles.historyImage}>
+                  {/* <div className={styles.historyImage}>
                     <ImageWithFallback
                       src={item.beneficiary.imageUrl || ''}
                       alt={item.beneficiary.name}
                       fallback="default"
                     />
-                  </div>
+                  </div> */}
                   <div className={styles.historyContent}>
                     <div className={styles.historyHeader}>
                       <div>

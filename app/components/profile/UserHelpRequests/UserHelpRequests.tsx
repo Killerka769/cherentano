@@ -103,10 +103,10 @@ export default function UserHelpRequests() {
                   <User size={16} />
                   {request.beneficiary.name}
                 </div>
-                <div className={styles.beneficiaryAddress}>
+                {/* <div className={styles.beneficiaryAddress}>
                   <MapPin size={14} />
                   {request.beneficiary.address}
-                </div>
+                </div> */}
               </div>
               <div className={styles.cardTotal}>
                 Сумма: <strong>{request.total} ₽</strong>
