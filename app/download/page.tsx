@@ -5,7 +5,7 @@ import { ArrowLeft, Smartphone, Download, Shield, Zap, Star, Bell, CheckCircle, 
 import styles from './page.module.scss';
 
 export default function DownloadPage() {
-  const apkUrl = '/downloads/celentano.apk';
+  const apkUrl = '/downloads/Celentano.apk';
   const apkSize = '~10 МБ';
   const apkVersion = '1.0.0'; 
 
@@ -33,7 +33,7 @@ export default function DownloadPage() {
         {/* Кнопка скачивания */}
         <a 
           href={apkUrl} 
-          download="celentano.apk"
+          download="Celentano.apk"
           className={styles.downloadBtn}
         >
           <Download size={22} />
