@@ -111,9 +111,10 @@ export default function Footer() {
           <div className={styles.column}>
             <h3 className={styles.title}>Информация</h3>
             <ul className={styles.links}>
-              <li><Link href="/about">О нас</Link></li>
+              <li><Link href="/">О нас</Link></li>
               <li><Link href="/contacts">Контакты</Link></li>
               <li><Link href="/reviews">Отзывы</Link></li>
+              <li><Link href="/download">Скачать приложение</Link></li>
               <li><Link href="/privacy">Политика конфиденциальности</Link></li>
             </ul>
           </div>

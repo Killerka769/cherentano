@@ -16,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/booking`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: currentDate },
     { url: `${baseUrl}/delivery`, priority: 0.6, changeFrequency: 'weekly' as const, lastModified: currentDate },
     { url: `${baseUrl}/weekly-menu`, priority: 0.7, changeFrequency: 'weekly' as const, lastModified: currentDate },
+    { url: `${baseUrl}/download`, priority: 0.6, changeFrequency: 'monthly' as const, lastModified: currentDate },
   ]
   
   // Динамические страницы блога
