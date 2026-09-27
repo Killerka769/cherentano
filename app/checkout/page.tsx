@@ -1122,7 +1122,10 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
                 required
               />
               <span>
-                Я согласен(на) на <a href="/privacy" target="_blank">обработку персональных данных</a>
+                Я даю согласие на{' '}
+                <a href="/consent" target="_blank">обработку персональных данных</a>{' '}
+                и принимаю условия{' '}
+                <a href="/offer" target="_blank">публичной оферты</a>
               </span>
             </label>
           </div>

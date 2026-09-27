@@ -9,6 +9,7 @@ import PageTransition from './components/ui/PageTransition/PageTransition';
 import Footer from './components/layout/Footer/Footer';
 // import OrderReminder from './components/ui/OrderReminder/OrderReminder';
 import YandexMetrika from './components/YandexMetrika/YandexMetrika';
+import CookieBanner from './components/ui/CookieBanner/CookieBanner';
 
 const inter = Inter({ subsets: ['cyrillic', 'latin'] });
 
@@ -86,6 +87,7 @@ export default function RootLayout({
             <main><PageTransition>{children}</PageTransition></main>
             <Toaster position="bottom-right" />
             <Footer />
+            <CookieBanner />
           </CartProvider>
         </AuthProvider>
       </body>

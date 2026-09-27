@@ -1,0 +1,56 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include container;
+  padding: 40px 0 80px;
+  max-width: 800px;
+}
+
+.content {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: $shadow-sm;
+  line-height: 1.8;
+  color: $text-dark;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    color: $primary;
+  }
+
+  p {
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+  }
+}
+
+.date {
+  color: $text-gray;
+  font-size: 0.85rem;
+  margin-bottom: 24px;
+}
+
+.footer {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid $border-light;
+  font-size: 0.9rem;
+  color: $text-gray;
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 24px 20px;
+  }
+}

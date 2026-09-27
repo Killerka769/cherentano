@@ -30,7 +30,7 @@ interface Table {
 }
 
 const BOOKING_PRICE = 1000;
-const PAYMENT_PHONE = '79034816223';
+const PAYMENT_PHONE = '+7 (988) 291-32-93';
 
 export default function BookingPage() {
   const { user, loading } = useAuth();
@@ -530,7 +530,10 @@ export default function BookingPage() {
                     required
                   />
                   <span>
-                    Я согласен(на) на <a href="/privacy" target="_blank">обработку персональных данных</a>
+                    Я даю согласие на{' '}
+                    <a href="/consent" target="_blank">обработку персональных данных</a>{' '}
+                    и принимаю условия{' '}
+                    <a href="/offer" target="_blank">публичной оферты</a>
                   </span>
                 </label>
               </div>
@@ -553,8 +556,8 @@ export default function BookingPage() {
         <div className={styles.info}>
           <div className={styles.infoCard}>
             <h3>📞 Или позвоните нам</h3>
-            <a href="tel:+79882938907" className={styles.phoneLink}>
-              +7 (988) 293-89-07
+            <a href="tel:+79882913293" className={styles.phoneLink}>
+              +7 (988) 291-32-93
             </a>
             <p>Ежедневно с 11:00 до 23:00</p>
           </div>
