@@ -20,11 +20,11 @@
   }
   
   @media (max-width: 768px) {
-    height: 300px;
+    height: 400px;
   }
   
   @media (max-width: 480px) {
-    height: 250px;
+    height: 400px;
   }
 }
 
@@ -71,7 +71,7 @@
   }
   
   @media (max-width: 480px) {
-    padding: 16px 20px;
+    padding: 16px 32px;
   }
 }
 
@@ -214,6 +214,8 @@
   @media (max-width: 768px) {
     width: 36px;
     height: 36px;
+    background-color: transparent;
+    backdrop-filter: none;
   }
   
   @media (max-width: 480px) {

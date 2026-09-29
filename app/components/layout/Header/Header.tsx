@@ -98,7 +98,7 @@ export default function Header() {
           
           <div className={styles.contContacts}>
             <div className={styles.contPhones}>
-              <Phone size={18} className={styles.phoneIcon}/>
+              {/* <Phone size={18} className={styles.phoneIcon}/> */}
               {/* Телефон скрываем на мобильных */}
               <div className={styles.contPhonesLinks}>
                 <a href="tel:+79882913293" className={`${styles.phone} ${styles.desktopOnly}`}>
