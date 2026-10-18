@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
       include: {
         items: true,
+        discount: true, 
         statusLogs: {
           orderBy: { createdAt: 'desc' },
           take: 5,
@@ -178,7 +179,8 @@ export async function POST(request: NextRequest) {
       data: orderData,
       include: {
         items: true,
-        user: true
+        user: true,
+        discount: true, // 👈 ДОБАВЛЕНО, чтобы TypeScript видел order.discount
       }
     })
 
@@ -193,6 +195,9 @@ export async function POST(request: NextRequest) {
       comment: order.comment,
       createdAt: order.createdAt,
       isCharity: order.isCharity || false,
+      discountAmount: order.discountAmount || 0,
+      discountCode: order.discount?.code || null,
+      discountName: order.discount?.name || null, // 👈 ДОБАВЛЕНО
     });
     
     // Логируем создание заказа

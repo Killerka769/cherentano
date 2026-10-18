@@ -25,6 +25,8 @@ interface Order {
   deliveryAddress?: string | null;
   comment?: string | null;
   total: number;
+  discountAmount?: number | null; // 👈 Добавили
+  discount?: { code: string; name: string } | null; // 👈 Добавили
   status: string;
   orderType: string;
   createdAt: string;
@@ -197,6 +199,11 @@ export default function AdminOrdersPage() {
                 <span className={styles.orderTime}>
                   {new Date(order.createdAt).toLocaleString('ru-RU')}
                 </span>
+                {order.discountAmount && order.discountAmount > 0 && (
+                  <span className={styles.discountBadge}>
+                    🏷️ {order.discount?.name || 'Скидка'}: -{order.discountAmount} ₽
+                  </span>
+                )}
               </div>
               <span 
                 className={styles.orderStatus}
@@ -289,6 +296,17 @@ export default function AdminOrdersPage() {
                     <span>{item.price * item.quantity} ₽</span>
                   </div>
                 ))}
+                
+                {selectedOrder.discountAmount && selectedOrder.discountAmount > 0 && (
+                  <div className={styles.orderItemDetail} style={{ color: '#4caf50', fontWeight: 'bold', borderBottom: 'none', marginTop: '8px' }}>
+                    <span>
+                      🏷️ {selectedOrder.discount?.name || 'Скидка'} 
+                      {selectedOrder.discount?.code ? ` (${selectedOrder.discount.code})` : ''}
+                    </span>
+                    <span>-{selectedOrder.discountAmount} ₽</span>
+                  </div>
+                )}
+
                 <div className={styles.orderTotalDetail}>
                   <strong>Итого:</strong> <strong className={styles.totalAmount}>{selectedOrder.total} ₽</strong>
                 </div>

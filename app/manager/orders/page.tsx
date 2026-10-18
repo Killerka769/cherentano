@@ -14,6 +14,8 @@ interface Order {
   deliveryAddress?: string;
   comment?: string;
   total: number;
+  discountAmount?: number | null; // 👈 Добавили
+  discount?: { code: string; name: string } | null; // 👈 Добавили
   status: string;
   orderType: string;
   isCharity?: boolean;
@@ -42,7 +44,6 @@ export default function ManagerOrdersPage() {
   const [cancelModal, setCancelModal] = useState<{ order: Order; status: string } | null>(null);
   const [cancelReason, setCancelReason] = useState('');
   
-  // Поиск и фильтры
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -71,11 +72,7 @@ export default function ManagerOrdersPage() {
     const res = await fetch('/api/manager/orders', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        orderId, 
-        status: newStatus,
-        reason: reason || undefined
-      })
+      body: JSON.stringify({ orderId, status: newStatus, reason: reason || undefined })
     });
     
     if (res.ok) {
@@ -91,33 +88,18 @@ export default function ManagerOrdersPage() {
     }
   };
 
-  const getNextAction = (currentStatus: string) => {
-    const step = statusSteps.find(s => s.key === currentStatus);
-    return step?.action;
-  };
+  const getNextAction = (currentStatus: string) => statusSteps.find(s => s.key === currentStatus)?.action;
+  const getStatusStepIndex = (status: string) => statusSteps.findIndex(s => s.key === status);
 
-  const activeOrders = orders.filter(o => 
-    !['COMPLETED', 'CANCELLED', 'REJECTED'].includes(o.status)
-  );
-  const completedOrders = orders.filter(o => 
-    ['COMPLETED', 'CANCELLED', 'REJECTED'].includes(o.status)
-  );
-
-  const getStatusStepIndex = (status: string) => {
-    return statusSteps.findIndex(s => s.key === status);
-  };
+  const activeOrders = orders.filter(o => !['COMPLETED', 'CANCELLED', 'REJECTED'].includes(o.status));
+  const completedOrders = orders.filter(o => ['COMPLETED', 'CANCELLED', 'REJECTED'].includes(o.status));
 
   const getOrderTypeLabel = (order: Order) => {
-    if (order.isCharity) {
-      return { icon: Heart, label: 'Благотворительность', color: '#e91e63' };
-    }
-    if (order.orderType === 'PICKUP') {
-      return { icon: Store, label: 'Самовывоз', color: '#ff9800' };
-    }
+    if (order.isCharity) return { icon: Heart, label: 'Благотворительность', color: '#e91e63' };
+    if (order.orderType === 'PICKUP') return { icon: Store, label: 'Самовывоз', color: '#ff9800' };
     return { icon: Truck, label: 'Доставка', color: '#2196f3' };
   };
 
-  // Фильтрация заказов
   const filteredOrders = (ordersList: Order[]) => {
     return ordersList.filter(order => {
       const searchLower = searchQuery.toLowerCase();
@@ -128,7 +110,6 @@ export default function ManagerOrdersPage() {
         (order.deliveryAddress && order.deliveryAddress.toLowerCase().includes(searchLower));
 
       const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-      
       const matchesType = typeFilter === 'all' || 
         (typeFilter === 'pickup' && order.orderType === 'PICKUP' && !order.isCharity) ||
         (typeFilter === 'delivery' && order.orderType === 'DELIVERY' && !order.isCharity) ||
@@ -155,6 +136,11 @@ export default function ManagerOrdersPage() {
               <TypeIcon size={12} />
               {typeInfo.label}
             </span>
+            {order.discountAmount && order.discountAmount > 0 && (
+              <span className={styles.discountBadge}>
+                🏷️ {order.discount?.name || 'Скидка'}: -{order.discountAmount} ₽
+              </span>
+            )}
           </div>
           <span className={`${styles.orderStatus} ${styles[order.status.toLowerCase()]}`}>
             {statusSteps.find(s => s.key === order.status)?.label}
@@ -185,9 +171,8 @@ export default function ManagerOrdersPage() {
               {getNextAction(order.status) && (
                 <button
                   onClick={() => {
-                    if (getNextAction(order.status) === 'call') {
-                      setCallModal(order);
-                    } else {
+                    if (getNextAction(order.status) === 'call') setCallModal(order);
+                    else {
                       const nextStep = statusSteps[currentStepIndex + 1];
                       if (nextStep) updateStatus(order.id, nextStep.key);
                     }
@@ -233,7 +218,6 @@ export default function ManagerOrdersPage() {
         </div>
       </div>
 
-      {/* Поиск и фильтры */}
       <div className={styles.filtersSection}>
         <div className={styles.searchBox}>
           <Search size={18} />
@@ -244,18 +228,12 @@ export default function ManagerOrdersPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className={styles.clearBtn}>
-              ✕
-            </button>
+            <button onClick={() => setSearchQuery('')} className={styles.clearBtn}>✕</button>
           )}
         </div>
         
         <div className={styles.filters}>
-          <select 
-            value={statusFilter} 
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className={styles.filterSelect}
-          >
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={styles.filterSelect}>
             <option value="all">Все статусы</option>
             <option value="NEW">Новые</option>
             <option value="CALLED">Позвонили</option>
@@ -267,11 +245,7 @@ export default function ManagerOrdersPage() {
             <option value="CANCELLED">Отменены</option>
           </select>
           
-          <select 
-            value={typeFilter} 
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className={styles.filterSelect}
-          >
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className={styles.filterSelect}>
             <option value="all">Все типы</option>
             <option value="pickup">🏠 Самовывоз</option>
             <option value="delivery">🚚 Доставка</option>
@@ -317,6 +291,9 @@ export default function ManagerOrdersPage() {
               {callModal.orderType === 'DELIVERY' && callModal.deliveryAddress && (
                 <p><strong>Адрес:</strong> {callModal.deliveryAddress}</p>
               )}
+              {callModal.discountAmount && callModal.discountAmount > 0 && (
+                <p><strong>Скидка:</strong> <span style={{color: '#4caf50', fontWeight: 'bold'}}>{callModal.discountAmount} ₽</span></p>
+              )}
               {callModal.comment && (
                 <p><strong>Комментарий:</strong> {callModal.comment}</p>
               )}
@@ -344,9 +321,7 @@ export default function ManagerOrdersPage() {
               <AlertCircle size={24} className={styles.cancelIcon} />
               <h3>Отмена заказа #{cancelModal.order.id}</h3>
             </div>
-            <p className={styles.cancelDescription}>
-              Укажите причину отмены заказа:
-            </p>
+            <p className={styles.cancelDescription}>Укажите причину отмены заказа:</p>
             <textarea
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
@@ -411,6 +386,17 @@ export default function ManagerOrdersPage() {
                     <span>{item.price * item.quantity} ₽</span>
                   </div>
                 ))}
+                
+                {selectedOrder.discountAmount && selectedOrder.discountAmount > 0 && (
+                  <div className={styles.detailItem} style={{ color: '#4caf50', fontWeight: 'bold', marginTop: '8px' }}>
+                    <span>
+                      🏷️ {selectedOrder.discount?.name || 'Скидка'} 
+                      {selectedOrder.discount?.code ? ` (${selectedOrder.discount.code})` : ''}
+                    </span>
+                    <span>-{selectedOrder.discountAmount} ₽</span>
+                  </div>
+                )}
+
                 <div className={styles.detailTotal}>Итого: {selectedOrder.total} ₽</div>
               </div>
               

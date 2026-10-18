@@ -26,6 +26,9 @@ interface OrderData {
   comment?: string | null;
   createdAt: Date | string;
   isCharity?: boolean;
+  discountAmount?: number | null;
+  discountCode?: string | null;  
+  discountName?: string | null;  
 }
 
 interface BookingData {
@@ -62,6 +65,11 @@ export async function sendOrderNotification(order: OrderData) {
   const deliveryAddress = order.deliveryAddress || undefined;
   const comment = order.comment || undefined;
 
+  // Формируем текст скидки для plain text
+  const discountText = (order.discountAmount && order.discountAmount > 0)
+  ? `\n🏷️ Скидка: ${order.discountName || 'Скидка'} ${order.discountCode ? `(Код: ${order.discountCode})` : ''} -${order.discountAmount} ₽`
+  : '';
+
   const text = `
 ${subject}
 
@@ -74,7 +82,7 @@ ${subject}
 📦 Тип: ${typeLabel}${charityLabel}
 ${deliveryAddress ? `📍 Адрес: ${deliveryAddress}` : ''}
 📅 Дата: ${new Date(createdAtStr).toLocaleString('ru-RU')}
-💰 Сумма: ${order.total} ₽
+💰 Сумма: ${order.total} ₽${discountText}
 
 📝 Состав заказа:
 ${itemsList}
@@ -86,6 +94,11 @@ ${comment ? `💬 Комментарий: ${comment}` : ''}
 https://chelentano05.ru/manager/orders
   `;
 
+  // Формируем HTML скидки
+  const discountHtml = (order.discountAmount && order.discountAmount > 0)
+  ? `<tr><td style="padding:6px 0; border-bottom:1px solid #eee;"><strong>🏷️ ${order.discountName || 'Скидка'}</strong></td><td style="padding:6px 0; border-bottom:1px solid #eee; color: #4caf50; font-weight: bold;">-${order.discountAmount} ₽ ${order.discountCode ? `(Код: ${order.discountCode})` : ''}</td></tr>`
+  : '';
+
   const html = `
 <h2>${subject}</h2>
 
@@ -95,6 +108,7 @@ https://chelentano05.ru/manager/orders
   <tr><td style="padding:6px 0; border-bottom:1px solid #eee;"><strong>📞 Телефон</strong></td><td style="padding:6px 0; border-bottom:1px solid #eee;">${order.customerPhone}</td></tr>
   <tr><td style="padding:6px 0; border-bottom:1px solid #eee;"><strong>📦 Тип</strong></td><td style="padding:6px 0; border-bottom:1px solid #eee;">${typeLabel}${charityLabel}</td></tr>
   ${deliveryAddress ? `<tr><td style="padding:6px 0; border-bottom:1px solid #eee;"><strong>📍 Адрес</strong></td><td style="padding:6px 0; border-bottom:1px solid #eee;">${deliveryAddress}</td></tr>` : ''}
+  ${discountHtml}
   <tr><td style="padding:6px 0; border-bottom:1px solid #eee;"><strong>💰 Сумма</strong></td><td style="padding:6px 0; border-bottom:1px solid #eee; font-weight:bold; color:#c4492c;">${order.total} ₽</td></tr>
 </table>
 
