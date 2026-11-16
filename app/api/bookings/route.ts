@@ -2,41 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { sendBookingNotification } from '@/lib/email'
-
-function addHours(time: string, hours: number): string {
-  const [h, m] = time.split(':').map(Number)
-  const totalMinutes = h * 60 + m + hours * 60
-  const newH = Math.floor(totalMinutes / 60)
-  const newM = totalMinutes % 60
-  return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
-}
-
-function addMinutes(time: string, minutes: number): string {
-  const [h, m] = time.split(':').map(Number)
-  const totalMinutes = h * 60 + m + minutes
-  const newH = Math.floor(totalMinutes / 60)
-  const newM = totalMinutes % 60
-  return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
-}
-
-function isTimeOverlap(
-  newStart: string,
-  newEnd: string,
-  existingStart: string,
-  existingEnd: string | null
-): boolean {
-  const existingEndTime = existingEnd || addHours(existingStart, 2)
-  
-  const newStartWithBuffer = addMinutes(newStart, -15)
-  const newEndWithBuffer = addMinutes(newEnd, 15)
-  
-  return (
-    (newStartWithBuffer >= existingStart && newStartWithBuffer < existingEndTime) ||
-    (newEndWithBuffer > existingStart && newEndWithBuffer <= existingEndTime) ||
-    (newStartWithBuffer <= existingStart && newEndWithBuffer >= existingEndTime) ||
-    (newStartWithBuffer >= existingStart && newEndWithBuffer <= existingEndTime)
-  )
-}
+import {
+  addHours,
+  assertCabinAvailable,
+  BookingConflictError,
+  BookingValidationError,
+  getBookingDateStart,
+  getNoShowTime,
+  isBookingDateTimeInPast,
+} from '@/lib/booking-utils'
 
 // GET - получить бронирования пользователя
 export async function GET(request: NextRequest) {
@@ -104,78 +78,57 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Заполните все обязательные поля' }, { status: 400 })
     }
     
-    const bookingDate = new Date(date)
+    const bookingDate = getBookingDateStart(date)
     const bookingEndTime = endTime || addHours(time, 2)
-    
-    // Проверяем существующие брони на этот столик и дату
-    const existingBookings = await prisma.booking.findMany({
-      where: {
-        tableId,
-        date: bookingDate,
-        status: { in: ['CONFIRMED', 'PENDING'] }
-      }
-    })
-    
-    // Проверяем пересечение времени (с 15-минутным буфером)
-    const conflictingBookings = []
-    for (const booking of existingBookings) {
-      const bookingEnd = booking.endTime || addHours(booking.time, 2)
-      if (isTimeOverlap(time, bookingEndTime, booking.time, bookingEnd)) {
-        conflictingBookings.push({
-          time: booking.time,
-          endTime: booking.endTime,
-          customerName: booking.customerName
-        })
-      }
+    const guestCount = guests || 2
+
+    if (isBookingDateTimeInPast(bookingDate, time)) {
+      return NextResponse.json({ error: 'Дата бронирования не может быть в прошлом' }, { status: 400 })
     }
-    
-    if (conflictingBookings.length > 0) {
-      return NextResponse.json({
-        error: 'Столик уже занят в это время (учитывается 15-минутный перерыв)',
-        conflictingBookings
-      }, { status: 409 })
-    }
-    
-    // 👇 СОЗДАЕМ БРОНЬ
+
     const requiredAmount = 1000
     const paidAmountNum = parseFloat(paidAmount) || 0
-    
-    const noShowTime = new Date(bookingDate)
-    const [hours, minutes] = time.split(':').map(Number)
-    noShowTime.setHours(hours + 1, minutes, 0, 0) // Через 1 час после начала
-    
-    // 👇 ФОРМИРУЕМ ДАННЫЕ ДЛЯ СОЗДАНИЯ
-    const bookingData: any = {
-      tableId,
-      userId: user.id,
-      customerName,
-      customerPhone,
-      customerEmail,
-      date: bookingDate,
-      time,
-      endTime: bookingEndTime,
-      guests: guests || 2,
-      comment,
-      status: 'PENDING',
-      noShowTime: noShowTime,
-    }
-    
-    // 👇 ДОБАВЛЯЕМ ПОЛЯ ОПЛАТЫ, ЕСЛИ ЕСТЬ
-    if (paidAmountNum > 0) {
-      bookingData.paidAmount = paidAmountNum
-      bookingData.paymentData = {
-        amount: paidAmountNum,
-        method: paymentMethod || 'ONLINE',
-        paidAt: new Date().toISOString()
+
+    const booking = await prisma.$transaction(async (tx) => {
+      await assertCabinAvailable(tx, {
+        tableId,
+        date: bookingDate,
+        time,
+        endTime: bookingEndTime,
+        guests: guestCount,
+      })
+
+      const bookingData: any = {
+        tableId,
+        userId: user.id,
+        customerName,
+        customerPhone,
+        customerEmail,
+        date: bookingDate,
+        time,
+        endTime: bookingEndTime,
+        guests: guestCount,
+        comment,
+        status: 'PENDING',
+        noShowTime: getNoShowTime(bookingDate, time),
       }
-    }
-    
-    const booking = await prisma.booking.create({
-      data: bookingData,
-      include: { table: true }
+
+      if (paidAmountNum > 0) {
+        bookingData.paidAmount = paidAmountNum
+        bookingData.paymentData = {
+          amount: paidAmountNum,
+          method: paymentMethod || 'ONLINE',
+          paidAt: new Date().toISOString()
+        }
+      }
+
+      return tx.booking.create({
+        data: bookingData,
+        include: { table: true }
+      })
     })
 
-    await sendBookingNotification({
+    const emailResult = await sendBookingNotification({
       id: booking.id,
       customerName: booking.customerName,
       customerPhone: booking.customerPhone,
@@ -186,15 +139,32 @@ export async function POST(request: NextRequest) {
       time: booking.time,
       guests: booking.guests,
       comment: booking.comment,
-    });
+    })
+
+    const emailSent = Boolean(emailResult?.success)
+    if (!emailSent) {
+      console.error('❌ Email о бронировании не отправлен, bookingId:', booking.id, emailResult?.error)
+    }
     
     return NextResponse.json({ 
       booking,
+      emailSent,
       message: paidAmountNum >= requiredAmount 
         ? 'Бронирование создано. Ожидайте подтверждения менеджера.'
         : 'Бронирование создано, но требуется оплата 1000 ₽ для подтверждения.'
     }, { status: 201 })
   } catch (error) {
+    if (error instanceof BookingConflictError) {
+      return NextResponse.json({
+        error: error.message,
+        conflictingBookings: error.conflictingBookings,
+      }, { status: 409 })
+    }
+
+    if (error instanceof BookingValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
+
     console.error('Booking error:', error)
     return NextResponse.json({ error: 'Ошибка создания бронирования' }, { status: 500 })
   }

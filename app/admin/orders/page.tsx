@@ -25,8 +25,8 @@ interface Order {
   deliveryAddress?: string | null;
   comment?: string | null;
   total: number;
-  discountAmount?: number | null; // 👈 Добавили
-  discount?: { code: string; name: string } | null; // 👈 Добавили
+  discountAmount?: number | null;
+  discount?: { code: string; name: string } | null; 
   status: string;
   orderType: string;
   createdAt: string;

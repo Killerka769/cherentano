@@ -2,30 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { sendOrderNotification } from '@/lib/email'
+import {
+  addHours,
+  assertCabinAvailable,
+  BookingConflictError,
+  BookingValidationError,
+  getBookingDateStart,
+  getNoShowTime,
+  isBookingDateTimeInPast,
+} from '@/lib/booking-utils'
 
-// Вспомогательная функция для добавления часов
-function addHours(time: string, hours: number): string {
-  const [h, m] = time.split(':').map(Number)
-  const totalMinutes = h * 60 + m + hours * 60
-  const newH = Math.floor(totalMinutes / 60)
-  const newM = totalMinutes % 60
-  return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
-}
+const CHARITY_DELIVERY_FEE = 500
 
-// Проверка пересечения времени
-function isTimeOverlap(
-  newStart: string,
-  newEnd: string,
-  existingStart: string,
-  existingEnd: string | null
-): boolean {
-  const existingEndTime = existingEnd || addHours(existingStart, 2)
-  return (
-    (newStart >= existingStart && newStart < existingEndTime) ||
-    (newEnd > existingStart && newEnd <= existingEndTime) ||
-    (newStart <= existingStart && newEnd >= existingEndTime) ||
-    (newStart >= existingStart && newEnd <= existingEndTime)
-  )
+type OrderLine = {
+  dishId: number
+  dishName: string
+  quantity: number
+  price: number
 }
 
 export async function GET(request: NextRequest) {
@@ -77,7 +70,6 @@ export async function POST(request: NextRequest) {
       deliveryAddress, 
       comment, 
       items, 
-      total, 
       paymentMethod,
       needBooking,
       tableId,
@@ -88,103 +80,356 @@ export async function POST(request: NextRequest) {
       isCharity,
       charityRequestId,
       discountId,
-      discountAmount,
       isIndividualDiscount
     } = body
     
     const user = await getCurrentUser()
     
-    // Валидация
     if (!customerName || !customerPhone || !items || items.length === 0) {
       return NextResponse.json(
         { error: 'Заполните все обязательные поля' },
         { status: 400 }
       )
     }
-    
-    // Проверка доступности блюд
-    const dishIds = items.map((item: any) => item.id)
-    const availableDishes = await prisma.dish.findMany({
-      where: {
-        id: { in: dishIds },
-        isAvailable: true
-      },
-      select: { id: true }
+
+    const dishIds = items.map((item: { id: number }) => item.id)
+    const dbDishes = await prisma.dish.findMany({
+      where: { id: { in: dishIds } },
+      select: { id: true, name: true, price: true, isAvailable: true }
     })
-    
-    const availableIds = new Set(availableDishes.map(d => d.id))
-    const unavailableItems = items.filter((item: any) => !availableIds.has(item.id))
-    
+
+    const dishesById = new Map(dbDishes.map((dish) => [dish.id, dish]))
+    const unavailableItems = items.filter((item: { id: number; name: string }) => {
+      const dish = dishesById.get(item.id)
+      return !dish || !dish.isAvailable
+    })
+
     if (unavailableItems.length > 0) {
       return NextResponse.json({
-        error: `Некоторые блюда временно недоступны: ${unavailableItems.map((i: any) => i.name).join(', ')}`,
-        unavailableItems: unavailableItems.map((i: any) => i.name)
+        error: `Некоторые блюда временно недоступны: ${unavailableItems.map((i: { name: string }) => i.name).join(', ')}`,
+        unavailableItems: unavailableItems.map((i: { name: string }) => i.name)
       }, { status: 400 })
     }
-    
-    // 👇 СОХРАНЯЕМ ТИП ЗАКАЗА (orderType)
-    const normalizedOrderType = orderType === 'pickup' ? 'PICKUP' : 'DELIVERY'
-    const normalizedPaymentMethod = paymentMethod === 'cash' ? 'CASH' : 'CARD'
-    
-    // 👇 СОЗДАЁМ ЗАКАЗ С ПОДДЕРЖКОЙ ВСЕХ ПОЛЕЙ
-    const orderData: any = {
-      userId: user?.id || null,
-      customerName,
-      customerPhone,
-      orderType: normalizedOrderType, // 👈 СОХРАНЯЕМ ТИП
-      deliveryAddress: normalizedOrderType === 'DELIVERY' ? deliveryAddress : null,
-      comment: comment || '',
-      total,
-      paymentMethod: normalizedPaymentMethod,
-      status: isCharity ? 'NEW' : 'NEW',
-      isCharity: isCharity || false,
-      paymentStatus: 'PENDING',
-      expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 минут на оплату
-      items: {
-        create: items.map((item: any) => ({
-          dishId: item.id,
-          dishName: item.name,
-          quantity: item.quantity,
-          price: item.price
-        }))
-      }
+
+    const invalidQuantity = items.find((item: { quantity: number }) => {
+      const quantity = Number(item.quantity)
+      return !Number.isFinite(quantity) || quantity < 1
+    })
+    if (invalidQuantity) {
+      return NextResponse.json({ error: 'Некорректное количество блюд' }, { status: 400 })
     }
-    
-    // 👇 ДОБАВЛЯЕМ СКИДКУ ЕСЛИ ЕСТЬ
-    if (discountId && discountAmount) {
-      orderData.discountId = parseInt(discountId)
-      orderData.discountAmount = parseFloat(discountAmount)
-      
-      // Обновляем использование скидки
-      await prisma.discount.update({
-        where: { id: parseInt(discountId) },
-        data: { usedCount: { increment: 1 } }
-      })
-      
-      // Если скидка индивидуальная, отмечаем как использованную
-      if (isIndividualDiscount && user) {
-        await prisma.userDiscount.updateMany({
-          where: {
-            userId: user.id,
-            discountId: parseInt(discountId),
-            used: false
-          },
-          data: { used: true, usedAt: new Date() }
-        })
-      }
-    }
-    
-    // Создаем заказ
-    const order = await prisma.order.create({
-      data: orderData,
-      include: {
-        items: true,
-        user: true,
-        discount: true, // 👈 ДОБАВЛЕНО, чтобы TypeScript видел order.discount
+
+    const orderItems: OrderLine[] = items.map((item: { id: number; quantity: number }) => {
+      const dish = dishesById.get(item.id)!
+      return {
+        dishId: dish.id,
+        dishName: dish.name,
+        quantity: Math.floor(Number(item.quantity)),
+        price: dish.price,
       }
     })
 
-    await sendOrderNotification({
+    const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    const charityFee = isCharity ? CHARITY_DELIVERY_FEE : 0
+
+    const normalizedOrderType = orderType === 'pickup' ? 'PICKUP' : 'DELIVERY'
+    const normalizedPaymentMethod = paymentMethod === 'cash' ? 'CASH' : 'CARD'
+    const wantsBooking = Boolean(needBooking && normalizedOrderType === 'PICKUP' && bookingDate)
+    const parsedDiscountId = discountId ? parseInt(discountId, 10) : NaN
+    const hasDiscount = Number.isInteger(parsedDiscountId)
+
+    let bookingDateStart: Date | null = null
+    let bookingEnd = ''
+    let guestCount = 2
+
+    if (wantsBooking) {
+      if (!tableId) {
+        return NextResponse.json({
+          error: 'Не выбран столик для бронирования',
+          bookingFailed: true,
+        }, { status: 409 })
+      }
+      if (!bookingTime) {
+        return NextResponse.json({
+          error: 'Не указано время бронирования',
+          bookingFailed: true,
+        }, { status: 409 })
+      }
+
+      bookingDateStart = getBookingDateStart(bookingDate)
+      bookingEnd = bookingEndTime || addHours(bookingTime, 2)
+      guestCount = bookingGuests || 2
+
+      if (isBookingDateTimeInPast(bookingDateStart, bookingTime)) {
+        return NextResponse.json({
+          error: 'Дата бронирования не может быть в прошлом',
+          bookingFailed: true,
+        }, { status: 409 })
+      }
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      let bookingTable = null
+
+      if (wantsBooking && bookingDateStart) {
+        bookingTable = await assertCabinAvailable(tx, {
+          tableId,
+          date: bookingDateStart,
+          time: bookingTime,
+          endTime: bookingEnd,
+          guests: guestCount,
+        })
+      }
+
+      let computedDiscountAmount = 0
+      let discountRecord: {
+        id: number
+        code: string
+        name: string
+        type: string
+        value: number
+        minOrderAmount: number | null
+        maxDiscount: number | null
+        usageLimit: number | null
+        usedCount: number
+        isActive: boolean
+        isIndividual: boolean
+      } | null = null
+
+      if (hasDiscount) {
+        await tx.$queryRaw`SELECT id FROM "Discount" WHERE id = ${parsedDiscountId} FOR UPDATE`
+
+        discountRecord = await tx.discount.findUnique({
+          where: { id: parsedDiscountId },
+          select: {
+            id: true,
+            code: true,
+            name: true,
+            type: true,
+            value: true,
+            minOrderAmount: true,
+            maxDiscount: true,
+            usageLimit: true,
+            usedCount: true,
+            isActive: true,
+            isIndividual: true,
+          },
+        })
+
+        if (!discountRecord || !discountRecord.isActive) {
+          throw new BookingValidationError('Скидка недоступна')
+        }
+
+        if (discountRecord.usageLimit != null && discountRecord.usedCount >= discountRecord.usageLimit) {
+          throw new BookingValidationError('Лимит использования скидки исчерпан')
+        }
+
+        if (discountRecord.minOrderAmount && subtotal < discountRecord.minOrderAmount) {
+          throw new BookingValidationError(
+            `Минимальная сумма заказа для скидки: ${discountRecord.minOrderAmount} ₽`
+          )
+        }
+
+        if (discountRecord.isIndividual) {
+          if (!user) {
+            throw new BookingValidationError('Индивидуальная скидка доступна только авторизованным пользователям')
+          }
+
+          const userDiscount = await tx.userDiscount.findFirst({
+            where: {
+              userId: user.id,
+              discountId: parsedDiscountId,
+              used: false,
+            },
+          })
+
+          if (!userDiscount) {
+            throw new BookingValidationError('Эта скидка не доступна вам')
+          }
+        }
+
+        if (discountRecord.type === 'PERCENT') {
+          computedDiscountAmount = (subtotal * discountRecord.value) / 100
+        } else {
+          computedDiscountAmount = discountRecord.value
+        }
+
+        if (discountRecord.maxDiscount && computedDiscountAmount > discountRecord.maxDiscount) {
+          computedDiscountAmount = discountRecord.maxDiscount
+        }
+
+        computedDiscountAmount = Math.min(subtotal, Math.round(computedDiscountAmount * 100) / 100)
+      }
+
+      const computedTotal = Math.max(0, subtotal - computedDiscountAmount + charityFee)
+
+      const order = await tx.order.create({
+        data: {
+          userId: user?.id || null,
+          customerName,
+          customerPhone,
+          orderType: normalizedOrderType,
+          deliveryAddress: normalizedOrderType === 'DELIVERY' ? deliveryAddress : null,
+          comment: comment || '',
+          total: computedTotal,
+          paymentMethod: normalizedPaymentMethod,
+          status: 'NEW',
+          isCharity: isCharity || false,
+          paymentStatus: 'PENDING',
+          expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+          ...(hasDiscount && computedDiscountAmount > 0
+            ? {
+                discountId: parsedDiscountId,
+                discountAmount: computedDiscountAmount,
+              }
+            : {}),
+          items: {
+            create: orderItems,
+          },
+        },
+        include: {
+          items: true,
+          user: true,
+          discount: true,
+        },
+      })
+
+      await tx.orderStatusLog.create({
+        data: {
+          orderId: order.id,
+          status: 'NEW',
+          comment: isCharity
+            ? 'Благотворительный заказ создан, ожидает оплаты'
+            : 'Заказ создан, ожидает оплаты',
+        },
+      })
+
+      if (hasDiscount && computedDiscountAmount > 0 && discountRecord) {
+        await tx.discount.update({
+          where: { id: parsedDiscountId },
+          data: { usedCount: { increment: 1 } },
+        })
+
+        if ((isIndividualDiscount || discountRecord.isIndividual) && user) {
+          await tx.userDiscount.updateMany({
+            where: {
+              userId: user.id,
+              discountId: parsedDiscountId,
+              used: false,
+            },
+            data: { used: true, usedAt: new Date() },
+          })
+        }
+
+        if (user) {
+          await tx.discountUsage.create({
+            data: {
+              discountId: parsedDiscountId,
+              userId: user.id,
+              orderId: order.id,
+              discountValue: computedDiscountAmount,
+            },
+          })
+        }
+      }
+
+      let bookingCreated = false
+      let bookingId: string | null = null
+
+      if (wantsBooking && bookingDateStart) {
+        const newBooking = await tx.booking.create({
+          data: {
+            tableId,
+            userId: user?.id || null,
+            customerName,
+            customerPhone,
+            customerEmail: user?.email || null,
+            date: bookingDateStart,
+            time: bookingTime,
+            endTime: bookingEnd,
+            guests: guestCount,
+            status: 'PENDING',
+            noShowTime: getNoShowTime(bookingDateStart, bookingTime),
+            comment: `Создано вместе с заказом #${order.id}. ${comment || ''}`,
+          },
+        })
+        bookingCreated = true
+        bookingId = newBooking.id
+      }
+
+      if (isCharity && charityRequestId) {
+        const helpRequest = await tx.helpRequest.findUnique({
+          where: { id: charityRequestId },
+          include: { beneficiary: true },
+        })
+
+        if (helpRequest) {
+          const charityItems = orderItems.map((item) => ({
+            name: item.dishName,
+            quantity: item.quantity,
+            price: item.price,
+          }))
+
+          await tx.helpRequest.update({
+            where: { id: charityRequestId },
+            data: {
+              orderId: order.id,
+              items: charityItems,
+              total: computedTotal,
+              status: 'APPROVED',
+            },
+          })
+
+          const existingHistory = await tx.helpHistory.findFirst({
+            where: { helpRequestId: charityRequestId },
+          })
+
+          if (!existingHistory) {
+            await tx.helpHistory.create({
+              data: {
+                helpRequestId: charityRequestId,
+                beneficiaryId: helpRequest.beneficiaryId,
+                userId: user?.id,
+                mealTime: helpRequest.mealTime || 'LUNCH',
+                amount: computedTotal,
+                items: charityItems,
+                comment: `Заказ #${order.id}`,
+              },
+            })
+          }
+
+          const completedHelps = await tx.helpRequest.count({
+            where: {
+              beneficiaryId: helpRequest.beneficiaryId,
+              status: 'COMPLETED',
+            },
+          })
+
+          const activeRequests = await tx.helpRequest.count({
+            where: {
+              beneficiaryId: helpRequest.beneficiaryId,
+              status: { notIn: ['COMPLETED', 'REJECTED'] },
+            },
+          })
+
+          if (completedHelps >= 3 && activeRequests === 0) {
+            await tx.beneficiary.update({
+              where: { id: helpRequest.beneficiaryId },
+              data: {
+                isCompleted: true,
+                isActive: false,
+              },
+            })
+          }
+        }
+      }
+
+      return { order, bookingCreated, bookingId }
+    })
+
+    const { order, bookingCreated, bookingId } = result
+
+    const emailResult = await sendOrderNotification({
       id: order.id,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
@@ -197,197 +442,41 @@ export async function POST(request: NextRequest) {
       isCharity: order.isCharity || false,
       discountAmount: order.discountAmount || 0,
       discountCode: order.discount?.code || null,
-      discountName: order.discount?.name || null, // 👈 ДОБАВЛЕНО
-    });
-    
-    // Логируем создание заказа
-    await prisma.orderStatusLog.create({
-      data: {
-        orderId: order.id,
-        status: isCharity ? 'NEW' : 'NEW',
-        comment: isCharity ? 'Благотворительный заказ создан, ожидает оплаты' : 'Заказ создан, ожидает оплаты'
-      }
+      discountName: order.discount?.name || null,
     })
-    
-    // 👇 ЗАПИСЫВАЕМ ИСПОЛЬЗОВАНИЕ СКИДКИ
-    if (discountId && discountAmount) {
-      try {
-        await prisma.discountUsage.create({
-          data: {
-            discountId: parseInt(discountId),
-            userId: user?.id || 'guest',
-            orderId: order.id,
-            discountValue: parseFloat(discountAmount)
-          }
-        })
-        console.log('✅ Discount usage recorded')
-      } catch (error) {
-        console.error('Error recording discount usage:', error)
-      }
+
+    const emailSent = Boolean(emailResult?.success)
+    if (!emailSent) {
+      console.error('❌ Ошибка отправки email, orderId:', order.id, emailResult?.error)
     }
-    
-    let bookingCreated = false
-    let bookingId = null
-    let bookingError = null
-    
-    // Создаем бронирование столика если нужно
-    if (needBooking && normalizedOrderType === 'PICKUP' && bookingDate) {
-      const bookingDateTime = new Date(bookingDate)
-      const endTime = bookingEndTime || addHours(bookingTime, 2)
-      
-      if (bookingDateTime < new Date()) {
-        bookingError = 'Дата бронирования не может быть в прошлом'
-      } else if (!tableId) {
-        bookingError = 'Не выбран столик для бронирования'
-      } else {
-        const selectedTable = await prisma.table.findUnique({
-          where: { id: tableId }
-        })
-        
-        if (!selectedTable) {
-          bookingError = 'Выбранный столик не найден'
-        } else if (!selectedTable.isActive) {
-          bookingError = 'Выбранный столик временно недоступен'
-        } else if (selectedTable.seats < (bookingGuests || 2)) {
-          bookingError = `В кабинке ${selectedTable.seats} мест, а вы выбрали ${bookingGuests || 2} гостей`
-        } else {
-          const existingBookings = await prisma.booking.findMany({
-            where: {
-              tableId: tableId,
-              date: bookingDateTime,
-              status: { in: ['CONFIRMED', 'PENDING'] }
-            }
-          })
-          
-          let hasConflict = false
-          let conflictingBooking = null
-          
-          for (const booking of existingBookings) {
-            const bookingEnd = booking.endTime || addHours(booking.time, 2)
-            if (isTimeOverlap(bookingTime, endTime, booking.time, bookingEnd)) {
-              hasConflict = true
-              conflictingBooking = booking
-              break
-            }
-          }
-          
-          if (hasConflict && conflictingBooking) {
-            bookingError = `Кабинка занята в это время. Бронь: ${conflictingBooking.customerName} (${conflictingBooking.time}${conflictingBooking.endTime ? ` - ${conflictingBooking.endTime}` : ''})`
-          } else if (!hasConflict) {
-            const newBooking = await prisma.booking.create({
-              data: {
-                tableId: tableId,
-                userId: user?.id || null,
-                customerName,
-                customerPhone,
-                customerEmail: user?.email || null,
-                date: bookingDateTime,
-                time: bookingTime,
-                endTime: endTime,
-                guests: bookingGuests || 2,
-                status: 'PENDING',
-                comment: `Создано вместе с заказом #${order.id}. ${comment || ''}`
-              }
-            })
-            bookingCreated = true
-            bookingId = newBooking.id
-          }
-        }
-      }
-    }
-    
-    // Если бронирование не создано, но нужно было — возвращаем ошибку и откатываем заказ
-    if (needBooking && normalizedOrderType === 'PICKUP' && bookingDate && !bookingCreated) {
-      await prisma.order.delete({ where: { id: order.id } })
-      return NextResponse.json({
-        error: bookingError || 'Не удалось забронировать столик',
-        bookingFailed: true
-      }, { status: 409 })
-    }
-    
-    // 👇 БЛАГОТВОРИТЕЛЬНОСТЬ - СОЗДАНИЕ ИСТОРИИ
-    if (isCharity && charityRequestId) {
-      try {
-        const helpRequest = await prisma.helpRequest.findUnique({
-          where: { id: charityRequestId },
-          include: { beneficiary: true }
-        })
-        
-        if (helpRequest) {
-          await prisma.helpRequest.update({
-            where: { id: charityRequestId },
-            data: {
-              orderId: order.id,
-              items: items.map((item: any) => ({
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price
-              })),
-              total: total,
-              status: 'APPROVED'
-            }
-          })
-          
-          const existingHistory = await prisma.helpHistory.findFirst({
-            where: { helpRequestId: charityRequestId }
-          })
-          
-          if (!existingHistory) {
-            await prisma.helpHistory.create({
-              data: {
-                helpRequestId: charityRequestId,
-                beneficiaryId: helpRequest.beneficiaryId,
-                userId: user?.id,
-                mealTime: helpRequest.mealTime || 'LUNCH',
-                amount: total,
-                items: items.map((item: any) => ({
-                  name: item.name,
-                  quantity: item.quantity,
-                  price: item.price
-                })),
-                comment: `Заказ #${order.id}`
-              }
-            })
-            console.log('✅ Charity history created for order #', order.id)
-          }
-          
-          // Обновляем статус нуждающегося
-          const completedHelps = await prisma.helpRequest.count({
-            where: {
-              beneficiaryId: helpRequest.beneficiaryId,
-              status: 'COMPLETED'
-            }
-          })
-          
-          const activeRequests = await prisma.helpRequest.count({
-            where: {
-              beneficiaryId: helpRequest.beneficiaryId,
-              status: { notIn: ['COMPLETED', 'REJECTED'] }
-            }
-          })
-          
-          if (completedHelps >= 3 && activeRequests === 0) {
-            await prisma.beneficiary.update({
-              where: { id: helpRequest.beneficiaryId },
-              data: { 
-                isCompleted: true,
-                isActive: false
-              }
-            })
-            console.log('✅ Beneficiary marked as completed')
-          }
-        }
-      } catch (charityError) {
-        console.error('Error processing charity:', charityError)
-      }
-    }
-    
-    return NextResponse.json({ 
-      order, 
-      bookingCreated, 
-      bookingId 
+
+    return NextResponse.json({
+      order,
+      bookingCreated,
+      bookingId,
+      emailSent,
     }, { status: 201 })
   } catch (error) {
+    if (error instanceof BookingConflictError) {
+      return NextResponse.json({
+        error: error.message,
+        bookingFailed: true,
+        conflictingBookings: error.conflictingBookings,
+      }, { status: 409 })
+    }
+
+    if (error instanceof BookingValidationError) {
+      const isBookingIssue =
+        error.message.includes('столик') ||
+        error.message.includes('Кабинка') ||
+        error.message.includes('бронир')
+
+      return NextResponse.json({
+        error: error.message,
+        ...(isBookingIssue ? { bookingFailed: true } : {}),
+      }, { status: isBookingIssue ? 409 : 400 })
+    }
+
     console.error('Error creating order:', error)
     return NextResponse.json(
       { error: 'Ошибка при создании заказа' },
