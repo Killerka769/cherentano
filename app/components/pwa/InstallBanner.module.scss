@@ -1,0 +1,112 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.banner {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9990;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    'icon text close'
+    'icon actions actions';
+  gap: 8px 12px;
+  max-width: 380px;
+  padding: 14px 14px 14px 12px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(44, 24, 16, 0.18);
+  border: 1px solid $border-light;
+  animation: slideUp 0.35s ease;
+
+  @media (max-width: 600px) {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.icon {
+  grid-area: icon;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  align-self: center;
+}
+
+.text {
+  grid-area: text;
+  min-width: 0;
+
+  strong {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin-bottom: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: $text-gray;
+    line-height: 1.35;
+  }
+}
+
+.installBtn {
+  grid-area: actions;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: $primary;
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 700;
+  justify-self: start;
+  transition: background $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: $primary-dark;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+.closeBtn {
+  grid-area: close;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: $text-gray;
+  justify-self: end;
+
+  &:hover {
+    background: $bg-light;
+    color: $text-dark;
+  }
+}

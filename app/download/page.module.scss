@@ -3,7 +3,7 @@
 
 .container {
   @include container;
-  padding: 40px 0 80px;
+  padding: 24px 0 80px;
   min-height: calc(100vh - 200px);
 }
 
@@ -32,19 +32,22 @@
 }
 
 .appIcon {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 24px;
-  background: linear-gradient(135deg, $primary, $secondary);
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 20px;
+  background: $bg-white;
   border-radius: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 12px 40px rgba(196, 73, 44, 0.3);
-}
+  overflow: hidden;
 
-.appIconSvg {
-  color: white;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .title {
@@ -62,7 +65,7 @@
   font-size: 1.05rem;
   color: $text-gray;
   line-height: 1.6;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
@@ -83,19 +86,38 @@
   transition: all 0.3s ease;
   box-shadow: 0 8px 24px rgba(196, 73, 44, 0.3);
   
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(196, 73, 44, 0.4);
   }
   
-  &:active {
+  &:active:not(:disabled) {
     transform: translateY(-1px);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+
+  &.installed {
+    background: #2e7d32;
+    box-shadow: none;
+    opacity: 1;
   }
   
   @media (max-width: 480px) {
     width: 100%;
     padding: 14px 24px;
   }
+}
+
+.status {
+  margin: 16px auto 0;
+  max-width: 460px;
+  font-size: 0.9rem;
+  color: $text-dark;
+  line-height: 1.5;
 }
 
 .appInfo {
@@ -181,6 +203,7 @@
   border-radius: 20px;
   padding: 32px;
   box-shadow: $shadow-sm;
+  scroll-margin-top: 140px;
   
   @media (max-width: 600px) {
     padding: 24px 20px;
@@ -199,6 +222,38 @@
   svg {
     color: $primary;
   }
+}
+
+.platformBlock {
+  & + & {
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid $border-light;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin-bottom: 8px;
+  }
+}
+
+.platformLead {
+  font-size: 0.9rem;
+  color: $text-gray;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.platformActive h3 {
+  color: $primary;
+}
+
+.inlineIcon {
+  display: inline;
+  vertical-align: -2px;
+  color: $primary;
 }
 
 .steps {
@@ -300,11 +355,6 @@
   .appIcon {
     width: 96px;
     height: 96px;
-    
-    svg {
-      width: 48px;
-      height: 48px;
-    }
   }
   
   .appInfo {

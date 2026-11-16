@@ -10,10 +10,19 @@ import Footer from './components/layout/Footer/Footer';
 // import OrderReminder from './components/ui/OrderReminder/OrderReminder';
 import YandexMetrika from './components/YandexMetrika/YandexMetrika';
 import CookieBanner from './components/ui/CookieBanner/CookieBanner';
+import { PwaProvider } from './components/pwa/PwaContext';
+import InstallBanner from './components/pwa/InstallBanner';
 
 const inter = Inter({ subsets: ['cyrillic', 'latin'] });
 
 export const metadata: Metadata = {
+  applicationName: 'Челентано',
+  manifest: '/site.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'Челентано',
+    statusBarStyle: 'default',
+  },
   title: {
     default: 'Челентано | Ресторан дагестанской и европейской кухни в Махачкале',
     template: '%s | Челентано'
@@ -80,16 +89,19 @@ export default function RootLayout({
     <html lang="ru">
       <body className={inter.className}>
         <YandexMetrika />
-        <AuthProvider>
-          <CartProvider>
-            <Header />
-            {/* <OrderReminder /> */}
-            <main><PageTransition>{children}</PageTransition></main>
-            <Toaster position="bottom-right" />
-            <Footer />
-            <CookieBanner />
-          </CartProvider>
-        </AuthProvider>
+        <PwaProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Header />
+              {/* <OrderReminder /> */}
+              <main><PageTransition>{children}</PageTransition></main>
+              <Toaster position="bottom-right" />
+              <Footer />
+              <CookieBanner />
+              <InstallBanner />
+            </CartProvider>
+          </AuthProvider>
+        </PwaProvider>
       </body>
     </html>
   );

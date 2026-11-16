@@ -114,7 +114,7 @@ export default function Footer() {
               <li><Link href="/">О нас</Link></li>
               <li><Link href="/contacts">Контакты</Link></li>
               <li><Link href="/reviews">Отзывы</Link></li>
-              <li><Link href="/download">Скачать приложение</Link></li>
+              <li><Link href="/download">Установить приложение</Link></li>
               <li><Link href="/privacy">Политика конфиденциальности</Link></li>
               <li><Link href="/consent">Согласие на обработку данных</Link></li>
               <li><Link href="/offer">Публичная оферта</Link></li>
