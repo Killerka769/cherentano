@@ -446,7 +446,14 @@ ${isCharity ? `Получатель: ${formData.charityBeneficiary?.name} (${for
       // router.push(isCharity ? '/charity/history' : '/profile');
 
       setShowSuccessModal(true);
-      // clearCart();      
+      // clearCart();
+
+      if (typeof window !== 'undefined') {
+        window.ym?.(111106968, 'reachGoal', 'order_success');
+        if (data.bookingCreated) {
+          window.ym?.(111106968, 'reachGoal', 'booking_success');
+        }
+      }
       
       if (data.bookingCreated) {
         setTimeout(() => {

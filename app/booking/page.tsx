@@ -178,6 +178,9 @@ export default function BookingPage() {
       
       setCreatedBookingId(data.booking.id);
       setShowPaymentDetails(true);
+      if (typeof window !== 'undefined') {
+        window.ym?.(111106968, 'reachGoal', 'booking_success');
+      }
       toast.success('Бронирование создано! Оплатите 1000 ₽ для подтверждения.');
       
     } catch (err: any) {

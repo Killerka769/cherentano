@@ -19,7 +19,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://chelentano05.ru';
   
   return {
-    title: `${dish.name} | Меню Челентано`,
+    title: {
+      absolute: `${dish.name} — заказать в Махачкале`,
+    },
     description: dish.description || `${dish.name} — блюдо дагестанской и европейской кухни в ресторане Челентано. ${dish.price} ₽.`,
     keywords: `${dish.name}, ${dish.category?.name || ''}, меню ресторана, Челентано, доставка еды, Махачкала`,
     robots: {

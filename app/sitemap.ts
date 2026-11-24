@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let dishPages: MetadataRoute.Sitemap = []
   try {
     const dishes = await prisma.dish.findMany({
-      where: { isAvailable: true },
+      where: { isAvailable: true, slug: { not: '' } },
       select: { slug: true, createdAt: true }
     })
     dishPages = dishes.map(dish => ({
@@ -71,5 +71,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Failed to fetch categories for sitemap:', error)
   }
   
-  return [...staticPages, ...blogPages, ...dishPages, ...categoryPages]
+  const allPages = [...staticPages, ...blogPages, ...dishPages, ...categoryPages]
+  const seen = new Set<string>()
+
+  return allPages.filter((page) => {
+    if (seen.has(page.url)) return false
+    seen.add(page.url)
+    return true
+  })
 }

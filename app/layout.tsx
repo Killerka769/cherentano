@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Inter } from 'next/font/google';
 import Header from '@/app/components/layout/Header/Header';
 import { CartProvider } from '@/app/contexts/CartContext';
@@ -18,6 +19,16 @@ const inter = Inter({ subsets: ['cyrillic', 'latin'] });
 export const metadata: Metadata = {
   applicationName: 'Челентано',
   manifest: '/site.webmanifest',
+  icons: {
+    icon: [{ url: '/favicon.ico', sizes: 'any' }],
+    apple: [
+      {
+        url: '/apple-touch-icon.png',
+        sizes: '120x120',
+        type: 'image/png',
+      },
+    ],
+  },
   appleWebApp: {
     capable: true,
     title: 'Челентано',
@@ -88,7 +99,9 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={inter.className}>
-        <YandexMetrika />
+        <Suspense fallback={null}>
+          <YandexMetrika />
+        </Suspense>
         <PwaProvider>
           <AuthProvider>
             <CartProvider>

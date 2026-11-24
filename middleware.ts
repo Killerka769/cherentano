@@ -17,6 +17,7 @@ const ABSOLUTELY_PUBLIC = [
   '/favicon.ico',
   '/robots.txt',
   '/sitemap.xml',
+  '/yml.xml',
   '/site.webmanifest',
   '/sw.js',
 ]
@@ -302,6 +303,6 @@ export const config = {
      * - .svg, .png, .jpg, .jpeg, .webp (image files)
      * - robots.txt, sitemap.xml
      */
-    '/((?!_next/static|_next/image|favicon.ico|public|images|.*\\.svg|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.webp|robots.txt|sitemap.xml|site.webmanifest|sw.js).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public|images|.*\\.svg|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.webp|robots.txt|sitemap.xml|yml.xml|site.webmanifest|sw.js).*)',
   ],
 }
