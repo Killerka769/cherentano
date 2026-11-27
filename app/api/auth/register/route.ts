@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { hashPassword } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
+  // Частоту с одного IP режет middleware → lib/rate-limit.ts (5 запросов/мин)
   try {
     const { email, phone, password, name, birthDate } = await request.json()
     

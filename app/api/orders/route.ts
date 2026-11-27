@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Частоту с одного IP режет middleware → lib/rate-limit.ts (10 запросов/мин)
   try {
     const body = await request.json()
     const { 

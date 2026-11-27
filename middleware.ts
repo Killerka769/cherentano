@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ============ КОНФИГУРАЦИЯ МАРШРУТОВ ============
 
@@ -13,6 +14,7 @@ const ABSOLUTELY_PUBLIC = [
   '/api/auth/register',
   '/api/auth/block-info',
   '/api/auth/check-block',
+  '/api/payments/webhook',
   '/_next',
   '/favicon.ico',
   '/robots.txt',
@@ -181,6 +183,12 @@ async function verifyToken(token: string): Promise<{ userId: string; role: strin
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Rate limit СРАЗУ, до публичных исключений: иначе /api/auth/login
+  // и /api/auth/register выходили бы из middleware без проверки.
+  // Логика счётчика — в lib/rate-limit.ts (IP + окно 1 минута).
+  const limited = checkRateLimit(request)
+  if (limited) return limited
   
   // ============ 1. АБСОЛЮТНО ПУБЛИЧНЫЕ МАРШРУТЫ ============
   if (isAbsolutelyPublic(pathname)) {
